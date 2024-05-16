@@ -1,0 +1,8 @@
+/* TODO */
+
+Create websocket architecture between client and server
+Import restaurant models to create the world
+Import Cylinder model to create the player
+Add animation and button press functionality to the player
+Send over player data to the server for broadcasting
+Create object models and functionalities
