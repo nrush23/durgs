@@ -13,8 +13,6 @@
     "@babylonjs/core": "^7.6.1",
     "@babylonjs/inspector": "^7.6.1",
     "html-webpack-plugin": "^5.6.0",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.4.5",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4"
