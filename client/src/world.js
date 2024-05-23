@@ -7,7 +7,7 @@ export class World{
     env;
     constructor(scene){
         this.scene = scene;
-        SceneLoader.ImportMesh("", "", "./assets/restaurant.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh("", "", "./assets/restaurant_furnishing.glb", scene, (meshes) => {
             meshes.forEach(mesh =>{
                 mesh.isPickable = false;
                 mesh.enablePointerMoveEvents = false;
