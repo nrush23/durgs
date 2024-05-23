@@ -8,9 +8,10 @@ export class World{
     constructor(scene){
         this.scene = scene;
         SceneLoader.ImportMesh("", "", "./assets/restaurant.glb", scene, (meshes) => {
-            if(meshes.length > 0){
-
-            }
+            meshes.forEach(mesh =>{
+                mesh.isPickable = false;
+                mesh.enablePointerMoveEvents = false;
+            });
         });
         new Bun(scene, true, new Vector3(0,1,0));
     }

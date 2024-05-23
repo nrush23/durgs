@@ -11,7 +11,14 @@ export class Bun extends Food {
         SceneLoader.ImportMesh(bun, "", "./assets/burger.glb", scene, (meshes) => {
             if (meshes.length > 0) {
                 this.model = meshes[0];
+                console.log("bun:",this.model);
                 this.model.position = position;
+                this.model.isPickable = false;
+                this.model.enablePointerMoveEvents = false;
+                this.model.name = bun;
+                // this.model.parent = null;
+                // this.model = this.model.parent;
+                console.log("bun:",meshes);
             }
         });
         this.doneness = cook_state.perfect;

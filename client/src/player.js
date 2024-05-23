@@ -1,7 +1,10 @@
-import { AbstractMesh, ArcRotateCamera, Mesh, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int } from "@babylonjs/core";
+import { AbstractMesh, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PointerEventTypes, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
-
-export class Player{
+const pocket = {
+    empty: 'EMPTY',
+    full: 'FULL'
+};
+export class Player {
     PID;
     username;
     model = null;
@@ -10,68 +13,117 @@ export class Player{
     camera;
     cam_root;
     controller;
-    ytilt;
+    isLocked = false;
+    socket;
+    right_hand = "";
+    // right_item;
+    grab = false;
 
-     static  PLAYER_SPEED = 0.45;
-     static  JUMP_FORCE = 0.80;
+    static PLAYER_SPEED = 0.45;
+    static JUMP_FORCE = 0.80;
     static GRAVITY = -2.8;
     static ORIGINAL_TILT = new Vector3(0.5934119456780721, 0, 0);
 
 
-    constructor(scene, camera){
+    constructor(scene, camera, socket) {
         this.scene = scene;
         this.PID = -1;
         this.username = "null";
         this.model = new AbstractMesh("", this.scene);
         this.camera = camera;
         this.movement = new TransformNode("player", scene);
+        this.movement.position = new Vector3(0, 0, 0);
+        this.camera.position = this.movement.position;
+        // this.camera.parent = this.movement;
+        this.right_hand = "";
     }
 
-    createBody(scene){
+    createBody(scene) {
         this.scene = scene;
-        SceneLoader.ImportMesh("", "", "./assets/player.glb", this.scene, (meshes) => {
-            if(meshes.length > 0){
-                this.model = meshes[0]; // Assign the first mesh to the class property
-                this.model.position = new Vector3(0,1,0);
+        SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
+            if (meshes.length > 0) {
+                console.log(meshes);
+
+                this.model = scene.getMeshByName("body");
+                this.model.isPickable = false;
+                this.model.enablePointerMoveEvents = false;
+
+                this.model = this.model.parent;
+                this.model.name = "body";
+                console.log(this.model);
             }
         });
         this.controller = new PlayerInput(scene);
-        scene.registerBeforeRender(()=>{
+        this.camera.inputs.remove(this.camera.inputs.attached.keyboard);
+
+        //Set up mouse pointer input
+        this.setupPointer();
+
+        scene.registerBeforeRender(() => {
             this.updatePosition();
+            this.updateGrab();
         });
     }
 
-    updatePosition(){
-        this.model.position.x += this.controller.horizontal;
-        this.model.position.z += this.controller.vertical;
-        // this.camera.setPosition(this.model.position);
-        this.camera._position = this.model.position;
-        this.model.rotation = this.movement.rotation;
+    updateChildren(){
+        this.camera.position = this.movement.position.clone();
+        this.model.position = this.movement.position.clone();
+        if (this.right_hand) {
+            this.right_hand.position = this.movement.position.clone();
+        }
+    }
+    updatePosition() {
+
+        let modifier = 5;
+        var forward = this.camera.getForwardRay().direction;
+        var right = Vector3.Cross(Axis.Y, forward);
+        var moveDirection = forward.scale(this.controller.vertical / modifier).add(right.scale(this.controller.horizontal / modifier));
+
+        this.movement.position.addInPlace(moveDirection);
+        this.updateChildren();
     }
 
-    initializeCamera(camera){
-        // this.camera = camera;
-        // this.camera.position = new Vector3(0,0,0);
-        // this.ytilt = new TransformNode("ytilt");
-        // this.ytilt.rotation = Player.ORIGINAL_TILT;
-        this.cam_root = new TransformNode("root");
-        this.cam_root.position = new Vector3(0, 0, 0); //initialized at (0,0,0)
-        //to face the player from behind (180 degrees)
-        this.cam_root.rotation = new Vector3(0, Math.PI, 0);
+    updateGrab() {
+        this.grab = this.controller.grabbed;
+        var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
+        var hit = this.scene.pickWithRay(ray);
 
-        //rotations along the x-axis (up/down tilting)
-        let ytilt = new TransformNode("ytilt");
-        //adjustments to camera view to point down at our player
-        ytilt.rotation = Player.ORIGINAL_TILT;
-        this.ytilt = ytilt;
-        ytilt.parent = this.cam_root;
+        if (hit.pickedMesh && this.grab && !this.right_hand && hit.pickedMesh.isPickable) {
+            this.right_hand = hit.pickedMesh.parent;
+            console.log("Hit an object: %s", hit.pickedMesh.name);
+        } else if (!this.grab && this.right_hand) {
+            this.right_hand.position.y = 0;
+            this.right_hand = "";
+        }
+    }
 
-        //our actual camera that's pointing at our root's position
-        this.camera = camera;
-        this.camera.lockedTarget = this.cam_root.position;
-        this.camera.fov = 0.47350045992678597;
-        this.camera.parent = ytilt;
+    setupPointer() {
+        // On click event, request pointer lock
+        this.scene.onPointerDown = function (evt) {
+            //true/false check if we're locked, faster than checking pointerlock on each single click.
+            if (!this.isLocked) {
+                canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+                if (canvas.requestPointerLock) {
+                    canvas.requestPointerLock();
+                }
+            }
+        };
 
-        // this.scene.activeCamera = this.camera;
+        // Event listener when the pointerlock is updated (or removed by pressing ESC for example).
+        var pointerlockchange = function () {
+            var controlEnabled = document.mozPointerLockElement || document.webkitPointerLockElement || document.msPointerLockElement || document.pointerLockElement || null;
+            // If the user is already locked
+            if (!controlEnabled) {
+                this.isLocked = false;
+            } else {
+                this.isLocked = true;
+            }
+        };
+
+        // Attach events to the document
+        document.addEventListener("pointerlockchange", pointerlockchange, false);
+        document.addEventListener("mspointerlockchange", pointerlockchange, false);
+        document.addEventListener("mozpointerlockchange", pointerlockchange, false);
+
     }
 }

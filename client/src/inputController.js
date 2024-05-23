@@ -7,6 +7,7 @@ export class PlayerInput {
     horizontal;
     verticalAxis;
     horizontalAxis;
+    grabbed;
     constructor(scene) {
         scene.actionManager = new ActionManager(scene);
         this.inputMap = {};
@@ -18,6 +19,8 @@ export class PlayerInput {
         scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnKeyUpTrigger, (event) => {
             this.inputMap[event.sourceEvent.key] = event.sourceEvent.type == "keydown";
         }));
+
+        this.grabbed = false;
 
         scene.onBeforeRenderObservable.add(() => {
             this.updateFromKeyboard();
@@ -47,6 +50,13 @@ export class PlayerInput {
         else {
             this.horizontal = 0;
             this.horizontalAxis = 0;
+        }
+
+        if(this.inputMap["e"]){
+            this.grabbed = true;
+            console.log("grabbing");
+        }else{
+            this.grabbed = false;
         }
     }
 }
