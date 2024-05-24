@@ -1,0 +1,28 @@
+***Manager can change the burger items using their manager screen***
+***8 item slots, can put any item in it***
+
+Menu items:
+Mystery Item (must be discovered from the players)
+Hamburger (patty, buns)
+HLT (patty, lettuce, tomato)
+DLT (bacon, lettuce, tomato)
+The Durg (two patties as buns, 4 pieces of bacon)
+The Berg (lettuce, lettuce, lettuce)
+Soda (bring cup to soda machine)
+BACON (bacon)
+EXTRA BACON (two bacon)
+DURG JR (buns, patty, bacon)
+Murger (buns, patty, lettuce, tomato)
+Lil Durg (buns, patty, bacon, lettuce, tomato)
+Big Durg (buns, two patty, lettuce, tomato)
+
+
+Legendary items:
+DUCK (capture a duck)
+THE QUACK (buns, deep fried duck)
+LIGUID DURG (bring cup to toilet)
+FOOT LETTUCE (Step on the lettuce and use it)
+THE MANAGER (give a duck a manager hat, fry it)
+DURG'S DURGER (Hamburger but patty gets thrown in toilet first)
+
+
