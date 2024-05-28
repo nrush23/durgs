@@ -5,6 +5,7 @@ import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, PointerEvent
 import * as GUI from "@babylonjs/gui";
 import { World } from "./world"
 import { Player } from "./player"
+import { Member } from "./member";
 class App {
 
     WORLD;
@@ -15,6 +16,8 @@ class App {
     camera;
     canvas;
     engine;
+
+    Members;
     constructor() {
         //Initialize this.canvas and attach to webpage
         this.canvas = document.createElement("canvas");
@@ -28,6 +31,7 @@ class App {
         this.scene = new Scene(this.engine);
         this.scene.locked = false;
         this.scene.getEngine().setHardwareScalingLevel(0.5);
+        this.Members = new Map();
 
         window.addEventListener('resize', () => {
             this.canvas.width = window.innerWidth;
@@ -73,7 +77,23 @@ class App {
                 case "join":
                     this.PLAYER.PID = data.PID;
                     this.PLAYER.username = data.username;
-                    this.PLAYER.createBody(scene);
+                    this.PLAYER.createBody(scene, data.texture);
+                    break;
+                case "new_member":
+                    if(!this.Members.has(data.username)){
+                        var member = new Member(data.username, scene, data.position, data.texture);
+                        this.Members.set(member.username, member);
+                    }
+                    break;
+                case "member_movement":
+                    if(this.Members.has(data.username)){
+                        this.Members.get(data.username).updatePosition(data.position);
+                    }
+                    break;
+                case "delete":
+                    if(this.Members.has(data.username)){
+                        this.scene.removeMesh(this.Members.get(data.username).movement, true);
+                    }
                     break;
                 default:
                     console.log('Unknown type: %s', data.type);

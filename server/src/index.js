@@ -1,9 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import http from 'http';
+import http, { get } from 'http';
 import { WebSocketServer } from 'ws';
 import Player from "./player.js";
 import { v4 as uuidv4 } from 'uuid';
+import { Vector3 } from '@babylonjs/core';
+import { type } from 'os';
 console.log("Starting...");
 
 const PORT = process.env.PORT || 3001;
@@ -22,28 +24,82 @@ const wss = new WebSocketServer({server});
 let players = new Map();
 let sockets = new Map();
 
+function broadcast(msg){
+    console.log("Broadcast starting...");
+    console.log(players.size)
+    for(let player of players.values()){
+        console.log("Sending to %s", player.username);
+        player.socket.send(msg);
+    }
+}
+
+function getTexture(){
+    return "skin" + Math.floor((Math.random() * 2) + 1);
+}
+
 wss.on('connection', function connection(ws){
     ws.on('error', console.error);
     ws.on('close', function close(data){
+        /* TODO: Add in code to delete the player from the players and socket list */
+        // let player = players.g
+        if(ws.ID){
+            broadcast(JSON.stringify({
+                timestamp: Date.now(),
+                type: "delete",
+                username: players.get(ws.ID).username
+            }));
+            players.delete(ws.ID);
+            console.log("Player%s deleted", ws.ID);
+        }
         console.log("Connection closed");
     });
     ws.on('message', function message(data){
-        console.log("received %s", data);
+        // console.log("received %s", data);
         const msg = JSON.parse(data);
 
         switch(msg.type){
             case "join":
                 let player = new Player();
-                player.PID = players.size;
+                player.PID = uuidv4();
+                ws.ID = player.PID;
                 player.username = "player" + player.PID;
-                player.WID = uuidv4();
+                player.socket = ws;
+                player.texture = getTexture();
+                if(players.size > 0){
+                    for(let member of players.values()){
+                        member.socket.send(JSON.stringify({
+                            timestamp: Date.now(),
+                            type: "new_member",
+                            username: player.username,
+                            position: new Vector3(0,0,0),
+                            texture: player.texture,
+                        }));
+                        ws.send(JSON.stringify({
+                            timestamp: Date.now(),
+                            type: "new_member",
+                            username: member.username,
+                            position: member.position,
+                            texture: member.texture,
+                        }));
+                    }
+                }
                 players.set(player.PID, player);
-                sockets.set(player.WID, ws);
-
+                console.log(players.get(player.PID));
                 ws.send(JSON.stringify({
                     type: msg.type,
-                    pid: player.PID,
-                    username: player.username
+                    PID: player.PID,
+                    username: player.username,
+                    texture: player.texture
+                }));
+                break;
+            case "movement":
+                // console.log("movement recevied %s", data);
+                players.get(msg.PID).updatePosition(msg.position);
+                broadcast(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "member_movement",
+                    username: players.get(msg.PID).username,
+                    position: msg.position
                 }));
                 break;
             default:

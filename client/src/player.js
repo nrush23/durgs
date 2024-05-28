@@ -14,10 +14,10 @@ export class Player {
     cam_root;
     controller;
     isLocked = false;
-    socket;
     right_hand = "";
     // right_item;
     grab = false;
+    SOCKET;
 
     static PLAYER_SPEED = 0.45;
     static JUMP_FORCE = 0.80;
@@ -36,20 +36,22 @@ export class Player {
         this.camera.position = this.movement.position;
         // this.camera.parent = this.movement;
         this.right_hand = "";
+        this.SOCKET = socket;
     }
 
-    createBody(scene) {
+    createBody(scene, texture) {
         this.scene = scene;
         SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
             if (meshes.length > 0) {
                 console.log(meshes);
 
-                this.model = scene.getMeshByName("body");
+                // this.model = scene.getMeshByName("body");
+                this.model = meshes[0];
                 this.model.isPickable = false;
                 this.model.enablePointerMoveEvents = false;
-
-                this.model = this.model.parent;
-                this.model.name = "body";
+                // this.model = this.model.parent;
+                this.model.name = "player_body";
+                this.model.parent = this.movement;
                 console.log(this.model);
             }
         });
@@ -65,9 +67,16 @@ export class Player {
         });
     }
 
-    updateChildren(){
+    updateChildren() {
+        console.log(this.PID);
+        this.SOCKET.send(JSON.stringify({
+            timestamp: Date.now(),
+            type: "movement",
+            PID: this.PID,
+            position: this.movement.position,
+        }));
         this.camera.position = this.movement.position.clone();
-        this.model.position = this.movement.position.clone();
+        // this.model.position = this.movement.position.clone();
         if (this.right_hand) {
             this.right_hand.position = this.movement.position.clone();
         }
@@ -77,10 +86,12 @@ export class Player {
         let modifier = 5;
         var forward = this.camera.getForwardRay().direction;
         var right = Vector3.Cross(Axis.Y, forward);
-        var moveDirection = forward.scale(this.controller.vertical / modifier).add(right.scale(this.controller.horizontal / modifier));
+        if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
+            var moveDirection = forward.scale(this.controller.vertical / modifier).add(right.scale(this.controller.horizontal / modifier));
 
-        this.movement.position.addInPlace(moveDirection);
-        this.updateChildren();
+            this.movement.position.addInPlace(moveDirection);
+            this.updateChildren();
+        }
     }
 
     updateGrab() {
