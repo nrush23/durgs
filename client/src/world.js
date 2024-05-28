@@ -13,6 +13,6 @@ export class World{
                 mesh.enablePointerMoveEvents = false;
             });
         });
-        new Bun(scene, true, new Vector3(0,1,0));
+        // new Bun(scene, true, new Vector3(0,1,0));
     }
 }

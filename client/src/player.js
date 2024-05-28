@@ -33,8 +33,8 @@ export class Player {
         this.camera = camera;
         this.movement = new TransformNode("player", scene);
         this.movement.position = new Vector3(0, 0, 0);
-        this.camera.position = this.movement.position;
-        // this.camera.parent = this.movement;
+        // this.camera.position = this.movement.position;
+        this.camera.parent = this.movement;
         this.right_hand = "";
         this.SOCKET = socket;
     }
@@ -75,7 +75,7 @@ export class Player {
             PID: this.PID,
             position: this.movement.position,
         }));
-        this.camera.position = this.movement.position.clone();
+        // this.camera.position = this.movement.position.clone();
         // this.model.position = this.movement.position.clone();
         if (this.right_hand) {
             this.right_hand.position = this.movement.position.clone();
