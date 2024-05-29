@@ -80,8 +80,10 @@ class App {
                     this.PLAYER.createBody(scene, data.texture);
                     break;
                 case "new_member":
+                    console.log(data);
                     if (!this.Members.has(data.username)) {
-                        var member = new Member(data.username, scene, data.position, data.texture);
+                        var position = new Vector3(data.position.x, data.position.y, data.position.z);
+                        var member = new Member(data.username, scene, position, data.texture);
                         this.Members.set(member.username, member);
                     }
                     break;
@@ -110,17 +112,15 @@ class App {
                     if (this.Members.has(data.username)) {
                         var member = this.Members.get(data.username);
                         var item = scene.getMeshByName(data.item);
-                        item.position = member.movement.position;
-                        item.parent = member.movement;
+                        member.updateGrab(item);
                     }
                     break;
                 case "member_released":
                     console.log('Message received: %s', event.data);
                     if(this.Members.has(data.username)){
-                        var item = scene.getMeshByName(data.item);
-                        item.parent = null;
-                        item.position = this.Members.get(data.username).movement.position;
-                        item.position.y = 0;
+                        var member = this.Members.get(data.username);
+                        member.right_hand.position.y = 0;
+                        member.updateGrab("");
                     }
                     break;
                 default:

@@ -11,6 +11,7 @@ export class Member {
     constructor(username, scene, position, texture){
         this.username = username;
         this.movement = new TransformNode(username, scene);
+        this.movement.position = new Vector3(0,0,0);
         this.movement.position = position;
         this.scene = scene;
         SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
@@ -34,7 +35,11 @@ export class Member {
     }
 
     updatePosition(position){
-        this.movement.position = position;
+        console.log(position);
+        this.movement.position = new Vector3(position._x, position._y, position._z);
+        if(this.right_hand){
+            this.right_hand.position = this.movement.position;
+        }
     }
 
     updateGrab(item){
