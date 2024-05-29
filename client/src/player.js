@@ -29,12 +29,11 @@ export class Player {
         this.scene = scene;
         this.PID = -1;
         this.username = "null";
-        this.model = new AbstractMesh("", this.scene);
+        // this.model = new AbstractMesh("", this.scene);
         this.camera = camera;
         this.movement = new TransformNode("player", scene);
         this.movement.position = new Vector3(0, 0, 0);
-        // this.camera.position = this.movement.position;
-        this.camera.parent = this.movement;
+        // this.camera.parent = this.movement;
         this.right_hand = "";
         this.SOCKET = socket;
     }
@@ -47,11 +46,15 @@ export class Player {
 
                 // this.model = scene.getMeshByName("body");
                 this.model = meshes[0];
-                this.model.isPickable = false;
-                this.model.enablePointerMoveEvents = false;
+                // this.model.isPickable = false;
+                // this.model.enablePointerMoveEvents = false;
                 // this.model = this.model.parent;
                 this.model.name = "player_body";
                 this.model.parent = this.movement;
+                meshes.forEach(mesh =>{
+                    mesh.isPickable = false;
+                    mesh.enablePointerMoveEvents = false;
+                });
                 console.log(this.model);
             }
         });
@@ -75,7 +78,7 @@ export class Player {
             PID: this.PID,
             position: this.movement.position,
         }));
-        // this.camera.position = this.movement.position.clone();
+        this.camera.position = this.movement.position.clone();
         // this.model.position = this.movement.position.clone();
         if (this.right_hand) {
             this.right_hand.position = this.movement.position.clone();
@@ -85,7 +88,7 @@ export class Player {
 
         let modifier = 5;
         var forward = this.camera.getForwardRay().direction;
-        var right = Vector3.Cross(Axis.Y, forward);
+        var right = Vector3.Cross(Axis.Y, forward, 100);
         if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
             var moveDirection = forward.scale(this.controller.vertical / modifier).add(right.scale(this.controller.horizontal / modifier));
 
@@ -98,14 +101,31 @@ export class Player {
         this.grab = this.controller.grabbed;
         var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
         var hit = this.scene.pickWithRay(ray);
-
-        if (hit.pickedMesh && this.grab && !this.right_hand && hit.pickedMesh.isPickable) {
-            this.right_hand = hit.pickedMesh.parent;
-            console.log("Hit an object: %s", hit.pickedMesh.name);
-        } else if (!this.grab && this.right_hand) {
-            this.right_hand.position.y = 0;
-            this.right_hand = "";
+        if((hit.pickedMesh && this.grab)){
+            hit.pickedMesh.parent.metadata.classInstance.action(this);
+        }else if (!this.grab && this.right_hand){
+            this.right_hand.metadata.classInstance.action(this);
         }
+        // if (hit.pickedMesh && this.grab && !this.right_hand && hit.pickedMesh.isPickable) {
+        //     this.right_hand = hit.pickedMesh.parent;
+        //     console.log("Hit an object: %s", hit.pickedMesh.name);
+        //     // this.SOCKET.send(JSON.stringify({
+        //     //     timestamp: Date.now(),
+        //     //     type: "grab",
+        //     //     PID: this.PID,
+        //     //     item: this.right_hand.name
+        //     // }));
+        // } else if (!this.grab && this.right_hand) {
+        //     this.SOCKET.send(JSON.stringify({
+        //         timestamp: Date.now(),
+        //         type: "release",
+        //         PID: this.PID,
+        //         item: this.right_hand.name,
+        //         position: this.movement.position
+        //     }));
+        //     this.right_hand.position.y = 0;
+        //     this.right_hand = "";
+        // }
     }
 
     setupPointer() {

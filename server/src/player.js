@@ -8,6 +8,7 @@ export default class Player{
     // scene;
     socket;
     texture;
+    right_hand;
 
     constructor(){
         this.PID = -1;
@@ -16,6 +17,7 @@ export default class Player{
         this.socket = null;
         this.texture = null;
         this.position = new Vector3(0,0,0);
+        this.right_hand = "";
     }
 
     joinGame(scene){

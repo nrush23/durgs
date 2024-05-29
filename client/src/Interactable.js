@@ -7,7 +7,6 @@ export class Interactable {
     scene;
 
     constructor(scene){
-        this.model = new Mesh();
         this.scene = scene;
     }
 

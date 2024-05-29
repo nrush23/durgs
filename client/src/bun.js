@@ -15,7 +15,8 @@ export class Bun extends Food {
                 this.model.position = position;
                 this.model.isPickable = false;
                 this.model.enablePointerMoveEvents = false;
-                this.model.name = bun;
+                this.model.name = bun + "_root";
+                this.model.metadata = { classInstance: this };
                 console.log("bun:",meshes);
             }
         });

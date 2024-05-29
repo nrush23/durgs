@@ -59,7 +59,7 @@ wss.on('connection', function connection(ws){
 
         switch(msg.type){
             case "join":
-                let player = new Player();
+                var player = new Player();
                 player.PID = uuidv4();
                 ws.ID = player.PID;
                 player.username = "player" + player.PID;
@@ -100,6 +100,48 @@ wss.on('connection', function connection(ws){
                     type: "member_movement",
                     username: players.get(msg.PID).username,
                     position: msg.position
+                }));
+                break;
+            case "grab":
+                console.log(msg);
+                //When a player grabs, get the associated player using the msg.PID
+                //and the item they grabbed
+                var player = players.get(msg.PID);
+                player.right_hand = msg.item;
+
+                //Next, broadcast the update to the other players so their scene
+                //can parent the item to necessary player
+                broadcast(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "member_grabbed",
+                    item: msg.item,
+                    username: player.username
+                }));
+
+                //Finally, give the okay to the player who grabbed to pick it up
+                ws.send(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "grabbed",
+                    item: msg.item
+                }));
+                break;
+            case "release":
+                var player = players.get(msg.PID);
+                player.right_hand = "";
+                
+                //Next, broadcast the update to the other players so their scene
+                //can parent the item to necessary player
+                broadcast(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "member_released",
+                    item: msg.item,
+                    username: player.username
+                }));
+
+                //Finally, give the okay to the player who grabbed to pick it up
+                ws.send(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "released"
                 }));
                 break;
             default:

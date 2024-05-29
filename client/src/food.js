@@ -11,18 +11,34 @@ export class Food extends Interactable {
         super(scene);
         this.scene = scene;
         this.cook_time = 0;
-        this.model = new AbstractMesh("");
     }
 
-    action(input) {
-        this.grab(input);
+    action(player) {
+        // this.grab(input);
+        // console.log(player);
+        if (player.grab && !player.right_hand) {
+            player.SOCKET.send(JSON.stringify({
+                timestamp: Date.now(),
+                type: "grab",
+                PID: player.PID,
+                item: this.model.name,
+            }));
+        }else if (!player.grab && player.right_hand){
+            player.SOCKET.send(JSON.stringify({
+                timestamp: Date.now(),
+                type: "release",
+                PID: player.PID,
+                item: this.model.name,
+            }));
+        }
     }
 
     cook() {
 
     }
 
-    grab(input) {
-        this.model.position = input;
+    grab(player) {
+        // this.model.position = input;
+        // this.model.parent = player.movement;
     }
 }

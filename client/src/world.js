@@ -12,7 +12,9 @@ export class World{
                 mesh.isPickable = false;
                 mesh.enablePointerMoveEvents = false;
             });
+            this.DURGS = meshes[0];
+            this.DURGS.name = "restaurant";
         });
-        // new Bun(scene, true, new Vector3(0,1,0));
+        new Bun(scene, true, new Vector3(0,1,0));
     }
 }

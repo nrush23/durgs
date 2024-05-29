@@ -18,12 +18,16 @@ export class Member {
                 console.log(meshes);
 
                 this.model = meshes[0];
-                this.model.isPickable = false;
-                this.model.enablePointerMoveEvents = false;
+                // this.model.isPickable = false;
+                // this.model.enablePointerMoveEvents = false;
 
                 // this.model = this.model.parent;
                 this.model.name = "member";
                 this.model.parent = this.movement;
+                meshes.forEach(mesh =>{
+                    mesh.isPickable = false;
+                    mesh.enablePointerMoveEvents = false;
+                });
                 console.log(this.model);
             }
         });

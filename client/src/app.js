@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, PointerEventTypes, StandardMaterial, Color3, MeshBuilder, Mesh, Axis, Space, CSG, Color4, FollowCamera, ExecuteCodeAction, UniversalCamera } from "@babylonjs/core";
+import { Engine, PointLight, Scene, ArcRotateCamera, Vector3, HemisphericLight, PointerEventTypes, StandardMaterial, Color3, MeshBuilder, Mesh, Axis, Space, CSG, Color4, FollowCamera, ExecuteCodeAction, UniversalCamera } from "@babylonjs/core";
 import * as GUI from "@babylonjs/gui";
 import { World } from "./world"
 import { Player } from "./player"
@@ -47,7 +47,7 @@ class App {
 
         //Connect to server
         this.connect(this.scene);
-        
+
         this.scene.clearColor = Color4.FromHexString("#c7f2f8");
         this.engine.runRenderLoop(() => {
             this.scene.render();
@@ -72,7 +72,7 @@ class App {
 
         this.SOCKET.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
-            console.log('Message received: %s', event.data);
+            // console.log('Message received: %s', event.data);
             switch (data.type) {
                 case "join":
                     this.PLAYER.PID = data.PID;
@@ -80,19 +80,47 @@ class App {
                     this.PLAYER.createBody(scene, data.texture);
                     break;
                 case "new_member":
-                    if(!this.Members.has(data.username)){
+                    if (!this.Members.has(data.username)) {
                         var member = new Member(data.username, scene, data.position, data.texture);
                         this.Members.set(member.username, member);
                     }
                     break;
                 case "member_movement":
-                    if(this.Members.has(data.username)){
+                    if (this.Members.has(data.username)) {
                         this.Members.get(data.username).updatePosition(data.position);
                     }
                     break;
                 case "delete":
-                    if(this.Members.has(data.username)){
+                    if (this.Members.has(data.username)) {
                         this.scene.removeMesh(this.Members.get(data.username).movement, true);
+                    }
+                    break;
+                case "grabbed":
+                    var item = scene.getMeshByName(data.item);
+                    this.PLAYER.right_hand = item;
+                    break;
+                case "released":
+                    if (this.PLAYER.right_hand) {
+                        this.PLAYER.right_hand.position.y = 0;
+                        this.PLAYER.right_hand = "";
+                    }
+                    break;
+                case "member_grabbed":
+                    console.log('Message received: %s', event.data);
+                    if (this.Members.has(data.username)) {
+                        var member = this.Members.get(data.username);
+                        var item = scene.getMeshByName(data.item);
+                        item.position = member.movement.position;
+                        item.parent = member.movement;
+                    }
+                    break;
+                case "member_released":
+                    console.log('Message received: %s', event.data);
+                    if(this.Members.has(data.username)){
+                        var item = scene.getMeshByName(data.item);
+                        item.parent = null;
+                        item.position = this.Members.get(data.username).movement.position;
+                        item.position.y = 0;
                     }
                     break;
                 default:
