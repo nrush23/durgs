@@ -6,6 +6,7 @@ import * as GUI from "@babylonjs/gui";
 import { World } from "./world"
 import { Player } from "./player"
 import { Member } from "./member";
+import { Restocker } from "./restocker";
 class App {
 
     WORLD;
@@ -47,6 +48,8 @@ class App {
 
         //Connect to server
         this.connect(this.scene);
+
+        // let restocker = new Restocker(this.scene);
 
         this.scene.clearColor = Color4.FromHexString("#c7f2f8");
         this.engine.runRenderLoop(() => {

@@ -1,20 +1,25 @@
 import { Axis, Color3, Mesh, MeshBuilder, Scene, SceneLoader, Space, StandardMaterial, Vector3 } from "@babylonjs/core";
 import { Bun } from "./bun";
-export class World{
+import { Restocker } from "./restocker";
+export class World {
     DURGS;
     GROUND;
     scene;
     env;
-    constructor(scene){
+
+    //Need to finsih modifying how the world imports the restock icons
+    constructor(scene) {
         this.scene = scene;
-        SceneLoader.ImportMesh("", "", "./assets/restaurant_furnishing.glb", scene, (meshes) => {
-            meshes.forEach(mesh =>{
+        SceneLoader.ImportMeshAsync("", "", "./assets/restaurant_furnishing1.glb", scene, (meshes) => {
+            meshes.forEach(mesh => {
                 mesh.isPickable = false;
                 mesh.enablePointerMoveEvents = false;
             });
             this.DURGS = meshes[0];
             this.DURGS.name = "restaurant";
+        }).then((scene) => {
+            new Restocker(scene);
         });
-        new Bun(scene, true, new Vector3(0,1,0));
+        new Bun(scene, true, new Vector3(0, 1, 0));
     }
 }
