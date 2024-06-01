@@ -99,7 +99,8 @@ wss.on('connection', function connection(ws){
                     timestamp: Date.now(),
                     type: "member_movement",
                     username: players.get(msg.PID).username,
-                    position: msg.position
+                    position: msg.position,
+                    rotation: msg.rotation,
                 }));
                 break;
             case "grab":

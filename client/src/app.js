@@ -56,6 +56,9 @@ class App {
         this.scene.debugLayer.show();
     }
 
+    createRestocks(){
+        
+    }
 
     //Address in WebSocket is url to connect to
     //Create new player and wait for join message to get username
@@ -89,7 +92,7 @@ class App {
                     break;
                 case "member_movement":
                     if (this.Members.has(data.username)) {
-                        this.Members.get(data.username).updatePosition(data.position);
+                        this.Members.get(data.username).updatePosition(data.position, data.rotation);
                     }
                     break;
                 case "delete":
@@ -122,6 +125,8 @@ class App {
                         member.right_hand.position.y = 0;
                         member.updateGrab("");
                     }
+                    break;
+                case "spawn":
                     break;
                 default:
                     console.log('Unknown type: %s', data.type);

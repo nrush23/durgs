@@ -77,6 +77,7 @@ export class Player {
             type: "movement",
             PID: this.PID,
             position: this.movement.position,
+            rotation: this.camera.rotation,
         }));
         this.camera.position = this.movement.position.clone();
         // this.model.position = this.movement.position.clone();
@@ -95,6 +96,7 @@ export class Player {
             this.movement.position.addInPlace(moveDirection);
             this.updateChildren();
         }
+        this.movement.rotation = this.camera.rotation;
     }
 
     updateGrab() {

@@ -34,12 +34,13 @@ export class Member {
         });
     }
 
-    updatePosition(position){
+    updatePosition(position, rotation){
         console.log(position);
         this.movement.position = new Vector3(position._x, position._y, position._z);
         if(this.right_hand){
             this.right_hand.position = this.movement.position;
         }
+        this.movement.rotation = new Vector3(rotation._x, rotation._y, rotation._z);
     }
 
     updateGrab(item){
