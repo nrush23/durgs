@@ -11,7 +11,8 @@ export class Restock_Platform {
     constructor(scene) {
         this.scene = scene;
         this.model = scene.getMeshByName("stock_platform");
-        // this.top = new Vector3(0, this.model.position.y, 0);
+        this.top = this.model.position;
+        console.log(this.top);
     }
  
     //When physics is implemented, these will just fall from the sky
@@ -37,15 +38,19 @@ export class Restock_Platform {
                 break;
         }
 
-        let position = this.model.position;
+        // let position = this.model.position;
+        // let position = new Vector3(this.model.position._x, this.model.position._y, this.model.position._z);
+        let position = new Vector3(-1*this.top._x, this.top._y, this.top._z);
         for(let i = 0; i < 5; i++){
             if(type == Bun){
                 new type(this.scene, (item)?true:false, position);
             }else{
                 new type(this.scene, position);
             }
-            position.y += 0.2;
+            position.y += 0.02;
+            // top._y += 0.2;
         }
+        this.top._y = position.y;
     }
     
 }

@@ -12,6 +12,7 @@ class App {
     WORLD;
     PLAYER;
     SOCKET;
+    RESTOCKER;
     scene;
     moved = false;
     camera;
@@ -44,12 +45,12 @@ class App {
         this.camera.attachControl(this.canvas, true);
 
         var SUN = new HemisphericLight("SUN", new Vector3(0, 3, 0), this.scene);
-        this.WORLD = new World(this.scene);
+        this.WORLD = new World(this.scene, ()=>{
+            this.RESTOCKER = new Restocker(this.scene);
+        });
 
         //Connect to server
         this.connect(this.scene);
-
-        // let restocker = new Restocker(this.scene);
 
         this.scene.clearColor = Color4.FromHexString("#c7f2f8");
         this.engine.runRenderLoop(() => {

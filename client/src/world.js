@@ -8,7 +8,7 @@ export class World {
     env;
 
     //Need to finsih modifying how the world imports the restock icons
-    constructor(scene) {
+    constructor(scene, callback) {
         this.scene = scene;
         SceneLoader.ImportMeshAsync("", "./", "./assets/restaurant_furnishing1.glb", scene).then((result) => {
             const meshes = result.meshes;
@@ -18,21 +18,13 @@ export class World {
             });
             this.DURGS = meshes[0];
             this.DURGS.name = "restaurant";
-            new Restocker(scene);
+            if(typeof callback == 'function'){
+                callback();
+            }
+            // new Restocker(scene);
         }).catch((error) => {
             console.log("Loading mesh error: ", error);
         });
-        // this.scene = scene;
-        // SceneLoader.ImportMeshAsync("", "", "./assets/restaurant_furnishing1.glb", scene, (meshes) => {
-        //     meshes.forEach(mesh => {
-        //         mesh.isPickable = false;
-        //         mesh.enablePointerMoveEvents = false;
-        //     });
-        //     this.DURGS = meshes[0];
-        //     this.DURGS.name = "restaurant";
-        // }).then((scene) => {
-        //     new Restocker(scene);
-        // });
         new Bun(scene, true, new Vector3(0, 1, 0));
     }
 }

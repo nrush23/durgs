@@ -12,9 +12,6 @@ export class Restocker{
         this.platform = new Restock_Platform(scene);
         for(let i = 0; i < ingredients.length; i++){
             this.icons[i] = new Restock_Icon(scene, ingredients[i], this.platform);
-            // this.icons[i].action = (item) => {
-            //     this.platform.spawnIngredient(ingredients[i]);
-            // }
             this.icons[i].setModel(scene.getMeshByName("restock_" + ingredients[i]));
         }
     }
