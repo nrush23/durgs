@@ -1,5 +1,5 @@
 import { Food, cook_state } from "./food";
-
+import { SceneLoader } from "@babylonjs/core";
 export class Tomato extends Food {
     constructor(scene, position){
         super(scene);
@@ -10,7 +10,8 @@ export class Tomato extends Food {
                 this.model.position = position;
                 this.model.isPickable = false;
                 this.model.enablePointerMoveEvents = false;
-                this.model.name = bun;
+                this.model.name = "tomato";
+                this.model.metadata = { classInstance: this };
                 console.log("tomato:",meshes);
             }
         });

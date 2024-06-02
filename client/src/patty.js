@@ -13,6 +13,7 @@ export class Patty extends Food{
                 this.model.isPickable = false;
                 this.model.enablePointerMoveEvents = false;
                 this.model.name = "patty";
+                this.model.metadata = { classInstance: this };
                 console.log("patty:",meshes);
             }
         });

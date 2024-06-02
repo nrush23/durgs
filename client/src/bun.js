@@ -9,6 +9,8 @@ export class Bun extends Food {
         this.top = top;
         let bun = (this.top) ? "top_bun" : "bottom_bun";
         SceneLoader.ImportMesh(bun, "", "./assets/burger.glb", scene, (meshes) => {
+            //The model is the root of the bun mesh, so the action is associated with the parent
+            //of the mesh, and not the mesh itself
             if (meshes.length > 0) {
                 this.model = meshes[0];
                 console.log("bun:",this.model);
