@@ -1,7 +1,8 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, PointLight, Scene, ArcRotateCamera, Vector3, HemisphericLight, PointerEventTypes, StandardMaterial, Color3, MeshBuilder, Mesh, Axis, Space, CSG, Color4, FollowCamera, ExecuteCodeAction, UniversalCamera } from "@babylonjs/core";
+import { Engine, PointLight, Scene, ArcRotateCamera, Vector3, HemisphericLight, PointerEventTypes, StandardMaterial, Color3, MeshBuilder, Mesh, Axis, Space, CSG, Color4, FollowCamera, ExecuteCodeAction, UniversalCamera, HavokPlugin } from "@babylonjs/core";
+import  HavokPhysics  from "@babylonjs/havok";
 import * as GUI from "@babylonjs/gui";
 import { World } from "./world"
 import { Player } from "./player"
@@ -49,6 +50,8 @@ class App {
             this.RESTOCKER = new Restocker(this.scene);
         });
 
+        this.initializePhysics();
+
         //Connect to server
         this.connect(this.scene);
 
@@ -60,8 +63,18 @@ class App {
         this.scene.debugLayer.show();
     }
 
-    createRestocks(){
-        
+    async initializePhysics(){
+        const hk = await HavokPhysics();
+        const havokPlugin = new HavokPlugin(true, hk);
+        this.scene.enablePhysics(new Vector3(0, -9.81,0), havokPlugin);
+        // var hk = await new HavokPlugin();
+        // this.scene.enablePhysics(new Vector3(0,-9.81, 0), hk);
+        // HavokPhysics().then((havok)=>{
+        //     // this.initializePhysics = havok;
+        //     // var gravityVector = new Vector3(0, -9.81, 0);
+        //     // var physicsPlugin = new HavokPlugin();
+        //     // this.scene.enablePhysics(gravityVector, physicsPlugin);
+        // })
     }
 
     //Address in WebSocket is url to connect to

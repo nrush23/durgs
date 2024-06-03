@@ -2,12 +2,19 @@
 
 STAGE 2
 
-Server architecture for respawning items
-Broadcast the spawn
-Server architecture for maintaing/spooling the items that can be spawned
-Test item grabs
-
 PHYSICS
+
+Layer Architecture for items
+    -Items are made out of stack layers
+    -When you grab on any of the items in the stack, you take the top
+
+Server needs to keep track of scene positions so it
+can send the correct positions and items to a new player
+
+//Server architecture for respawning items
+//Broadcast the spawn
+//Server architecture for maintaing/spooling the items that can be spawned
+//Test item grabs
 
 STAGE 1 (didn't do animations)
 //Create websocket architecture between client and server
