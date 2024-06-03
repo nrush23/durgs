@@ -130,7 +130,9 @@ class App {
                         member.updateGrab("");
                     }
                     break;
-                case "spawn":
+                case "spawn_response":
+                    console.log('Message received: %s', event.data);
+                    this.RESTOCKER.platform.spawnIngredient(data.item, data.pool);
                     break;
                 default:
                     console.log('Unknown type: %s', data.type);

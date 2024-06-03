@@ -11,13 +11,13 @@ export class Restock_Platform {
     constructor(scene) {
         this.scene = scene;
         this.model = scene.getMeshByName("stock_platform");
-        this.top = this.model.position;
+        this.top = this.model.position.clone();
         console.log(this.top);
     }
  
     //When physics is implemented, these will just fall from the sky
     //and we won't need to worry about tracking the top
-    spawnIngredient(item) {
+    spawnIngredient(item, pool) {
         let type;
         switch (item) {
             case "top_bun":
@@ -38,19 +38,21 @@ export class Restock_Platform {
                 break;
         }
 
-        // let position = this.model.position;
-        // let position = new Vector3(this.model.position._x, this.model.position._y, this.model.position._z);
-        let position = new Vector3(-1*this.top._x, this.top._y, this.top._z);
         for(let i = 0; i < 5; i++){
-            if(type == Bun){
-                new type(this.scene, (item)?true:false, position);
-            }else{
-                new type(this.scene, position);
+            let check = this.scene.getMeshByName(item + pool[i]);
+            if(check){
+                check.dispose();
             }
-            position.y += 0.02;
-            // top._y += 0.2;
+            let position = this.top.clone();
+            position.x *= -1;
+            if(type == Bun){
+                check = new type(this.scene, (item == 'top_bun')?true:false, position);
+            }else{
+                check = new type(this.scene, position, item + pool[i]);
+            }
+            this.top.y += 0.2;
+            console.log("%s: %s",item+pool[i],position);
         }
-        this.top._y = position.y;
     }
     
 }

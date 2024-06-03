@@ -25,6 +25,6 @@ export class World {
         }).catch((error) => {
             console.log("Loading mesh error: ", error);
         });
-        new Bun(scene, true, new Vector3(0, 1, 0));
+        new Bun(scene, true, new Vector3(0, 1, 0), "default_bun");
     }
 }

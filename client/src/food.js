@@ -36,9 +36,5 @@ export class Food extends Interactable {
     cook() {
 
     }
-
-    grab(player) {
-        // this.model.position = input;
-        // this.model.parent = player.movement;
-    }
+    
 }

@@ -25,6 +25,11 @@ export class Restock_Icon extends Interactable {
     }
 
     action(player) {
-        this.platform.spawnIngredient(this.item);
+        // this.platform.spawnIngredient(this.item);
+        player.SOCKET.send(JSON.stringify({
+            timestamp: Date.now(),
+            type: "spawn_request",
+            item: this.item
+        }));
     }
 }

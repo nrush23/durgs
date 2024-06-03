@@ -1,18 +1,19 @@
 import { Food, cook_state } from "./food";
 import { SceneLoader } from "@babylonjs/core";
 export class Tomato extends Food {
-    constructor(scene, position){
+    constructor(scene, position, name){
         super(scene);
         SceneLoader.ImportMesh("tomato", "", "./assets/burger.glb", scene, (meshes) => {
             if (meshes.length > 0) {
                 this.model = meshes[0];
-                console.log("tomato:",this.model);
+                // console.log("tomato:",this.model);
                 this.model.position = position;
                 this.model.isPickable = false;
                 this.model.enablePointerMoveEvents = false;
-                this.model.name = "tomato";
+                // this.model.name = "tomato";
+                this.model.name = name;
                 this.model.metadata = { classInstance: this };
-                console.log("tomato:",meshes);
+                // console.log("tomato:",meshes);
             }
         });
         this.doneness = cook_state.perfect;

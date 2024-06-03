@@ -1,8 +1,18 @@
 /* TODO */
 
-Create websocket architecture between client and server
-Import restaurant models to create the world
-Import Cylinder model to create the player
-Add animation and button press functionality to the player
-Send over player data to the server for broadcasting
-Create object models and functionalities
+STAGE 2
+
+Server architecture for respawning items
+Broadcast the spawn
+Server architecture for maintaing/spooling the items that can be spawned
+Test item grabs
+
+PHYSICS
+
+STAGE 1 (didn't do animations)
+//Create websocket architecture between client and server
+//Import restaurant models to create the world
+//Import Cylinder model to create the player
+//Add animation and button press functionality to the player
+//Send over player data to the server for broadcasting
+//Create object models and functionalities

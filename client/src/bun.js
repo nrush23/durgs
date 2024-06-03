@@ -4,7 +4,7 @@ import { Food, cook_state } from "./food";
 export class Bun extends Food {
     top;
     //Construct food items with their spawn position
-    constructor(scene, top, position) {
+    constructor(scene, top, position, name) {
         super(scene);
         this.top = top;
         let bun = (this.top) ? "top_bun" : "bottom_bun";
@@ -13,13 +13,14 @@ export class Bun extends Food {
             //of the mesh, and not the mesh itself
             if (meshes.length > 0) {
                 this.model = meshes[0];
-                console.log("bun:",this.model);
+                // console.log("bun:",this.model);
                 this.model.position = position;
                 this.model.isPickable = false;
                 this.model.enablePointerMoveEvents = false;
-                this.model.name = bun + "_root";
+                // this.model.name = bun + "_root";
+                this.model.name = name;
                 this.model.metadata = { classInstance: this };
-                console.log("bun:",meshes);
+                // console.log("bun:",meshes);
             }
         });
         this.doneness = cook_state.perfect;
