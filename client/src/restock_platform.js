@@ -46,7 +46,7 @@ export class Restock_Platform {
             let position = this.top.clone();
             position.x *= -1;
             if(type == Bun){
-                check = new type(this.scene, (item == 'top_bun')?true:false, position);
+                check = new type(this.scene, (item == 'top_bun')?true:false, position, item + pool[i]);
             }else{
                 check = new type(this.scene, position, item + pool[i]);
             }

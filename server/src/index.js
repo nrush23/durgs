@@ -4,8 +4,8 @@ import http, { get } from 'http';
 import { WebSocketServer } from 'ws';
 import Player from "./player.js";
 import { v4 as uuidv4 } from 'uuid';
-import { Vector3 } from '@babylonjs/core';
-import { type } from 'os';
+import { Vector3, HavokPlugin } from '@babylonjs/core';
+import HavokPhysics from "@babylonjs/havok";
 import { Restock_Manager } from './restock_manager.js';
 console.log("Starting...");
 
@@ -23,9 +23,16 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 let players = new Map();
-let sockets = new Map();
 
 const restock_manager = new Restock_Manager();
+
+// const hk = await HavokPhysics();
+// const havokPlugin = new HavokPlugin(true, hk);
+// this.scene.enablePhysics(new Vector3(0, -9.81,0), havokPlugin);
+
+// HavokPhysics().then((hk)=>{
+//     const havokPlugin = new HavokPlugin(true, hk);
+// });
 
 function broadcast(msg) {
     console.log("Broadcast starting...");

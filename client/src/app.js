@@ -46,11 +46,12 @@ class App {
         this.camera.attachControl(this.canvas, true);
 
         var SUN = new HemisphericLight("SUN", new Vector3(0, 3, 0), this.scene);
-        this.WORLD = new World(this.scene, ()=>{
-            this.RESTOCKER = new Restocker(this.scene);
+        this.initializePhysics().then(()=>{
+            this.WORLD = new World(this.scene, ()=>{
+                this.RESTOCKER = new Restocker(this.scene);
+            });
+    
         });
-
-        this.initializePhysics();
 
         //Connect to server
         this.connect(this.scene);

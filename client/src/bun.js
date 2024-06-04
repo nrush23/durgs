@@ -1,4 +1,4 @@
-import { Scene, SceneLoader, Vector3 } from "@babylonjs/core";
+import { PhysicsAggregate, PhysicsBody, PhysicsMotionType, PhysicsShapeBox, PhysicsShapeType, Quaternion, Scene, SceneLoader, Vector3 } from "@babylonjs/core";
 import { Food, cook_state } from "./food";
 
 export class Bun extends Food {
@@ -12,14 +12,28 @@ export class Bun extends Food {
             //The model is the root of the bun mesh, so the action is associated with the parent
             //of the mesh, and not the mesh itself
             if (meshes.length > 0) {
-                this.model = meshes[0];
-                // console.log("bun:",this.model);
+                meshes.forEach((mesh)=>{
+                    mesh.isPickable = false;
+                    mesh.enablePointerMoveEvents = false;
+                });
+                const root = meshes[0];
+                this.model = new TransformNode(name);
+                root.parent = this.model;
+                const {min, max} = this.model.getHierarchyBoundingVectors();
+                const size = max.subtract(min);
+                const center = min.add(max).scale(0.5);
+                const shape = new PhysicsShapeBox(new Vector3(center.x, center.y, center.z), Quaternion.Identity(), size, scene);
                 this.model.position = position;
-                this.model.isPickable = false;
-                this.model.enablePointerMoveEvents = false;
-                // this.model.name = bun + "_root";
-                this.model.name = name;
-                this.model.metadata = { classInstance: this };
+                const body = PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
+                body.shape = shape;
+                body.setMassProperties({mass: 1});
+                // this.model = meshes[0];
+                // this.model.position = position;
+                // this.model.isPickable = false;
+                // this.model.enablePointerMoveEvents = false;
+                // this.model.name = name;
+                // this.model.metadata = { classInstance: this };
+                // new PhysicsAggregate(meshes[1], PhysicsShapeType.CYLINDER, {mass: 1}, scene);
                 // console.log("bun:",meshes);
             }
         });
