@@ -54,7 +54,7 @@ export class PlayerInput {
 
         if(this.inputMap["e"]){
             this.grabbed = true;
-            console.log("grabbing");
+            // console.log("grabbing");
         }else{
             this.grabbed = false;
         }

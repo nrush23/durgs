@@ -122,12 +122,14 @@ wss.on('connection', function connection(ws) {
 
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player
-                broadcast(JSON.stringify({
-                    timestamp: Date.now(),
-                    type: "member_grabbed",
-                    item: msg.item,
-                    username: player.username
-                }));
+                if (players.size > 1) {
+                    broadcast(JSON.stringify({
+                        timestamp: Date.now(),
+                        type: "member_grabbed",
+                        item: msg.item,
+                        username: player.username
+                    }));
+                }
 
                 //Finally, give the okay to the player who grabbed to pick it up
                 ws.send(JSON.stringify({
@@ -165,7 +167,7 @@ wss.on('connection', function connection(ws) {
                         pool: pool,
                     }));
                     restock_manager.timer = 1000;
-                    setTimeout(()=>{restock_manager.timer = 0}, restock_manager.timer);
+                    setTimeout(() => { restock_manager.timer = 0 }, restock_manager.timer);
                 }
                 break;
             default:

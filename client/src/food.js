@@ -7,6 +7,7 @@ export class Food extends Interactable {
     //We will overlay a color darkener based on the cook state
     doneness;
     cook_time;
+    body;
     constructor(scene) {
         super(scene);
         this.scene = scene;

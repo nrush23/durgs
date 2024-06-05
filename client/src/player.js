@@ -51,7 +51,7 @@ export class Player {
                 // this.model = this.model.parent;
                 this.model.name = "player_body";
                 this.model.parent = this.movement;
-                meshes.forEach(mesh =>{
+                meshes.forEach(mesh => {
                     mesh.isPickable = false;
                     mesh.enablePointerMoveEvents = false;
                 });
@@ -66,7 +66,7 @@ export class Player {
 
         scene.registerBeforeRender(() => {
             this.updatePosition();
-            this.updateGrab();
+            this.updateInteract();
         });
     }
 
@@ -83,6 +83,7 @@ export class Player {
         // this.model.position = this.movement.position.clone();
         if (this.right_hand) {
             this.right_hand.position = this.movement.position.clone();
+            // this.right_hand.metadata.classInstance.body.position.set(this.movement.position.clone());
         }
     }
     updatePosition() {
@@ -99,13 +100,14 @@ export class Player {
         this.movement.rotation = this.camera.rotation;
     }
 
-    updateGrab() {
+    updateInteract() {
         this.grab = this.controller.grabbed;
         var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
         var hit = this.scene.pickWithRay(ray);
-        if((hit.pickedMesh && this.grab)){
-            hit.pickedMesh.parent.metadata.classInstance.action(this);
-        }else if (!this.grab && this.right_hand){
+        if ((hit.pickedMesh && this.grab)) {
+            // hit.pickedMesh.parent.metadata.classInstance.action(this);
+            hit.pickedMesh.metadata.classInstance.action(this);
+        } else if (!this.grab && this.right_hand) {
             this.right_hand.metadata.classInstance.action(this);
         }
         // if (hit.pickedMesh && this.grab && !this.right_hand && hit.pickedMesh.isPickable) {

@@ -1,4 +1,4 @@
-import { PhysicsAggregate, PhysicsBody, PhysicsMotionType, PhysicsShapeBox, PhysicsShapeType, Quaternion, Scene, SceneLoader, Vector3 } from "@babylonjs/core";
+import { TransformNode, PhysicsAggregate, PhysicsBody, PhysicsMotionType, PhysicsShapeBox, PhysicsShapeType, Quaternion, Scene, SceneLoader, Vector3 } from "@babylonjs/core";
 import { Food, cook_state } from "./food";
 
 export class Bun extends Food {
@@ -12,11 +12,13 @@ export class Bun extends Food {
             //The model is the root of the bun mesh, so the action is associated with the parent
             //of the mesh, and not the mesh itself
             if (meshes.length > 0) {
-                meshes.forEach((mesh)=>{
-                    mesh.isPickable = false;
-                    mesh.enablePointerMoveEvents = false;
-                });
+                // meshes.forEach((mesh)=>{
+                //     mesh.isPickable = false;
+                //     mesh.enablePointerMoveEvents = false;
+                // });
                 const root = meshes[0];
+                root.isPickable = false;
+                root.enablePointerMoveEvents = false;
                 this.model = new TransformNode(name);
                 root.parent = this.model;
                 const {min, max} = this.model.getHierarchyBoundingVectors();
@@ -24,9 +26,17 @@ export class Bun extends Food {
                 const center = min.add(max).scale(0.5);
                 const shape = new PhysicsShapeBox(new Vector3(center.x, center.y, center.z), Quaternion.Identity(), size, scene);
                 this.model.position = position;
-                const body = PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
-                body.shape = shape;
-                body.setMassProperties({mass: 1});
+                this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
+                this.body.shape = shape;
+                this.body.setMassProperties({mass: 1});
+                // meshes[1].isPickable = true;
+                // meshes[1].enablePointerMoveEvents = true;
+                meshes[1].metadata = {classInstance: this};
+                meshes[1].name = name;
+                this.model.metadata = {classInstance: this};
+                // this.model.isPickable = true;
+                // this.model.enablePointerMoveEvents = true;
+                // this.model.metadata = { classInstance: this };
                 // this.model = meshes[0];
                 // this.model.position = position;
                 // this.model.isPickable = false;

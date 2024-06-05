@@ -120,11 +120,17 @@ class App {
                     break;
                 case "grabbed":
                     var item = scene.getMeshByName(data.item);
-                    this.PLAYER.right_hand = item;
+                    console.log(data);
+                    console.log(item.metadata.classInstance.body);
+                    // item.metadata.classInstance.body.setMassProperties({mass: 0});
+                    item.metadata.classInstance.body.disablePreStep = false;
+                    this.PLAYER.right_hand = item.parent.parent;
                     break;
                 case "released":
                     if (this.PLAYER.right_hand) {
-                        this.PLAYER.right_hand.position.y = 0;
+                        // this.PLAYER.right_hand.metadata.classInstance.body.position.y = 0;
+                        // this.PLAYER.right_hand.metadata.classInstance.body.setMassProperties({mass: 1});
+                        this.PLAYER.right_hand.metadata.classInstance.body.disablePreStep = true;
                         this.PLAYER.right_hand = "";
                     }
                     break;
