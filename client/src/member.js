@@ -8,10 +8,10 @@ export class Member {
     right_hand = "";
     grab = false;
 
-    constructor(username, scene, position, texture){
+    constructor(username, scene, position, texture) {
         this.username = username;
         this.movement = new TransformNode(username, scene);
-        this.movement.position = new Vector3(0,0,0);
+        this.movement.position = new Vector3(0, 0, 0);
         this.movement.position = position;
         this.scene = scene;
         SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
@@ -25,7 +25,7 @@ export class Member {
                 // this.model = this.model.parent;
                 this.model.name = "member";
                 this.model.parent = this.movement;
-                meshes.forEach(mesh =>{
+                meshes.forEach(mesh => {
                     mesh.isPickable = false;
                     mesh.enablePointerMoveEvents = false;
                 });
@@ -34,16 +34,19 @@ export class Member {
         });
     }
 
-    updatePosition(position, rotation){
+    updatePosition(position, rotation) {
         console.log(position);
         this.movement.position = new Vector3(position._x, position._y, position._z);
-        if(this.right_hand){
-            this.right_hand.position = this.movement.position;
+        if (this.right_hand) {
+            this.right_hand.parent.parent.position = this.movement.position;
         }
         this.movement.rotation = new Vector3(rotation._x, rotation._y, rotation._z);
     }
 
-    updateGrab(item){
+    updateGrab(item) {
+        if (item) {
+            item.metadata.classInstance.body.disablePreStep = false;
+        }
         this.right_hand = item;
     }
 }

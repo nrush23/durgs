@@ -122,14 +122,11 @@ class App {
                     var item = scene.getMeshByName(data.item);
                     console.log(data);
                     console.log(item.metadata.classInstance.body);
-                    // item.metadata.classInstance.body.setMassProperties({mass: 0});
                     item.metadata.classInstance.body.disablePreStep = false;
                     this.PLAYER.right_hand = item.parent.parent;
                     break;
                 case "released":
                     if (this.PLAYER.right_hand) {
-                        // this.PLAYER.right_hand.metadata.classInstance.body.position.y = 0;
-                        // this.PLAYER.right_hand.metadata.classInstance.body.setMassProperties({mass: 1});
                         this.PLAYER.right_hand.metadata.classInstance.body.disablePreStep = true;
                         this.PLAYER.right_hand = "";
                     }
@@ -146,7 +143,8 @@ class App {
                     console.log('Message received: %s', event.data);
                     if(this.Members.has(data.username)){
                         var member = this.Members.get(data.username);
-                        member.right_hand.position.y = 0;
+                        // member.right_hand.position.y = 0;
+                        member.right_hand.metadata.classInstance.body.disablePreStep = true;
                         member.updateGrab("");
                     }
                     break;

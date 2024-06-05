@@ -22,11 +22,9 @@ export class Restock_Icon extends Interactable {
         this.model.position = new Vector3(0,0,0);
         this.model.parent = parent;
         this.model.parent.metadata = {classInstance: this};
-        // console.log(this.model);
     }
 
     action(player) {
-        // this.platform.spawnIngredient(this.item);
         player.SOCKET.send(JSON.stringify({
             timestamp: Date.now(),
             type: "spawn_request",
