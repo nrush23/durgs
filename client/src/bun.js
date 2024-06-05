@@ -9,18 +9,18 @@ export class Bun extends Food {
         this.top = top;
         let bun = (this.top) ? "top_bun" : "bottom_bun";
         SceneLoader.ImportMesh(bun, "", "./assets/burger.glb", scene, (meshes) => {
-            //The model is the root of the bun mesh, so the action is associated with the parent
-            //of the mesh, and not the mesh itself
             if (meshes.length > 0) {
-                // meshes.forEach((mesh)=>{
-                //     mesh.isPickable = false;
-                //     mesh.enablePointerMoveEvents = false;
-                // });
+
+                //Get the root of the mesh and set it to be unpickable
                 const root = meshes[0];
                 root.isPickable = false;
                 root.enablePointerMoveEvents = false;
+
+                //Create the actual root transform node
                 this.model = new TransformNode(name);
                 root.parent = this.model;
+
+                //Generate the Physics shape and body
                 const {min, max} = this.model.getHierarchyBoundingVectors();
                 const size = max.subtract(min);
                 const center = min.add(max).scale(0.5);
@@ -29,11 +29,13 @@ export class Bun extends Food {
                 this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
                 this.body.shape = shape;
                 this.body.setMassProperties({mass: 1});
-                // meshes[1].isPickable = true;
-                // meshes[1].enablePointerMoveEvents = true;
+
+                //Set the metadata of the root and mesh to be this instance
                 meshes[1].metadata = {classInstance: this};
                 meshes[1].name = name;
                 this.model.metadata = {classInstance: this};
+
+
                 // this.model.isPickable = true;
                 // this.model.enablePointerMoveEvents = true;
                 // this.model.metadata = { classInstance: this };
