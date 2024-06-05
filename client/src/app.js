@@ -120,10 +120,11 @@ class App {
                     break;
                 case "grabbed":
                     var item = scene.getMeshByName(data.item);
-                    console.log(data);
-                    console.log(item.metadata.classInstance.body);
+                    // console.log(data);
+                    // console.log(item.metadata.classInstance.body);
                     item.metadata.classInstance.body.disablePreStep = false;
-                    this.PLAYER.right_hand = item.parent.parent;
+                    // this.PLAYER.right_hand = item.parent.parent;
+                    this.PLAYER.right_hand = item;
                     break;
                 case "released":
                     if (this.PLAYER.right_hand) {

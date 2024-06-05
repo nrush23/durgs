@@ -65,8 +65,11 @@ export class Player {
         this.setupPointer();
 
         scene.registerBeforeRender(() => {
-            this.updatePosition();
             this.updateInteract();
+            this.updatePosition();
+            if(this.right_hand){
+
+            }
         });
     }
 
@@ -82,7 +85,8 @@ export class Player {
         this.camera.position = this.movement.position.clone();
         // this.model.position = this.movement.position.clone();
         if (this.right_hand) {
-            this.right_hand.position = this.movement.position.clone();
+            // this.right_hand.position = this.movement.position.clone();
+            this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
             // this.right_hand.metadata.classInstance.body.position.set(this.movement.position.clone());
         }
     }
@@ -92,12 +96,25 @@ export class Player {
         var forward = this.camera.getForwardRay().direction;
         var right = Vector3.Cross(Axis.Y, forward, 100);
         if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
-            var moveDirection = forward.scale(this.controller.vertical / modifier).add(right.scale(this.controller.horizontal / modifier));
 
+            var moveDirection = forward.scale(this.controller.vertical / modifier).add(right.scale(this.controller.horizontal / modifier));
             this.movement.position.addInPlace(moveDirection);
-            this.updateChildren();
+  
+            this.SOCKET.send(JSON.stringify({
+                timestamp: Date.now(),
+                type: "movement",
+                PID: this.PID,
+                position: this.movement.position,
+                rotation: this.camera.rotation,
+            }));
+
+            this.camera.position = this.movement.position.clone();
+
         }
         this.movement.rotation = this.camera.rotation;
+        if (this.right_hand) {
+            this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+        }
     }
 
     updateInteract() {

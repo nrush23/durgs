@@ -1,4 +1,4 @@
-import { SceneLoader, TransformNode, Vector3 } from "@babylonjs/core";
+import { PhysicsMotionType, SceneLoader, TransformNode, Vector3 } from "@babylonjs/core";
 //Class for controlling other players who join the world
 export class Member {
     username;
@@ -32,13 +32,21 @@ export class Member {
                 console.log(this.model);
             }
         });
+
+        scene.registerBeforeRender(()=>{
+            if(this.right_hand){
+                this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+            }
+        });
+
     }
 
     updatePosition(position, rotation) {
         console.log(position);
         this.movement.position = new Vector3(position._x, position._y, position._z);
         if (this.right_hand) {
-            this.right_hand.parent.parent.position = this.movement.position;
+            // this.right_hand.parent.parent.position = this.movement.position;
+            this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
         }
         this.movement.rotation = new Vector3(rotation._x, rotation._y, rotation._z);
     }
@@ -46,6 +54,7 @@ export class Member {
     updateGrab(item) {
         if (item) {
             item.metadata.classInstance.body.disablePreStep = false;
+            // item.metadata.classInstance.body.motionType = PhysicsMotionType.STATIC;
         }
         this.right_hand = item;
     }
