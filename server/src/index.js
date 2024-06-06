@@ -8,6 +8,13 @@ import { Vector3, HavokPlugin, NullEngine, Scene } from '@babylonjs/core';
 import HavokPhysics from "@babylonjs/havok";
 import { Restock_Manager } from './restock_manager.js';
 import { Game } from './game.js';
+import xhr2 from 'xhr2';
+import '@babylonjs/loaders';
+import path from 'path';
+globalThis.XMLHttpRequest = xhr2;
+
+
+
 console.log("Starting...");
 
 const PORT = process.env.PORT || 3001;
@@ -22,9 +29,11 @@ app.use(cors(corsOptions));
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
-
+// app.use('/assets', express.static('assets'));
+app.use(express.static('public'));
 let players = new Map();
 const game = new Game();
+// global.XMLHttpRequest = require('xhr2');
 game.initializeScene().then((evt)=>{
     console.log("Scene loaded");
 });

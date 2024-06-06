@@ -1,6 +1,8 @@
-import { Axis, Color3, Mesh, MeshBuilder, PhysicsAggregate, PhysicsShapeType, Scene, SceneLoader, Space, StandardMaterial, Vector3 } from "@babylonjs/core";
-import { Bun } from "./bun";
-import { Restocker } from "./restocker";
+import { PhysicsAggregate, PhysicsShapeType, SceneLoader } from "@babylonjs/core";
+// import { Bun } from "./bun";
+// import { Restocker } from "./restocker";
+
+//global.XMLHttpRequest =  require("xhr2").XMLHttpRequest;
 export class World {
     DURGS;
     GROUND;
@@ -10,7 +12,7 @@ export class World {
     //Need to finsih modifying how the world imports the restock icons
     constructor(scene, callback) {
         this.scene = scene;
-        SceneLoader.ImportMeshAsync("", "./", "./assets/restaurant_furnishing1.glb", scene).then((result) => {
+        SceneLoader.ImportMeshAsync("", "http://localhost:3001/assets/", "restaurant_furnishing1.glb", scene).then((result) => {
             const meshes = result.meshes;
             meshes.forEach((mesh) => {
                 mesh.isPickable = false;
@@ -26,6 +28,5 @@ export class World {
         }).catch((error) => {
             console.log("Loading mesh error: ", error);
         });
-        var bun = new Bun(scene, true, new Vector3(0, 1, 0), "test_bun");
     }
 }

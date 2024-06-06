@@ -3,6 +3,9 @@
 STAGE 2
 
 PHYSICS
+-Add world meshes to server
+-Add food items to server side
+-implement sending over the physics positions every 20 frames
 
 Layer Architecture for items
     -Items are made out of stack layers

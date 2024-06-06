@@ -2,12 +2,14 @@ import { Vector3, HavokPlugin, NullEngine, Scene, MeshBuilder, TransformNode, Ph
 import HavokPhysics from '@babylonjs/havok';
 import fs from 'fs';
 import path from 'path';
+import { World } from './world.js';
 
 export class Game {
     scene;
     engine;
     camera;
     players;
+    world;
     constructor() {
         // this.engine = new NullEngine();
         // this.scene = new Scene(this.engine);
@@ -32,10 +34,11 @@ export class Game {
         const wasm = path.join(__dirname, 'node_modules/@babylonjs/havok/lib/esm/HavokPhysics.wasm');
         let binary = fs.readFileSync(wasm);
         HavokPhysics({ wasmBinary: binary }).then((hk) => {
-            //initialize physics plugin, NullEngine, etc
             const havokPlugin = new HavokPlugin(true, hk);
             this.scene.enablePhysics(new Vector3(0, -9.81, 0), havokPlugin);
+            this.world = new World(this.scene, ()=>{
 
+            });
 
 
             this.engine.runRenderLoop(() => {
