@@ -4,9 +4,10 @@ import http, { get } from 'http';
 import { WebSocketServer } from 'ws';
 import Player from "./player.js";
 import { v4 as uuidv4 } from 'uuid';
-import { Vector3, HavokPlugin } from '@babylonjs/core';
+import { Vector3, HavokPlugin, NullEngine, Scene } from '@babylonjs/core';
 import HavokPhysics from "@babylonjs/havok";
 import { Restock_Manager } from './restock_manager.js';
+import { Game } from './game.js';
 console.log("Starting...");
 
 const PORT = process.env.PORT || 3001;
@@ -23,7 +24,10 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 let players = new Map();
-
+const game = new Game();
+game.initializeScene().then((evt)=>{
+    console.log("Scene loaded");
+});
 const restock_manager = new Restock_Manager();
 
 // const hk = await HavokPhysics();
@@ -59,6 +63,7 @@ wss.on('connection', function connection(ws) {
                 username: players.get(ws.ID).username
             }));
             players.delete(ws.ID);
+            game.removePlayer(ws.ID);
             console.log("Player%s deleted", ws.ID);
         }
         console.log("Connection closed");
@@ -94,6 +99,7 @@ wss.on('connection', function connection(ws) {
                     }
                 }
                 players.set(player.PID, player);
+                game.addPlayer(player);
                 console.log(players.get(player.PID));
                 ws.send(JSON.stringify({
                     type: msg.type,
