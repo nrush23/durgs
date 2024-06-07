@@ -1,4 +1,4 @@
-import { Food, cook_state } from "./food";
+import { Food, cook_state } from "./food.js";
 import { SceneLoader, TransformNode, Vector3, PhysicsShapeBox, PhysicsBody, PhysicsMotionType, Quaternion } from "@babylonjs/core";
 export class Tomato extends Food {
     constructor(scene, position, name) {

@@ -1,5 +1,5 @@
 import { TransformNode, PhysicsAggregate, PhysicsBody, PhysicsMotionType, PhysicsShapeBox, PhysicsShapeType, Quaternion, Scene, SceneLoader, Vector3 } from "@babylonjs/core";
-import { Food, cook_state } from "./food";
+import { Food, cook_state } from "./food.js";
 
 export class Bun extends Food {
     top;

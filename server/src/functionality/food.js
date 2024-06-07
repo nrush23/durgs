@@ -1,5 +1,5 @@
 import { AbstractMesh, Mesh, Scene } from '@babylonjs/core';
-import { Interactable } from './Interactable';
+import { Interactable } from './Interactable.js';
 export const cook_state = { raw: 'RAW', perfect: 'PERFECT', burnt: 'BURNT' };
 export class Food extends Interactable {
     model;

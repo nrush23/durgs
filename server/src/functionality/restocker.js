@@ -1,5 +1,5 @@
-import { Restock_Icon } from "./restock_icon";
-import { Restock_Platform } from "./restock_platform";
+import { Restock_Icon } from "./restock_icon.js";
+import { Restock_Platform } from "./restock_platform.js";
 
 const ingredients = ["top_bun", "bottom_bun", "lettuce", "patty", "tomato"];
 

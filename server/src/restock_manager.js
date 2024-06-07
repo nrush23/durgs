@@ -1,3 +1,4 @@
+import { Restocker } from "./functionality/restocker.js";
 import { Item_Manager } from "./item_manager.js";
 
 export class Restock_Manager {
@@ -10,12 +11,14 @@ export class Restock_Manager {
 
     //For making sure restocks can only be pressed once every second
     timer = 0;
-    constructor() {
+    restocker;
+    constructor(scene) {
         this.top_bun = new Item_Manager("top_bun");
         this.bottom_bun = new Item_Manager("bottom_bun");
         this.lettuce = new Item_Manager("lettuce");
         this.tomato = new Item_Manager("tomato");
         this.patty = new Item_Manager("patty");
+        this.restocker = new Restocker(scene);
     }
 
     restock(item) {

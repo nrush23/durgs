@@ -1,8 +1,8 @@
 import { Vector3 } from "@babylonjs/core";
-import { Bun } from "./bun";
-import { Tomato } from "./tomato";
-import { Lettuce } from "./lettuce";
-import { Patty } from "./patty";
+import { Bun } from "./bun.js";
+import { Tomato } from "./tomato.js";
+import { Lettuce } from "./lettuce.js";
+import { Patty } from "./patty.js";
 
 export class Restock_Platform {
     model;
@@ -12,7 +12,6 @@ export class Restock_Platform {
         this.scene = scene;
         this.model = scene.getMeshByName("stock_platform");
         this.top = this.model.position.clone();
-        console.log(this.top);
     }
  
     //When physics is implemented, these will just fall from the sky

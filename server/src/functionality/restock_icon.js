@@ -1,6 +1,5 @@
-import { TransformNode } from "@babylonjs/core";
-import { Interactable } from "./Interactable";
-import { Vector3 } from "@babylonjs/core";
+import { TransformNode, Vector3 } from "@babylonjs/core";
+import { Interactable } from "./Interactable.js";
 export class Restock_Icon extends Interactable {
     item;
     platform;

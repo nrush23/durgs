@@ -12,6 +12,7 @@ export class Game {
     players;
     world;
     restock_manager;
+
     constructor() {
         // this.engine = new NullEngine();
         // this.scene = new Scene(this.engine);
@@ -23,11 +24,11 @@ export class Game {
         console.log("Player%s added: %s", player.PID, this.players);
     }
 
-    removePlayer(player) {
+    removePlayer(PID) {
         console.log("Game Players %s", this.players);
-        if (this.players.has(player)) {
-            this.players.delete(player);
-            console.log("Player%s removed: %s", player, this.players);
+        if (this.players.has(PID)) {
+            this.players.delete(PID);
+            console.log("Player%s removed: %s", PID, this.players);
         }
     }
 
@@ -42,7 +43,7 @@ export class Game {
             const havokPlugin = new HavokPlugin(true, hk);
             this.scene.enablePhysics(new Vector3(0, -9.81, 0), havokPlugin);
             this.world = new World(this.scene, () => {
-                this.restock_manager = new Restock_Manager();
+                this.restock_manager = new Restock_Manager(this.scene);
             });
 
 
