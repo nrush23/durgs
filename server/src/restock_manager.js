@@ -46,6 +46,7 @@ export class Restock_Manager {
                     console.log("Error: Invalid restock %s", item);
                     return null;
             }
+            this.restocker.platform.spawnIngredient(item, pool);
             return pool;
         }
     }
