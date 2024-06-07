@@ -82,7 +82,7 @@ class App {
     //Create new player and wait for join message to get username
     //and player id (pid)
     connect(scene) {
-        this.SOCKET = new WebSocket('ws://192.168.0.53:3001');
+        this.SOCKET = new WebSocket('ws://192.168.0.41:3001');
         this.PLAYER = new Player(scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('open', (event) => {
             this.SOCKET.send(JSON.stringify({
@@ -152,6 +152,9 @@ class App {
                 case "spawn_response":
                     console.log('Message received: %s', event.data);
                     this.RESTOCKER.platform.spawnIngredient(data.item, data.pool);
+                    break;
+                case "update_mesh":
+                    console.log('Message received: %s', event.data);
                     break;
                 default:
                     console.log('Unknown type: %s', data.type);

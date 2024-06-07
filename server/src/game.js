@@ -3,6 +3,7 @@ import HavokPhysics from '@babylonjs/havok';
 import fs from 'fs';
 import path from 'path';
 import { World } from './world.js';
+import { Restock_Manager } from './restock_manager.js';
 
 export class Game {
     scene;
@@ -10,6 +11,7 @@ export class Game {
     camera;
     players;
     world;
+    restock_manager;
     constructor() {
         // this.engine = new NullEngine();
         // this.scene = new Scene(this.engine);
@@ -18,11 +20,14 @@ export class Game {
 
     addPlayer(player) {
         this.players.set(player.PID, player);
+        console.log("Player%s added: %s", player.PID, this.players);
     }
 
     removePlayer(player) {
-        if (this.players.has(player.PID)) {
-            this.players.delete(player.PID);
+        console.log("Game Players %s", this.players);
+        if (this.players.has(player)) {
+            this.players.delete(player);
+            console.log("Player%s removed: %s", player, this.players);
         }
     }
 
@@ -36,8 +41,8 @@ export class Game {
         HavokPhysics({ wasmBinary: binary }).then((hk) => {
             const havokPlugin = new HavokPlugin(true, hk);
             this.scene.enablePhysics(new Vector3(0, -9.81, 0), havokPlugin);
-            this.world = new World(this.scene, ()=>{
-
+            this.world = new World(this.scene, () => {
+                this.restock_manager = new Restock_Manager();
             });
 
 

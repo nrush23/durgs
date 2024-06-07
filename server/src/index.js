@@ -10,11 +10,10 @@ import { Restock_Manager } from './restock_manager.js';
 import { Game } from './game.js';
 import xhr2 from 'xhr2';
 import '@babylonjs/loaders';
-import path from 'path';
-globalThis.XMLHttpRequest = xhr2;
 
+//Begin creating our express server
 
-
+// globalThis.XMLHttpRequest = xhr2;
 console.log("Starting...");
 
 const PORT = process.env.PORT || 3001;
@@ -27,56 +26,58 @@ let corsOptions = {
 
 app.use(cors(corsOptions));
 
+//Create the websocket and the public folder for the assets
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
-// app.use('/assets', express.static('assets'));
-app.use(express.static('public'));
+// app.use(express.static('public'));
+
+//Initialize the game
 let players = new Map();
 const game = new Game();
-// global.XMLHttpRequest = require('xhr2');
-game.initializeScene().then((evt)=>{
-    console.log("Scene loaded");
-});
-const restock_manager = new Restock_Manager();
-
-// const hk = await HavokPhysics();
-// const havokPlugin = new HavokPlugin(true, hk);
-// this.scene.enablePhysics(new Vector3(0, -9.81,0), havokPlugin);
-
-// HavokPhysics().then((hk)=>{
-//     const havokPlugin = new HavokPlugin(true, hk);
+// game.initializeScene().then((evt)=>{
+    // console.log("Scene loaded");
 // });
 
+//Create our restock manager to manage our pool of items
+const restock_manager = new Restock_Manager();
+
+//Broadcast message to send updates to all players in the room
 function broadcast(msg) {
     console.log("Broadcast starting...");
     console.log(players.size)
-    for (let player of players.values()) {
+    // for (let player of players.values()) {
+    for(let player of game.players.values()){
         console.log("Sending to %s", player.username);
         player.socket.send(msg);
     }
 }
 
+//Function to get the texture of a player, not used yet
 function getTexture() {
     return "skin" + Math.floor((Math.random() * 2) + 1);
 }
 
+//Create our socket functionality
 wss.on('connection', function connection(ws) {
     ws.on('error', console.error);
+
+    //On close, broadcast the delete to the other players and remove them from the server
     ws.on('close', function close(data) {
-        /* TODO: Add in code to delete the player from the players and socket list */
-        // let player = players.g
         if (ws.ID) {
             broadcast(JSON.stringify({
                 timestamp: Date.now(),
                 type: "delete",
-                username: players.get(ws.ID).username
+                username: game.players.get(ws.ID).username
             }));
-            players.delete(ws.ID);
+            // players.delete(ws.ID);
             game.removePlayer(ws.ID);
-            console.log("Player%s deleted", ws.ID);
+            // console.log("Player%s deleted", ws.ID);
         }
         console.log("Connection closed");
     });
+
+    //On receiving a message, switch through the different types
+    //and pick as necessary
     ws.on('message', function message(data) {
         // console.log("received %s", data);
         const msg = JSON.parse(data);
@@ -107,9 +108,9 @@ wss.on('connection', function connection(ws) {
                         }));
                     }
                 }
-                players.set(player.PID, player);
+                // players.set(player.PID, player);
                 game.addPlayer(player);
-                console.log(players.get(player.PID));
+                // console.log(players.get(player.PID));
                 ws.send(JSON.stringify({
                     type: msg.type,
                     PID: player.PID,
@@ -119,11 +120,11 @@ wss.on('connection', function connection(ws) {
                 break;
             case "movement":
                 // console.log("movement recevied %s", data);
-                players.get(msg.PID).updatePosition(msg.position);
+                game.players.get(msg.PID).updatePosition(msg.position);
                 broadcast(JSON.stringify({
                     timestamp: Date.now(),
                     type: "member_movement",
-                    username: players.get(msg.PID).username,
+                    username: game.players.get(msg.PID).username,
                     position: msg.position,
                     rotation: msg.rotation,
                 }));
@@ -132,7 +133,8 @@ wss.on('connection', function connection(ws) {
                 console.log(msg);
                 //When a player grabs, get the associated player using the msg.PID
                 //and the item they grabbed
-                var player = players.get(msg.PID);
+                // var player = players.get(msg.PID);
+                var player = game.players.get(msg.PID);
                 player.right_hand = msg.item;
 
                 //Next, broadcast the update to the other players so their scene
@@ -154,7 +156,8 @@ wss.on('connection', function connection(ws) {
                 }));
                 break;
             case "release":
-                var player = players.get(msg.PID);
+                // var player = players.get(msg.PID);
+                var player = game.players.get(msg.PID);
                 player.right_hand = "";
 
                 //Next, broadcast the update to the other players so their scene
@@ -181,6 +184,10 @@ wss.on('connection', function connection(ws) {
                         item: msg.item,
                         pool: pool,
                     }));
+                    game.restock_manager.timer = 1000;
+                    setTimeout(()=>{
+                        game.restock_manager.timer = 0
+                    }, game.restock_manager.timer);
                     restock_manager.timer = 1000;
                     setTimeout(() => { restock_manager.timer = 0 }, restock_manager.timer);
                 }
