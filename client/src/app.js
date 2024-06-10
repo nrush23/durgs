@@ -61,6 +61,14 @@ class App {
             this.scene.render();
         });
 
+        this.scene.registerBeforeRender(()=>{
+            this.PLAYER.updateInteract();
+            this.PLAYER.updatePosition();
+            this.Members.forEach((member)=>{
+                
+            });
+        })
+
         this.scene.debugLayer.show();
     }
 

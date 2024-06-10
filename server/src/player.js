@@ -1,6 +1,6 @@
-import { Mesh, Scene, Vector3 } from "@babylonjs/core";
+import { Mesh, Scene, SceneLoader, TransformNode, Vector3 } from "@babylonjs/core";
 
-export default class Player{
+export default class Player {
     PID;
     // WID;
     username;
@@ -9,26 +9,67 @@ export default class Player{
     socket;
     texture;
     right_hand;
+    model;
+    node;
+    scene;
+    movement;
+    previous_position;
+    moved;
 
-    constructor(){
+    constructor() {
         this.PID = -1;
         this.username = null;
         // this.WID = -1;
         this.socket = null;
         this.texture = null;
-        this.position = new Vector3(0,0,0);
+        this.position = new Vector3(0, 0, 0);
         this.right_hand = "";
+        this.moved = "";
     }
 
-    joinGame(scene){
+    joinGame(scene) {
+        this.scene = scene;
+        SceneLoader.ImportMesh("body", "http://localhost:3001/assets/", "player.glb", this.scene, (meshes)=>{
+            // console.log(meshes);
+            if(meshes.length > 0){
+                this.model = meshes[0];
+                this.model.name = this.username;
+                this.movement = new TransformNode(this.PID, this.scene);
+                this.movement.position = new Vector3(0,0,0);
+                this.model.parent = this.movement;
+                console.log("%s entered the scene", this.username);
+            }
+        })
+        // SceneLoader.ImportMeshAsync("body", "http://localhost:3001/assets/", "player.glb", this.scene, (meshes) => {
+        //     console.log(meshes);
+        //     if (meshes.length > 0) {
+        //         this.model = meshes[0];
+        //         this.model.name = this.username;
+        //         this.movement = new TransformNode(this.PID, this.scene);
+        //         this.movement.position = new Vector3(0, 0, 0);
+        //         // console.log(this.model);
+        //     }
 
+        //     // this.scene.registerBeforeRender(() => {
+        //     //     if (this.moved) {
+        //     //         this.updatePosition(this.moved);
+        //     //     }
+        //     // });
+        // }).then((evt) => {
+        //     console.log("%s entered the scene", this.username);
+        // });
     }
 
-    setModel(mesh){
+    setModel(mesh) {
         this.model = mesh;
     }
 
-    updatePosition(pos){
-        this.position = pos;
+    updatePosition(pos) {
+        if (this.model) {
+            // console.log(pos);
+            this.previous_position = this.movement.position;
+            this.movement.position = new Vector3(pos._x, pos._y, pos._z);
+            console.log("%s: <%s,%s,%s>", this.username, this.movement.position.x, this.movement.position.y, this.movement.position.z);
+        }
     }
 }

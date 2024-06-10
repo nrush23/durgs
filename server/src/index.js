@@ -40,7 +40,7 @@ game.initializeScene().then((evt)=>{
 //Broadcast message to send updates to all players in the room
 function broadcast(msg) {
     console.log("Broadcast starting...");
-    console.log(players.size)
+    console.log(game.players.size)
     // for (let player of players.values()) {
     for(let player of game.players.values()){
         console.log("Sending to %s", player.username);
@@ -84,8 +84,8 @@ wss.on('connection', function connection(ws) {
                 player.username = "player" + player.PID;
                 player.socket = ws;
                 player.texture = getTexture();
-                if (players.size > 0) {
-                    for (let member of players.values()) {
+                if (game.players.size > 0) {
+                    for (let member of game.players.values()) {
                         member.socket.send(JSON.stringify({
                             timestamp: Date.now(),
                             type: "new_member",
@@ -112,11 +112,14 @@ wss.on('connection', function connection(ws) {
                 break;
             case "movement":
                 // console.log("movement recevied %s", data);
-                game.players.get(msg.PID).updatePosition(msg.position);
+                // game.players.get(msg.PID).updatePosition(msg.position);
+                var player = game.players.get(msg.PID);
+                // console.log(player.model);
+                player.updatePosition(msg.position);
                 broadcast(JSON.stringify({
                     timestamp: Date.now(),
                     type: "member_movement",
-                    username: game.players.get(msg.PID).username,
+                    username: player.username,
                     position: msg.position,
                     rotation: msg.rotation,
                 }));

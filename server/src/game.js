@@ -21,6 +21,7 @@ export class Game {
 
     addPlayer(player) {
         this.players.set(player.PID, player);
+        player.joinGame(this.scene);
         console.log("Player%s added: %s", player.PID, this.players);
     }
 

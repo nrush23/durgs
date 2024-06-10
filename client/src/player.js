@@ -34,6 +34,7 @@ export class Player {
         this.movement.position = new Vector3(0, 0, 0);
         this.right_hand = "";
         this.SOCKET = socket;
+        this.controller = new PlayerInput(scene);
     }
 
     createBody(scene, texture) {
@@ -51,18 +52,15 @@ export class Player {
                 // console.log(this.model);
             }
         });
-        this.controller = new PlayerInput(scene);
+        // this.controller = new PlayerInput(scene);
         this.camera.inputs.remove(this.camera.inputs.attached.keyboard);
 
         //Set up mouse pointer input
         this.setupPointer();
 
         scene.registerBeforeRender(() => {
-            this.updateInteract();
-            this.updatePosition();
-            if(this.right_hand){
-
-            }
+            // this.updateInteract();
+            // this.updatePosition();
         });
     }
 
