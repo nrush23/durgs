@@ -115,14 +115,14 @@ wss.on('connection', function connection(ws) {
                 // game.players.get(msg.PID).updatePosition(msg.position);
                 var player = game.players.get(msg.PID);
                 // console.log(player.model);
-                player.updatePosition(msg.position);
-                broadcast(JSON.stringify({
-                    timestamp: Date.now(),
-                    type: "member_movement",
-                    username: player.username,
-                    position: msg.position,
-                    rotation: msg.rotation,
-                }));
+                player.updatePosition(msg.position, msg.rotation);
+                // broadcast(JSON.stringify({
+                //     timestamp: Date.now(),
+                //     type: "member_movement",
+                //     username: player.username,
+                //     position: msg.position,
+                //     rotation: msg.rotation,
+                // }));
                 break;
             case "grab":
                 console.log(msg);

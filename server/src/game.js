@@ -47,11 +47,45 @@ export class Game {
                 this.restock_manager = new Restock_Manager(this.scene);
             });
 
+            let startTime = performance.now();
+            let accumulator = 0;
+            let simulationSpeedFactor = 1;
+            const FIXED_TIME = 0.02;
+            this.scene.registerBeforeRender(() => {
+                const now = performance.now();
+                const delta = (now - startTime) / 1000;
+                startTime = now;
+                accumulator += delta;
+                while (accumulator >= FIXED_TIME) {
+                    for (let player of this.players.values()) {
+                        if (player.NETWORK_CACHE.length > 0) {
+                            player.NETWORK_CACHE.forEach(([pos, rot]) => {
+                                player.render(pos, rot);
+                            });
+                            this.broadcast(JSON.stringify({
+                                timestamp: Date.now(),
+                                type: "member_movement",
+                                username: player.username,
+                                position: player.movement.position,
+                                rotation: player.movement.rotation
+                            }));
+                            player.NETWORK_CACHE = [];
+                        }
+                    }
+                    accumulator -= FIXED_TIME;
+                }
+            });
 
             this.engine.runRenderLoop(() => {
                 this.scene.render();
             });
         });
+    }
+
+    broadcast(msg) {
+        for (let player of this.players.values()) {
+            player.socket.send(msg);
+        }
     }
 
     test_havok() {

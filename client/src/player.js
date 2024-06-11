@@ -58,10 +58,10 @@ export class Player {
         //Set up mouse pointer input
         this.setupPointer();
 
-        scene.registerBeforeRender(() => {
-            // this.updateInteract();
-            // this.updatePosition();
-        });
+        // scene.registerBeforeRender(() => {
+        //     // this.updateInteract();
+        //     // this.updatePosition();
+        // });
     }
 
     updateChildren() {
@@ -81,7 +81,7 @@ export class Player {
             // this.right_hand.metadata.classInstance.body.position.set(this.movement.position.clone());
         }
     }
-    updatePosition() {
+    sendPosition() {
 
         let modifier = 5;
         var forward = this.camera.getForwardRay().direction;

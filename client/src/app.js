@@ -73,7 +73,7 @@ class App {
 
             while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
                 this.PLAYER.updateInteract();
-                this.PLAYER.updatePosition();
+                this.PLAYER.sendPosition();
                 this.Members.forEach((member) => {
                     member.render();
                 });
@@ -168,6 +168,11 @@ class App {
                     break;
                 case "update_mesh":
                     console.log('Message received: %s', event.data);
+                    break;
+                case "movement_cache":
+                    if (data.cache.length > 0) {
+                        console.log(data);
+                    }
                     break;
                 default:
                     console.log('Unknown type: %s', data.type);

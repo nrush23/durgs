@@ -9,6 +9,8 @@ PHYSICS
 -Change server structure so that when restock icon is pressed,
 server spawns the items and sends their position over to the players
 -implement sending over the physics positions every 20 frames
+    -Implemented client sending information evert 20ms
+    -Need to implement server fixed loop and buffer system
 
 Layer Architecture for items
     -Items are made out of stack layers
