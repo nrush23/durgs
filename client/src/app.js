@@ -2,7 +2,7 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, PointLight, Scene, ArcRotateCamera, Vector3, HemisphericLight, PointerEventTypes, StandardMaterial, Color3, MeshBuilder, Mesh, Axis, Space, CSG, Color4, FollowCamera, ExecuteCodeAction, UniversalCamera, HavokPlugin } from "@babylonjs/core";
-import  HavokPhysics  from "@babylonjs/havok";
+import HavokPhysics from "@babylonjs/havok";
 import * as GUI from "@babylonjs/gui";
 import { World } from "./world"
 import { Player } from "./player"
@@ -46,11 +46,11 @@ class App {
         this.camera.attachControl(this.canvas, true);
 
         var SUN = new HemisphericLight("SUN", new Vector3(0, 3, 0), this.scene);
-        this.initializePhysics().then(()=>{
-            this.WORLD = new World(this.scene, ()=>{
+        this.initializePhysics().then(() => {
+            this.WORLD = new World(this.scene, () => {
                 this.RESTOCKER = new Restocker(this.scene);
             });
-    
+
         });
 
         //Connect to server
@@ -61,29 +61,32 @@ class App {
             this.scene.render();
         });
 
-        this.scene.registerBeforeRender(()=>{
-            this.PLAYER.updateInteract();
-            this.PLAYER.updatePosition();
-            this.Members.forEach((member)=>{
+        let startTime = performance.now();
+        let simulationSpeedFactor = 1;
+        let accumulator = 0;
+        this.scene.registerBeforeRender(() => {
+            const now = performance.now();
+            const delta = (now - startTime) / 1000;
+            startTime = now;
+            accumulator += delta;
 
-            });
+            while (accumulator >= 0.016 * simulationSpeedFactor) {
+                this.PLAYER.updateInteract();
+                this.PLAYER.updatePosition();
+                this.Members.forEach((member) => {
+                    member.render();
+                });
+                accumulator -= 0.016;
+            }
         })
 
         this.scene.debugLayer.show();
     }
 
-    async initializePhysics(){
+    async initializePhysics() {
         const hk = await HavokPhysics();
         const havokPlugin = new HavokPlugin(true, hk);
-        this.scene.enablePhysics(new Vector3(0, -9.81,0), havokPlugin);
-        // var hk = await new HavokPlugin();
-        // this.scene.enablePhysics(new Vector3(0,-9.81, 0), hk);
-        // HavokPhysics().then((havok)=>{
-        //     // this.initializePhysics = havok;
-        //     // var gravityVector = new Vector3(0, -9.81, 0);
-        //     // var physicsPlugin = new HavokPlugin();
-        //     // this.scene.enablePhysics(gravityVector, physicsPlugin);
-        // })
+        this.scene.enablePhysics(new Vector3(0, -9.81, 0), havokPlugin);
     }
 
     //Address in WebSocket is url to connect to
@@ -150,10 +153,10 @@ class App {
                     break;
                 case "member_released":
                     console.log('Message received: %s', event.data);
-                    if(this.Members.has(data.username)){
+                    if (this.Members.has(data.username)) {
                         var member = this.Members.get(data.username);
                         // member.right_hand.position.y = 0;
-                        console.log(member);
+                        // console.log(member);
                         member.right_hand.metadata.classInstance.body.disablePreStep = true;
                         member.updateGrab("");
                     }

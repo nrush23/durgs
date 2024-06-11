@@ -33,12 +33,18 @@ export class Member {
             }
         });
 
-        scene.registerBeforeRender(()=>{
-            if(this.right_hand){
-                this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-            }
-        });
+        // scene.registerBeforeRender(()=>{
+        //     if(this.right_hand){
+        //         this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+        //     }
+        // });
 
+    }
+
+    render() {
+        if (this.right_hand) {
+            this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+        }
     }
 
     updatePosition(position, rotation) {
