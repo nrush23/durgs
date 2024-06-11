@@ -65,7 +65,7 @@ class App {
             this.PLAYER.updateInteract();
             this.PLAYER.updatePosition();
             this.Members.forEach((member)=>{
-                
+
             });
         })
 
@@ -153,6 +153,7 @@ class App {
                     if(this.Members.has(data.username)){
                         var member = this.Members.get(data.username);
                         // member.right_hand.position.y = 0;
+                        console.log(member);
                         member.right_hand.metadata.classInstance.body.disablePreStep = true;
                         member.updateGrab("");
                     }

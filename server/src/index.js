@@ -133,7 +133,7 @@ wss.on('connection', function connection(ws) {
 
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player
-                if (players.size > 1) {
+                if (game.players.size > 1) {
                     broadcast(JSON.stringify({
                         timestamp: Date.now(),
                         type: "member_grabbed",
