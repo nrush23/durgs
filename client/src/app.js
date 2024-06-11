@@ -64,19 +64,20 @@ class App {
         let startTime = performance.now();
         let simulationSpeedFactor = 1;
         let accumulator = 0;
+        let FIXED_TIME = 0.02;
         this.scene.registerBeforeRender(() => {
             const now = performance.now();
             const delta = (now - startTime) / 1000;
             startTime = now;
             accumulator += delta;
 
-            while (accumulator >= 0.016 * simulationSpeedFactor) {
+            while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
                 this.PLAYER.updateInteract();
                 this.PLAYER.updatePosition();
                 this.Members.forEach((member) => {
                     member.render();
                 });
-                accumulator -= 0.016;
+                accumulator -= FIXED_TIME;
             }
         })
 
