@@ -57,11 +57,11 @@ export class Game {
                 startTime = now;
                 accumulator += delta;
                 while (accumulator >= FIXED_TIME) {
-                    for (let player of this.players.values()) {
-                        if (player.NETWORK_CACHE.length > 0) {
-                            player.NETWORK_CACHE.forEach(([pos, rot]) => {
-                                player.render(pos, rot);
-                            });
+                    for (let player of this.players.values()){
+                        if(player.INPUT_BUFFER.length > 0){
+                            player.INPUT_BUFFER.forEach((input)=>{
+                                player.render2(input);
+                            })
                             this.broadcast(JSON.stringify({
                                 timestamp: Date.now(),
                                 type: "member_movement",
@@ -69,9 +69,29 @@ export class Game {
                                 position: player.movement.position,
                                 rotation: player.movement.rotation
                             }));
-                            player.NETWORK_CACHE = [];
+                            player.socket.send(JSON.stringify({
+                                timestamp: Date.now(),
+                                type: "movement",
+                                position: player.movement.position,
+                            }));
+                            player.INPUT_BUFFER = [];
                         }
                     }
+                    // for (let player of this.players.values()) {
+                    //     if (player.NETWORK_CACHE.length > 0) {
+                    //         player.NETWORK_CACHE.forEach(([pos, rot]) => {
+                    //             player.render(pos, rot);
+                    //         });
+                    //         this.broadcast(JSON.stringify({
+                    //             timestamp: Date.now(),
+                    //             type: "member_movement",
+                    //             username: player.username,
+                    //             position: player.movement.position,
+                    //             rotation: player.movement.rotation
+                    //         }));
+                    //         player.NETWORK_CACHE = [];
+                    //     }
+                    // }
                     accumulator -= FIXED_TIME;
                 }
             });

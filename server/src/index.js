@@ -124,6 +124,11 @@ wss.on('connection', function connection(ws) {
                 //     rotation: msg.rotation,
                 // }));
                 break;
+            case "movement_input":
+                console.log(msg);
+                var player = game.players.get(msg.PID);
+                player.addInput(msg.vertical, msg.horizontal, msg.position, msg.rotation);
+                break;
             case "grab":
                 console.log(msg);
                 //When a player grabs, get the associated player using the msg.PID

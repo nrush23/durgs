@@ -18,6 +18,7 @@ export class Player {
     // right_item;
     grab = false;
     SOCKET;
+    NEXT_POSITION;
 
     static PLAYER_SPEED = 0.45;
     static JUMP_FORCE = 0.80;
@@ -35,6 +36,7 @@ export class Player {
         this.right_hand = "";
         this.SOCKET = socket;
         this.controller = new PlayerInput(scene);
+        this.NEXT_POSITION = new Vector3(0,0,0);
     }
 
     createBody(scene, texture) {
@@ -62,6 +64,9 @@ export class Player {
         //     // this.updateInteract();
         //     // this.updatePosition();
         // });
+        scene.registerBeforeRender(()=>{
+            this.render();
+        });
     }
 
     updateChildren() {
@@ -81,8 +86,8 @@ export class Player {
             // this.right_hand.metadata.classInstance.body.position.set(this.movement.position.clone());
         }
     }
-    sendPosition() {
 
+    sendPosition2(){
         let modifier = 5;
         var forward = this.camera.getForwardRay().direction;
         var right = Vector3.Cross(Axis.Y, forward, 100);
@@ -105,6 +110,25 @@ export class Player {
         this.movement.rotation = this.camera.rotation;
         if (this.right_hand) {
             this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+        }
+    }
+    sendPosition() {
+
+        var forward = this.camera.getForwardRay().direction;
+        if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
+
+            var veritcal_input = (this.controller.vertical > 0)? "UP": (this.controller.vertical < 0)? "DOWN":"";
+            var horizontal_input = (this.controller.horizontal > 0)? "RIGHT": (this.controller.horizontal < 0)? "LEFT":"";
+            this.SOCKET.send(JSON.stringify({
+                timestamp: Date.now(),
+                type: "movement_input",
+                PID: this.PID,
+                vertical: veritcal_input,
+                horizontal: horizontal_input,
+                rotation: forward,
+                position: this.movement.position
+            }));
+
         }
     }
 
@@ -148,5 +172,15 @@ export class Player {
         document.addEventListener("mspointerlockchange", pointerlockchange, false);
         document.addEventListener("mozpointerlockchange", pointerlockchange, false);
 
+    }
+
+    render(){
+        // console.log(this.NEXT_POSITION);
+        const delta = this.scene.getEngine().getDeltaTime()/1000;
+        const interpolationFactor = Math.min(1, delta * 60);
+        // this.movement.position.lerpTo(this.NEXT_POSITION, interpolationFactor);
+        Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
+        this.camera.position = this.movement.position.clone();
+        this.movement.rotation = this.camera.rotation;
     }
 }

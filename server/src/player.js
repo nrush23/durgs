@@ -16,6 +16,8 @@ export default class Player {
     previous_position;
     moved;
     NETWORK_CACHE;
+    INPUT_BUFFER;
+    MAX_SPEED;
 
     constructor() {
         this.PID = -1;
@@ -27,6 +29,8 @@ export default class Player {
         this.right_hand = "";
         this.moved = "";
         this.NETWORK_CACHE = [];
+        this.INPUT_BUFFER = [];
+        this.MAX_SPEED = 3;
     }
 
     joinGame(scene) {
@@ -73,13 +77,86 @@ export default class Player {
         }
     }
 
+    render2(input) {
+        console.log(input);
+        let CURRENT = input[3];
+        // let ROTATION = JSON.parse(input[2]);
+        let ROTATION = input[2];
+        let VERTICAL = input[0];
+        let HORIZONTAL = input[1];
+
+        // if (VERTICAL == "UP") {
+        //     this.movement.position.addInPlace(new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED));
+        // } else if (VERTICAL == "DOWN") {
+        //     this.movement.position.subtractInPlace(new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED));
+        // }
+
+        // if (HORIZONTAL == "LEFT") {
+        //     this.movement.position.subtractInPlace(new Vector3(ROTATION._y * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED));
+        // } else if (HORIZONTAL == "RIGHT") {
+        //     this.movement.position.addInPlace(new Vector3(ROTATION._y * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED));
+        // }
+
+        let forward = new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED);
+        let backward = forward.scale(-1);
+        let left = new Vector3(-ROTATION._z * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED);
+        let right = left.scale(-1);
+
+        if (VERTICAL == "UP") {
+            this.movement.position.addInPlace(forward);
+        } else if (VERTICAL == "DOWN") {
+            this.movement.position.addInPlace(backward);
+        }
+
+        if (HORIZONTAL == "LEFT") {
+            this.movement.position.addInPlace(left);
+        } else if (HORIZONTAL == "RIGHT") {
+            this.movement.position.addInPlace(right);
+        }
+
+
+        this.movement.rotation = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
+    }
+
+    // render2(input) {
+    //     console.log(input);
+    //     let CURRENT = input[3];
+    //     // let ROTATION = JSON.parse(input[2]);
+    //     let ROTATION = input[2];
+    //     let VERTICAL = input[0];
+    //     let HORIZONTAL = input[1];
+
+    //     if (VERTICAL == "UP") {
+    //         this.movement.position.x += this.MAX_SPEED;
+    //     } else if (VERTICAL == "DOWN") {
+    //         this.movement.position.x -= this.MAX_SPEED;
+    //     }
+
+    //     if (HORIZONTAL == "LEFT") {
+    //         this.movement.position.z -= this.MAX_SPEED;
+    //     } else if (HORIZONTAL == "RIGHT") {
+    //         this.movement.position.z += this.MAX_SPEED;
+    //     }
+
+    //     this.movement.rotation = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
+    // }
+
     updatePosition(pos, rot) {
         // if (this.model) {
-            // console.log(pos);
-            // this.previous_position = this.movement.position;
-            // this.movement.position = new Vector3(pos._x, pos._y, pos._z);
-            // console.log("%s: <%s,%s,%s>", this.username, this.movement.position.x, this.movement.position.y, this.movement.position.z);
-            this.NETWORK_CACHE.push([pos, rot]);
+        // console.log(pos);
+        // this.previous_position = this.movement.position;
+        // this.movement.position = new Vector3(pos._x, pos._y, pos._z);
+        // console.log("%s: <%s,%s,%s>", this.username, this.movement.position.x, this.movement.position.y, this.movement.position.z);
+        this.NETWORK_CACHE.push([pos, rot]);
         // }
+    }
+
+    addInput(vertical, horizontal, position, rotation) {
+        this.INPUT_BUFFER.push([vertical, horizontal, rotation, position]);
+    }
+
+    //for adding actions to the network cache eventually
+    addAction(action) {
+
     }
 }
