@@ -11,14 +11,23 @@ export class Player {
     movement;
     scene;
     camera;
-    cam_root;
     controller;
-    isLocked = false;
     right_hand = "";
-    // right_item;
     grab = false;
     SOCKET;
     NEXT_POSITION;
+    PREVIOUS_POSITION;
+    MAX_SPEED = 3;
+
+    //Sort by performance.now() values, send the index of the
+    //NEXT_POSITION in the JSON
+
+    //On receive, check if index (or maybe perfomance.now() value) matches
+    //server value. If not, set that NEXT_POSITION value to server value
+    //and reapply all remaining inputs.
+    //In all cases, once you retrive a key from the server, discard all older
+    //keys
+    INPUT_CACHE;
 
     static PLAYER_SPEED = 0.45;
     static JUMP_FORCE = 0.80;
@@ -37,6 +46,7 @@ export class Player {
         this.SOCKET = socket;
         this.controller = new PlayerInput(scene);
         this.NEXT_POSITION = new Vector3(0,0,0);
+        this.PREVIOUS_POSITION = new Vector3(0,0,0);
     }
 
     createBody(scene, texture) {
@@ -114,11 +124,13 @@ export class Player {
     }
     sendPosition() {
 
-        var forward = this.camera.getForwardRay().direction;
         if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
 
-            var veritcal_input = (this.controller.vertical > 0)? "UP": (this.controller.vertical < 0)? "DOWN":"";
-            var horizontal_input = (this.controller.horizontal > 0)? "RIGHT": (this.controller.horizontal < 0)? "LEFT":"";
+            // var veritcal_input = (this.controller.vertical > 0)? "UP": (this.controller.vertical < 0)? "DOWN":"";
+            // var horizontal_input = (this.controller.horizontal > 0)? "RIGHT": (this.controller.horizontal < 0)? "LEFT":"";
+            var forward = this.camera.getForwardRay().direction;
+            var veritcal_input = this.controller.vertical;
+            var horizontal_input = this.controller.horizontal;
             this.SOCKET.send(JSON.stringify({
                 timestamp: Date.now(),
                 type: "movement_input",
@@ -126,9 +138,23 @@ export class Player {
                 vertical: veritcal_input,
                 horizontal: horizontal_input,
                 rotation: forward,
-                position: this.movement.position
+                position: this.NEXT_POSITION,
             }));
 
+            //Client side prediction portion, same as server
+            forward.x *= this.MAX_SPEED;
+            forward.z *= this.MAX_SPEED;
+            let backward = forward.scale(-1);
+            let left = new Vector3(-forward.z * this.MAX_SPEED, 0, forward.x * this.MAX_SPEED);
+            let right = left.scale(-1);
+            if(this.controller.vertical){
+                this.NEXT_POSITION.addInPlace((this.controller.vertical == "UP")? forward: backward);
+            }
+            if(this.controller.horizontal){
+                this.NEXT_POSITION.addInPlace((this.controller.horizontal == "LEFT")? left:right );
+            }
+            this.movement.rotation = forward;
+            this.movement.position = this.PREVIOUS_POSITION;
         }
     }
 

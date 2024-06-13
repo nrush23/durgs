@@ -29,27 +29,33 @@ export class PlayerInput {
 
  updateFromKeyboard() {
         if (this.inputMap["ArrowUp"] || this.inputMap["w"]) {
-            this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
-            this.verticalAxis = 1;
+            this.vertical = "UP";
+            // this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
+            // this.verticalAxis = 1;
         } else if (this.inputMap["ArrowDown"] || this.inputMap["s"]) {
-            this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
-            this.verticalAxis = -1;
+            this.vertical = "DOWN";
+            // this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
+            // this.verticalAxis = -1;
         } else {
-            this.vertical = 0;
-            this.verticalAxis = 0;
+            this.vertical = "";
+            // this.vertical = 0;
+            // this.verticalAxis = 0;
         }
 
         if (this.inputMap["ArrowLeft"] || this.inputMap["a"]) {
-            this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
-            this.horizontalAxis = -1;
+            this.horizontal = "LEFT";
+            // this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
+            // this.horizontalAxis = -1;
 
         } else if (this.inputMap["ArrowRight"] || this.inputMap["d"]) {
-            this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
-            this.horizontalAxis = 1;
+            this.horizontal = "RIGHT";
+            // this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
+            // this.horizontalAxis = 1;
         }
         else {
-            this.horizontal = 0;
-            this.horizontalAxis = 0;
+            this.horizontal = "";
+            // this.horizontal = 0;
+            // this.horizontalAxis = 0;
         }
 
         if(this.inputMap["e"]){
