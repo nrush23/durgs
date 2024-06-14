@@ -176,8 +176,9 @@ class App {
                     break;
                 case "movement":
                     console.log("MOVEMENT MSG: %s", event.data);
-                    this.PLAYER.PREVIOUS_POSITION = this.PLAYER.NEXT_POSITION;
-                    this.PLAYER.NEXT_POSITION = new Vector3(data.position._x, data.position._y, data.position._z);
+                    this.PLAYER.INPUT_CACHE
+                    // this.PLAYER.PREVIOUS_POSITION = this.PLAYER.NEXT_POSITION;
+                    // this.PLAYER.NEXT_POSITION = new Vector3(data.position._x, data.position._y, data.position._z);
                     break;
                 default:
                     console.log('Unknown type: %s', data.type);

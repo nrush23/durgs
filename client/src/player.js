@@ -1,5 +1,6 @@
 import { AbstractMesh, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PointerEventTypes, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
+import { Sliding_Window } from "./sliding_window";
 const pocket = {
     empty: 'EMPTY',
     full: 'FULL'
@@ -47,6 +48,7 @@ export class Player {
         this.controller = new PlayerInput(scene);
         this.NEXT_POSITION = new Vector3(0,0,0);
         this.PREVIOUS_POSITION = new Vector3(0,0,0);
+        this.INPUT_CACHE = new Sliding_Window(100);
     }
 
     createBody(scene, texture) {
@@ -138,7 +140,7 @@ export class Player {
                 vertical: veritcal_input,
                 horizontal: horizontal_input,
                 rotation: forward,
-                position: this.NEXT_POSITION,
+                position: this.INPUT_CACHE.getEnd(),   //this one I can get rid of
             }));
 
             //Client side prediction portion, same as server
@@ -155,6 +157,7 @@ export class Player {
             }
             this.movement.rotation = forward;
             this.movement.position = this.PREVIOUS_POSITION;
+            this.INPUT_CACHE.addToWindow([this.NEXT_POSITION, this.controller.vertical, this.controller.horizontal]);
         }
     }
 
@@ -208,5 +211,19 @@ export class Player {
         Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
         this.camera.position = this.movement.position.clone();
         this.movement.rotation = this.camera.rotation;
+    }
+
+    //Write code to set the correction to our current position
+    //and apply the remaining inputs
+    removeFromCache(item, index){
+        if(this.INPUT_CACHE.get(index)[0] == item){
+            this.INPUT_CACHE.removeFromWindow(index);
+        }else{
+            this.INPUT_CACHE.removeFromWindow(index);
+        }
+    }
+
+    applyFromCache(index){
+
     }
 }
