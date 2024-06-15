@@ -73,6 +73,7 @@ export class Game {
                                 timestamp: Date.now(),
                                 type: "movement",
                                 position: player.movement.position,
+                                index: player.INPUT_BUFFER[player.INPUT_BUFFER.length - 1][3]
                             }));
                             player.INPUT_BUFFER = [];
                         }

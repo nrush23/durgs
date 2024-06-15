@@ -94,7 +94,7 @@ class App {
     //Create new player and wait for join message to get username
     //and player id (pid)
     connect(scene) {
-        this.SOCKET = new WebSocket('ws://192.168.0.41:3001');
+        this.SOCKET = new WebSocket('ws://192.168.0.45:3001');
         this.PLAYER = new Player(scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('open', (event) => {
             this.SOCKET.send(JSON.stringify({
@@ -176,7 +176,8 @@ class App {
                     break;
                 case "movement":
                     console.log("MOVEMENT MSG: %s", event.data);
-                    this.PLAYER.INPUT_CACHE
+                    this.PLAYER.removeFromCache(new Vector3(data.position._x, data.position._y, data.position._z), data.index);
+                    // this.PLAYER.INPUT_CACHE.pushback
                     // this.PLAYER.PREVIOUS_POSITION = this.PLAYER.NEXT_POSITION;
                     // this.PLAYER.NEXT_POSITION = new Vector3(data.position._x, data.position._y, data.position._z);
                     break;

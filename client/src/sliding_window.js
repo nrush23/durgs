@@ -1,16 +1,16 @@
 export class Sliding_Window {
-    INPUT_CACHE;
+    WINDOW;
     START;
     END;
     constructor(size) {
         this.START = 0;
         this.END = 0;
-        this.INPUT_CACHE = new Array(size).fill(null);
+        this.WINDOW = new Array(size).fill(null);
     }
 
     addToWindow(item) {
-        this.INPUT_CACHE[this.END % this.INPUT_CACHE.length] = item;
-        if((this.END - this.START) < this.INPUT_CACHE.length){
+        this.WINDOW[this.END % this.WINDOW.length] = item;
+        if((this.END - this.START) < this.WINDOW.length){
             this.END++;
         }else{
             this.START++;
@@ -24,11 +24,11 @@ export class Sliding_Window {
     }
 
     getEnd(){
-        return (this.END % this.INPUT_CACHE.length);
+        return (this.END % this.WINDOW.length);
     }
 
     get(index){
-        return this.INPUT_CACHE[index];
+        return this.WINDOW[index];
     }
 
     print() {
