@@ -19,6 +19,7 @@ export class Player {
     NEXT_POSITION;
     PREVIOUS_POSITION;
     MAX_SPEED = 3;
+    UPDATE_CACHE;
 
     //Sort by performance.now() values, send the index of the
     //NEXT_POSITION in the JSON
@@ -49,6 +50,7 @@ export class Player {
         this.NEXT_POSITION = new Vector3(0, 0, 0);
         this.PREVIOUS_POSITION = new Vector3(0, 0, 0);
         this.INPUT_CACHE = new Sliding_Window(100);
+        this.UPDATE_CACHE = "";
     }
 
     createBody(scene, texture) {
@@ -78,6 +80,10 @@ export class Player {
         // });
         scene.registerBeforeRender(() => {
             this.render();
+            if(this.UPDATE_CACHE){
+                this.UPDATE_CACHE();
+                this.UPDATE_CACHE = "";
+            }
         });
     }
 
@@ -236,6 +242,7 @@ export class Player {
                 }
                 this.movement.rotation = forward;
                 this.camera.position = this.movement.position.clone();
+                input[0] = (i == this.INPUT_CACHE.END-1)? this.NEXT_POSITION: this.movement.position;
             }
         }
     }
