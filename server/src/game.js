@@ -61,6 +61,7 @@ export class Game {
                         if(player.INPUT_BUFFER.length > 0){
                             player.INPUT_BUFFER.forEach((input)=>{
                                 player.render2(input);
+                                console.log(player.movement.position);
                             })
                             this.broadcast(JSON.stringify({
                                 timestamp: Date.now(),

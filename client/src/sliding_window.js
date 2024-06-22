@@ -28,7 +28,10 @@ export class Sliding_Window {
     }
 
     get(index){
-        return this.WINDOW[index];
+        if(index < this.START){
+            return null;
+        }
+        return this.WINDOW[index % this.WINDOW.length];
     }
 
     print() {

@@ -94,7 +94,7 @@ class App {
     //Create new player and wait for join message to get username
     //and player id (pid)
     connect(scene) {
-        this.SOCKET = new WebSocket('ws://192.168.0.45:3001');
+        this.SOCKET = new WebSocket('ws://192.168.56.1:3001');
         this.PLAYER = new Player(scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('open', (event) => {
             this.SOCKET.send(JSON.stringify({

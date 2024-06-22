@@ -49,7 +49,7 @@ export class Player {
         this.controller = new PlayerInput(scene);
         this.NEXT_POSITION = new Vector3(0, 0, 0);
         this.PREVIOUS_POSITION = new Vector3(0, 0, 0);
-        this.INPUT_CACHE = new Sliding_Window(100);
+        this.INPUT_CACHE = new Sliding_Window(10);
         this.UPDATE_CACHE = "";
     }
 
@@ -80,7 +80,7 @@ export class Player {
         // });
         scene.registerBeforeRender(() => {
             this.render();
-            if(this.UPDATE_CACHE){
+            if (this.UPDATE_CACHE) {
                 this.UPDATE_CACHE();
                 this.UPDATE_CACHE = "";
             }
@@ -148,22 +148,36 @@ export class Player {
                 rotation: forward,
                 index: this.INPUT_CACHE.getEnd(),   //this one I can get rid of
             }));
-
-            //Client side prediction portion, same as server
-            forward.x *= this.MAX_SPEED;
-            forward.z *= this.MAX_SPEED;
-            let backward = forward.scale(-1);
-            let left = new Vector3(-forward.z * this.MAX_SPEED, 0, forward.x * this.MAX_SPEED);
-            let right = left.scale(-1);
-            if (this.controller.vertical) {
-                this.NEXT_POSITION.addInPlace((this.controller.vertical == "UP") ? forward : backward);
-            }
-            if (this.controller.horizontal) {
-                this.NEXT_POSITION.addInPlace((this.controller.horizontal == "LEFT") ? left : right);
-            }
+            let INPUT = ["", forward, veritcal_input, horizontal_input];
+            console.log("INPUT BEFORE: %s", INPUT);
+            this.updateMovement(INPUT);
+            console.log("INPUT AFTER: %s",INPUT);
+            this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
+            this.movement.position = this.PREVIOUS_POSITION.clone();
+            this.camera.position = this.PREVIOUS_POSITION.clone();
             this.movement.rotation = forward;
-            this.movement.position = this.PREVIOUS_POSITION;
-            this.INPUT_CACHE.addToWindow([this.NEXT_POSITION, forward, this.controller.vertical, this.controller.horizontal]);
+            this.NEXT_POSITION = INPUT[0];
+            this.INPUT_CACHE.addToWindow(INPUT);
+            console.log(this.INPUT_CACHE.WINDOW);
+
+            /* OLD CODE */
+            // //Client side prediction portion, same as server
+            // forward.x *= this.MAX_SPEED;
+            // forward.z *= this.MAX_SPEED;
+            // forward.y = 0;
+            // let backward = forward.scale(-1);
+            // let left = new Vector3(-forward.z, 0, forward.x);
+            // let right = left.scale(-1);
+            // if (this.controller.vertical) {
+            //     this.NEXT_POSITION.addInPlace((this.controller.vertical == "UP") ? forward : backward);
+            // }
+            // if (this.controller.horizontal) {
+            //     this.NEXT_POSITION.addInPlace((this.controller.horizontal == "LEFT") ? left : right);
+            // }
+            // this.movement.rotation = forward;
+            // this.movement.position = this.PREVIOUS_POSITION;
+            // this.INPUT_CACHE.addToWindow([this.NEXT_POSITION, forward, this.controller.vertical, this.controller.horizontal]);
+            // console.log(this.INPUT_CACHE.WINDOW);
         }
     }
 
@@ -223,16 +237,17 @@ export class Player {
     //and apply the remaining inputs
     removeFromCache(pos, index) {
         console.log(index);
-        this.INPUT_CACHE.removeFromWindow(index);
-        if (this.INPUT_CACHE.get(index)[0] != pos) {
+        if (this.INPUT_CACHE.get(index) != null && this.INPUT_CACHE.get(index)[0] != pos) {
+            console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
             this.movement.position = pos;
             for (let i = this.INPUT_CACHE.START; i < this.INPUT_CACHE.END; i++) {
                 let input = this.INPUT_CACHE.WINDOW[i % this.INPUT_CACHE.WINDOW.length];
                 let forward = input[1];
                 forward.x *= this.MAX_SPEED;
                 forward.z *= this.MAX_SPEED;
+                forward.y = 0;
                 let backward = forward.scale(-1);
-                let left = new Vector3(-forward.z * this.MAX_SPEED, 0, forward.x * this.MAX_SPEED);
+                let left = new Vector3(-forward.z, 0, forward.x);
                 let right = left.scale(-1);
                 if (input[2]) {
                     (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION.addInPlace((this.controller.vertical == "UP") ? forward : backward) : this.movement.position.addInPlace(input[2] == "UP" ? forward : backward);
@@ -242,9 +257,35 @@ export class Player {
                 }
                 this.movement.rotation = forward;
                 this.camera.position = this.movement.position.clone();
-                input[0] = (i == this.INPUT_CACHE.END-1)? this.NEXT_POSITION: this.movement.position;
+                input[0] = (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION : this.movement.position;
             }
         }
+        this.INPUT_CACHE.removeFromWindow(index);
+    }
+
+    updateMovement(input) {
+        let ROTATION = input[1];
+        let VERTICAL = input[2];
+        let HORIZONTAL = input[3];
+        let forward = new Vector3(ROTATION.x * this.MAX_SPEED, 0, ROTATION.z * this.MAX_SPEED);
+        let backward = forward.scale(-1);
+        // let left = new Vector3(-ROTATION._z * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._x * this.MAX_SPEED);
+        let left = new Vector3(-ROTATION.z * this.MAX_SPEED, 0, ROTATION.x * this.MAX_SPEED);
+        let right = left.scale(-1);
+        let NEW_POSITION = this.NEXT_POSITION.clone();
+        if (VERTICAL == "UP") {
+            NEW_POSITION.addInPlace(forward);
+        } else if (VERTICAL == "DOWN") {
+            NEW_POSITION.addInPlace(backward);
+        }
+
+        if (HORIZONTAL == "LEFT") {
+            NEW_POSITION.addInPlace(left);
+        } else if (HORIZONTAL == "RIGHT") {
+            NEW_POSITION.addInPlace(right);
+        }
+        input[0] = NEW_POSITION;
+        // this.movement.rotation = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
     }
 
     applyFromCache(index) {

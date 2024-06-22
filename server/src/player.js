@@ -46,24 +46,6 @@ export default class Player {
                 console.log("%s entered the scene", this.username);
             }
         })
-        // SceneLoader.ImportMeshAsync("body", "http://localhost:3001/assets/", "player.glb", this.scene, (meshes) => {
-        //     console.log(meshes);
-        //     if (meshes.length > 0) {
-        //         this.model = meshes[0];
-        //         this.model.name = this.username;
-        //         this.movement = new TransformNode(this.PID, this.scene);
-        //         this.movement.position = new Vector3(0, 0, 0);
-        //         // console.log(this.model);
-        //     }
-
-        //     // this.scene.registerBeforeRender(() => {
-        //     //     if (this.moved) {
-        //     //         this.updatePosition(this.moved);
-        //     //     }
-        //     // });
-        // }).then((evt) => {
-        //     console.log("%s entered the scene", this.username);
-        // });
     }
 
     setModel(mesh) {
@@ -78,13 +60,13 @@ export default class Player {
     }
 
     render2(input) {
-        console.log(input);
+        // console.log(input);
         let CURRENT = input[3];
         // let ROTATION = JSON.parse(input[2]);
         let ROTATION = input[2];
         let VERTICAL = input[0];
         let HORIZONTAL = input[1];
-
+        console.log("CURRENT: %s, ROTATION: %s, VERT: %s, HORZ: %s", CURRENT, ROTATION, VERTICAL, HORIZONTAL);
         // if (VERTICAL == "UP") {
         //     this.movement.position.addInPlace(new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED));
         // } else if (VERTICAL == "DOWN") {
@@ -97,8 +79,10 @@ export default class Player {
         //     this.movement.position.addInPlace(new Vector3(ROTATION._y * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED));
         // }
 
+        // let forward = new Vector3(ROTATION._x * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._z * this.MAX_SPEED);
         let forward = new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED);
         let backward = forward.scale(-1);
+        // let left = new Vector3(-ROTATION._z * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._x * this.MAX_SPEED);
         let left = new Vector3(-ROTATION._z * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED);
         let right = left.scale(-1);
 
