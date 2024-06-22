@@ -151,7 +151,7 @@ export class Player {
             let INPUT = ["", forward, veritcal_input, horizontal_input];
             console.log("INPUT BEFORE: %s", INPUT);
             this.updateMovement(INPUT);
-            console.log("INPUT AFTER: %s",INPUT);
+            console.log("INPUT AFTER: %s", INPUT);
             this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
             this.movement.position = this.PREVIOUS_POSITION.clone();
             this.camera.position = this.PREVIOUS_POSITION.clone();
@@ -239,25 +239,32 @@ export class Player {
         console.log(index);
         if (this.INPUT_CACHE.get(index) != null && !this.INPUT_CACHE.get(index)[0].equals(pos)) {
             console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
-            this.movement.position = pos;
-            for (let i = this.INPUT_CACHE.START; i < this.INPUT_CACHE.END; i++) {
+            this.NEXT_POSITION.position = pos;
+            for (let i = index + 1; i < this.INPUT_CACHE.END; i++) {
                 let input = this.INPUT_CACHE.WINDOW[i % this.INPUT_CACHE.WINDOW.length];
-                let forward = input[1];
-                forward.x *= this.MAX_SPEED;
-                forward.z *= this.MAX_SPEED;
-                forward.y = 0;
-                let backward = forward.scale(-1);
-                let left = new Vector3(-forward.z, 0, forward.x);
-                let right = left.scale(-1);
-                if (input[2]) {
-                    (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION.addInPlace((this.controller.vertical == "UP") ? forward : backward) : this.movement.position.addInPlace(input[2] == "UP" ? forward : backward);
-                }
-                if (input[3]) {
-                    (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION.addInPlace((this.controller.horizontal == "LEFT") ? left : right) : this.movement.position.addInPlace(input[3] == "LEFT" ? left : right);
-                }
-                this.movement.rotation = forward;
+                this.updateMovement(input);
+                this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
+                this.NEXT_POSITION = input[0];
+                this.movement.position = this.PREVIOUS_POSITION.clone();
                 this.camera.position = this.movement.position.clone();
-                input[0] = (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION : this.movement.position;
+                /* OLD CODE */
+                // let input = this.INPUT_CACHE.WINDOW[i % this.INPUT_CACHE.WINDOW.length];
+                // let forward = input[1];
+                // forward.x *= this.MAX_SPEED;
+                // forward.z *= this.MAX_SPEED;
+                // forward.y = 0;
+                // let backward = forward.scale(-1);
+                // let left = new Vector3(-forward.z, 0, forward.x);
+                // let right = left.scale(-1);
+                // if (input[2]) {
+                //     (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION.addInPlace((this.controller.vertical == "UP") ? forward : backward) : this.movement.position.addInPlace(input[2] == "UP" ? forward : backward);
+                // }
+                // if (input[3]) {
+                //     (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION.addInPlace((this.controller.horizontal == "LEFT") ? left : right) : this.movement.position.addInPlace(input[3] == "LEFT" ? left : right);
+                // }
+                // this.movement.rotation = forward;
+                // this.camera.position = this.movement.position.clone();
+                // input[0] = (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION : this.movement.position;
             }
         }
         this.INPUT_CACHE.removeFromWindow(index);
