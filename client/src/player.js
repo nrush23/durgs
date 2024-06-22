@@ -237,7 +237,7 @@ export class Player {
     //and apply the remaining inputs
     removeFromCache(pos, index) {
         console.log(index);
-        if (this.INPUT_CACHE.get(index) != null && this.INPUT_CACHE.get(index)[0] != pos) {
+        if (this.INPUT_CACHE.get(index) != null && !this.INPUT_CACHE.get(index)[0].equals(pos)) {
             console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
             this.movement.position = pos;
             for (let i = this.INPUT_CACHE.START; i < this.INPUT_CACHE.END; i++) {

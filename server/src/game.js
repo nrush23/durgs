@@ -57,9 +57,9 @@ export class Game {
                 startTime = now;
                 accumulator += delta;
                 while (accumulator >= FIXED_TIME) {
-                    for (let player of this.players.values()){
-                        if(player.INPUT_BUFFER.length > 0){
-                            player.INPUT_BUFFER.forEach((input)=>{
+                    for (let player of this.players.values()) {
+                        if (player.INPUT_BUFFER.length > 0) {
+                            player.INPUT_BUFFER.forEach((input) => {
                                 player.render2(input);
                                 console.log(player.movement.position);
                             })
