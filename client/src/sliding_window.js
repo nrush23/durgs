@@ -36,8 +36,8 @@ export class Sliding_Window {
 
     print() {
         let output = '';
-        for (let i = this.start; i < this.end; i++) {
-            output += this.array[i % this.array.length] + ' ';
+        for (let i = this.START; i < this.END; i++) {
+            output += this.WINDOW[i % this.WINDOW.length] + ' ';
         }
         console.log(output.trim());
     }

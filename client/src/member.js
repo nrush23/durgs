@@ -54,7 +54,7 @@ export class Member {
             // this.right_hand.parent.parent.position = this.movement.position;
             this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
         }
-        this.movement.rotation = new Vector3(rotation._x, rotation._y, rotation._z);
+        this.movement.rotation = new Vector3(0, rotation._y,0);
     }
 
     updateGrab(item) {

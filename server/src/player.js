@@ -30,7 +30,7 @@ export default class Player {
         this.moved = "";
         this.NETWORK_CACHE = [];
         this.INPUT_BUFFER = [];
-        this.MAX_SPEED = 3;
+        this.MAX_SPEED = 1.5;
     }
 
     joinGame(scene) {
@@ -60,29 +60,15 @@ export default class Player {
     }
 
     render2(input) {
-        // console.log(input);
-        let CURRENT = input[3];
-        // let ROTATION = JSON.parse(input[2]);
+        let CURRENT = input[4];
+        let TWIST = input[3];
         let ROTATION = input[2];
         let VERTICAL = input[0];
         let HORIZONTAL = input[1];
-        console.log("CURRENT: %s, ROTATION: %s, VERT: %s, HORZ: %s", CURRENT, ROTATION, VERTICAL, HORIZONTAL);
-        // if (VERTICAL == "UP") {
-        //     this.movement.position.addInPlace(new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED));
-        // } else if (VERTICAL == "DOWN") {
-        //     this.movement.position.subtractInPlace(new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED));
-        // }
+        console.log("CURRENT: %s, TWIST: %s, ROTATION: %s, VERT: %s, HORZ: %s", CURRENT, TWIST, ROTATION, VERTICAL, HORIZONTAL);
 
-        // if (HORIZONTAL == "LEFT") {
-        //     this.movement.position.subtractInPlace(new Vector3(ROTATION._y * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED));
-        // } else if (HORIZONTAL == "RIGHT") {
-        //     this.movement.position.addInPlace(new Vector3(ROTATION._y * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED));
-        // }
-
-        // let forward = new Vector3(ROTATION._x * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._z * this.MAX_SPEED);
         let forward = new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED);
         let backward = forward.scale(-1);
-        // let left = new Vector3(-ROTATION._z * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._x * this.MAX_SPEED);
         let left = new Vector3(-ROTATION._z * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED);
         let right = left.scale(-1);
 
@@ -97,9 +83,9 @@ export default class Player {
         } else if (HORIZONTAL == "RIGHT") {
             this.movement.position.addInPlace(right);
         }
+        this.movement.rotation = new Vector3(0, TWIST, 0);
 
-
-        this.movement.rotation = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
+        // this.movement.rotation = new Vector3(ROTATION._x, 0, ROTATION._z);
     }
 
     // render2(input) {
@@ -135,8 +121,8 @@ export default class Player {
         // }
     }
 
-    addInput(vertical, horizontal, position, rotation) {
-        this.INPUT_BUFFER.push([vertical, horizontal, rotation, position]);
+    addInput(vertical, horizontal, rotation, twist, index) {
+        this.INPUT_BUFFER.push([vertical, horizontal, rotation, twist, index]);
     }
 
     //for adding actions to the network cache eventually

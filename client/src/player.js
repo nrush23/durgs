@@ -18,7 +18,7 @@ export class Player {
     SOCKET;
     NEXT_POSITION;
     PREVIOUS_POSITION;
-    MAX_SPEED = 3;
+    MAX_SPEED = 1.5;
     UPDATE_CACHE;
 
     //Sort by performance.now() values, send the index of the
@@ -134,8 +134,6 @@ export class Player {
 
         if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
 
-            // var veritcal_input = (this.controller.vertical > 0)? "UP": (this.controller.vertical < 0)? "DOWN":"";
-            // var horizontal_input = (this.controller.horizontal > 0)? "RIGHT": (this.controller.horizontal < 0)? "LEFT":"";
             var forward = this.camera.getForwardRay().direction;
             var veritcal_input = this.controller.vertical;
             var horizontal_input = this.controller.horizontal;
@@ -146,6 +144,7 @@ export class Player {
                 vertical: veritcal_input,
                 horizontal: horizontal_input,
                 rotation: forward,
+                twist: this.camera.rotation.y,
                 index: this.INPUT_CACHE.getEnd(),   //this one I can get rid of
             }));
             let INPUT = ["", forward, veritcal_input, horizontal_input];
@@ -155,7 +154,7 @@ export class Player {
             this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
             this.movement.position = this.PREVIOUS_POSITION.clone();
             this.camera.position = this.PREVIOUS_POSITION.clone();
-            this.movement.rotation = forward;
+            this.movement.rotation = new Vector3(0,this.camera.rotation.y,0);
             this.NEXT_POSITION = INPUT[0];
             this.INPUT_CACHE.addToWindow(INPUT);
             console.log(this.INPUT_CACHE.WINDOW);
@@ -230,7 +229,8 @@ export class Player {
         // this.movement.position.lerpTo(this.NEXT_POSITION, interpolationFactor);
         Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
         this.camera.position = this.movement.position.clone();
-        this.movement.rotation = this.camera.rotation;
+        // this.movement.rotation = this.camera.rotation;
+        this.movement.rotation.y = this.camera.rotation.y;
     }
 
     //Write code to set the correction to our current position

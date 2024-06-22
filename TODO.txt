@@ -5,7 +5,9 @@ STAGE 2
 PHYSICS
 //-Add world meshes to server
 //-Add food items to server side
--Add player model to server side
+//-Add player model to server side
+-Add LERP for the other player models
+-Fix rotation being sent over
 -Change server structure so that when restock icon is pressed,
 server spawns the items and sends their position over to the players
 -implement sending over the physics positions every 20 frames

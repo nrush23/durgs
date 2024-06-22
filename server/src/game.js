@@ -68,13 +68,14 @@ export class Game {
                                 type: "member_movement",
                                 username: player.username,
                                 position: player.movement.position,
+                                // rotation: new Vector3(0, player.movement.rotation.y, 0)
                                 rotation: player.movement.rotation
                             }));
                             player.socket.send(JSON.stringify({
                                 timestamp: Date.now(),
                                 type: "movement",
                                 position: player.movement.position,
-                                index: player.INPUT_BUFFER[player.INPUT_BUFFER.length - 1][3]
+                                index: player.INPUT_BUFFER[player.INPUT_BUFFER.length - 1][4]
                             }));
                             player.INPUT_BUFFER = [];
                         }
