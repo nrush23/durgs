@@ -132,7 +132,7 @@ export class Player {
     }
     sendPosition() {
 
-        if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
+        // if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
 
             var forward = this.camera.getForwardRay().direction;
             var veritcal_input = this.controller.vertical;
@@ -177,7 +177,7 @@ export class Player {
             // this.movement.position = this.PREVIOUS_POSITION;
             // this.INPUT_CACHE.addToWindow([this.NEXT_POSITION, forward, this.controller.vertical, this.controller.horizontal]);
             // console.log(this.INPUT_CACHE.WINDOW);
-        }
+        // }
     }
 
     updateInteract() {
