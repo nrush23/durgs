@@ -19,6 +19,7 @@ class App {
     camera;
     canvas;
     engine;
+    LOG = false;
 
     Members;
     constructor() {
@@ -37,7 +38,7 @@ class App {
     //and player id (pid)
     connect() {
         console.log("Trying to connect");
-        this.SOCKET = new WebSocket('ws://192.168.0.29:3001');
+        this.SOCKET = new WebSocket('ws://192.168.0.40:3001');
         // this.PLAYER = new Player(this.scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
@@ -113,7 +114,9 @@ class App {
                     }
                     break;
                 case "movement":
-                    console.log("MOVEMENT MSG: %s", event.data);
+                    if (this.LOG) {
+                        console.log("MOVEMENT MSG: %s", event.data);
+                    }
                     this.PLAYER.UPDATE_CACHE = () => this.PLAYER.removeFromCache(new Vector3(data.position._x, data.position._y, data.position._z), data.index);
                     break;
                 default:
@@ -181,44 +184,13 @@ class App {
         this.camera.attachControl(this.canvas, true);
 
         var SUN = new HemisphericLight("SUN", new Vector3(0, 3, 0), this.scene);
-        // this.initializePhysics().then(() => {
-        //     this.WORLD = new World(this.scene, () => {
-        //         this.RESTOCKER = new Restocker(this.scene);
-        //     });
-
-        // });
         await this.initializePhysics();
-        this.WORLD = new World(this.scene, ()=>{
+        this.WORLD = new World(this.scene, () => {
             this.RESTOCKER = new Restocker(this.scene);
         });
-        //Connect to server
+        //Connect to server and start game
         this.connect();
-        // this.scene.clearColor = Color4.FromHexString("#c7f2f8");
-        // this.engine.runRenderLoop(() => {
-        //     this.scene.render();
-        // });
 
-        // let startTime = performance.now();
-        // let simulationSpeedFactor = 1;
-        // let accumulator = 0;
-        // let FIXED_TIME = 0.02;
-        // this.scene.registerBeforeRender(() => {
-        //     const now = performance.now();
-        //     const delta = (now - startTime) / 1000;
-        //     startTime = now;
-        //     accumulator += delta;
-
-        //     while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
-        //         this.PLAYER.updateInteract();
-        //         // this.PLAYER.sendPosition();
-        //         this.Members.forEach((member) => {
-        //             member.render();
-        //         });
-        //         accumulator -= FIXED_TIME;
-        //     }
-        // })
-
-        // this.scene.debugLayer.show();
     }
 
     async RUN2() {

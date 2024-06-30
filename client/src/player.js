@@ -18,7 +18,7 @@ export class Player {
     SOCKET;
     NEXT_POSITION;
     PREVIOUS_POSITION;
-    MAX_SPEED = 1.5;
+    MAX_SPEED = 1;
     UPDATE_CACHE;
 
     //Sort by performance.now() values, send the index of the
@@ -84,6 +84,9 @@ export class Player {
                 this.UPDATE_CACHE();
                 this.UPDATE_CACHE = "";
             }
+            if(this.right_hand){
+                this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+            }
         });
     }
 
@@ -148,16 +151,16 @@ export class Player {
                 index: this.INPUT_CACHE.getEnd(),   //this one I can get rid of
             }));
             let INPUT = ["", forward, veritcal_input, horizontal_input];
-            console.log("INPUT BEFORE: %s", INPUT);
+            // console.log("INPUT BEFORE: %s", INPUT);
             this.updateMovement(INPUT);
-            console.log("INPUT AFTER: %s", INPUT);
+            // console.log("INPUT AFTER: %s", INPUT);
             this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
             this.movement.position = this.PREVIOUS_POSITION.clone();
             this.camera.position = this.PREVIOUS_POSITION.clone();
             this.movement.rotation = new Vector3(0,this.camera.rotation.y,0);
             this.NEXT_POSITION = INPUT[0];
             this.INPUT_CACHE.addToWindow(INPUT);
-            console.log(this.INPUT_CACHE.WINDOW);
+            // console.log(this.INPUT_CACHE.WINDOW);
 
             /* OLD CODE */
             // //Client side prediction portion, same as server
@@ -236,7 +239,7 @@ export class Player {
     //Write code to set the correction to our current position
     //and apply the remaining inputs
     removeFromCache(pos, index) {
-        console.log(index);
+        // console.log(index);
         if (this.INPUT_CACHE.get(index) != null && !this.INPUT_CACHE.get(index)[0].equals(pos)) {
             console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
             this.NEXT_POSITION.position = pos;
@@ -274,7 +277,7 @@ export class Player {
         let ROTATION = input[1];
         let VERTICAL = input[2];
         let HORIZONTAL = input[3];
-        let forward = new Vector3(ROTATION.x * this.MAX_SPEED, 0, ROTATION.z * this.MAX_SPEED);
+        let forward = new Vector3(ROTATION.x * this.MAX_SPEED, ROTATION.y * this.MAX_SPEED, ROTATION.z * this.MAX_SPEED);
         let backward = forward.scale(-1);
         // let left = new Vector3(-ROTATION._z * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._x * this.MAX_SPEED);
         let left = new Vector3(-ROTATION.z * this.MAX_SPEED, 0, ROTATION.x * this.MAX_SPEED);

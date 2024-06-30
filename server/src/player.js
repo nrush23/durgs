@@ -30,7 +30,7 @@ export default class Player {
         this.moved = "";
         this.NETWORK_CACHE = [];
         this.INPUT_BUFFER = [];
-        this.MAX_SPEED = 1.5;
+        this.MAX_SPEED = 1;
     }
 
     joinGame(scene) {
