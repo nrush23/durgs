@@ -1,9 +1,11 @@
 import { Axis, Color3, Mesh, MeshBuilder, PhysicsAggregate, PhysicsShapeType, Scene, SceneLoader, Space, StandardMaterial, Vector3 } from "@babylonjs/core";
 import { Bun } from "./bun";
 import { Restocker } from "./restocker";
+import { Grill } from "./grill";
 export class World {
     DURGS;
     GROUND;
+    GRILL;
     scene;
     env;
 
@@ -22,6 +24,7 @@ export class World {
             if(typeof callback == 'function'){
                 callback();
             }
+            this.GRILL = new Grill(scene);
             // new Restocker(scene);
         }).catch((error) => {
             console.log("Loading mesh error: ", error);

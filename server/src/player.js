@@ -67,10 +67,15 @@ export default class Player {
         let HORIZONTAL = input[1];
         console.log("CURRENT: %s, TWIST: %s, ROTATION: %s, VERT: %s, HORZ: %s", CURRENT, TWIST, ROTATION, VERTICAL, HORIZONTAL);
 
-        let forward = new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED);
+        let forward = new Vector3(ROTATION._x * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._z * this.MAX_SPEED);
         let backward = forward.scale(-1);
-        let left = new Vector3(-ROTATION._z * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED);
+        let left = new Vector3(-ROTATION._z * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._x * this.MAX_SPEED);
         let right = left.scale(-1);
+
+        // let forward = new Vector3(ROTATION._x * this.MAX_SPEED, 0, ROTATION._z * this.MAX_SPEED);
+        // let backward = forward.scale(-1);
+        // let left = new Vector3(-ROTATION._z * this.MAX_SPEED, 0, ROTATION._x * this.MAX_SPEED);
+        // let right = left.scale(-1);
 
         if (VERTICAL == "UP") {
             this.movement.position.addInPlace(forward);
