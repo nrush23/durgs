@@ -38,7 +38,7 @@ class App {
     //and player id (pid)
     connect() {
         console.log("Trying to connect");
-        this.SOCKET = new WebSocket('ws://192.168.0.40:3001');
+        this.SOCKET = new WebSocket('ws://192.168.0.27:3001');
         // this.PLAYER = new Player(this.scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);

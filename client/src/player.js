@@ -1,6 +1,7 @@
 import { AbstractMesh, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PointerEventTypes, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
 import { Sliding_Window } from "./sliding_window";
+import { Input_Cache } from "./input_cache";
 const pocket = {
     empty: 'EMPTY',
     full: 'FULL'
@@ -21,6 +22,8 @@ export class Player {
     MAX_SPEED = 1;
     UPDATE_CACHE;
 
+    INPUT_CACHE;
+
     //Sort by performance.now() values, send the index of the
     //NEXT_POSITION in the JSON
 
@@ -29,7 +32,7 @@ export class Player {
     //and reapply all remaining inputs.
     //In all cases, once you retrive a key from the server, discard all older
     //keys
-    INPUT_CACHE;
+    INPUT_CACHE2;
 
     static PLAYER_SPEED = 0.45;
     static JUMP_FORCE = 0.80;
@@ -49,8 +52,9 @@ export class Player {
         this.controller = new PlayerInput(scene);
         this.NEXT_POSITION = new Vector3(0, 0, 0);
         this.PREVIOUS_POSITION = new Vector3(0, 0, 0);
-        this.INPUT_CACHE = new Sliding_Window(10);
+        this.INPUT_CACHE2 = new Sliding_Window(10);
         this.UPDATE_CACHE = "";
+        this.INPUT_CACHE = new Input_Cache(10);
     }
 
     createBody(scene, texture) {
@@ -79,12 +83,12 @@ export class Player {
         //     // this.updatePosition();
         // });
         scene.registerBeforeRender(() => {
-            this.render();
             if (this.UPDATE_CACHE) {
                 this.UPDATE_CACHE();
                 this.UPDATE_CACHE = "";
             }
-            if(this.right_hand){
+            this.render();
+            if (this.right_hand) {
                 this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
             }
         });
@@ -137,9 +141,22 @@ export class Player {
 
         // if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
 
-            var forward = this.camera.getForwardRay().direction;
-            var veritcal_input = this.controller.vertical;
-            var horizontal_input = this.controller.horizontal;
+        var forward = this.camera.getForwardRay().direction;
+        var veritcal_input = this.controller.vertical;
+        var horizontal_input = this.controller.horizontal;
+
+        //Testing
+        let INPUT = new Array(4).fill(null);
+        // let INPUT = ["", forward, veritcal_input, horizontal_input];
+        INPUT[1] = forward;
+        INPUT[2] = veritcal_input;
+        INPUT[3] = horizontal_input;
+        this.updateMovement(INPUT);
+        
+        //If the input can be added, update and send to server
+        //Otherwise, we are still waiting on input to be validated
+        //and can't accept more
+        if(this.INPUT_CACHE.addToCache(INPUT)){
             this.SOCKET.send(JSON.stringify({
                 timestamp: Date.now(),
                 type: "movement_input",
@@ -148,38 +165,58 @@ export class Player {
                 horizontal: horizontal_input,
                 rotation: forward,
                 twist: this.camera.rotation.y,
-                index: this.INPUT_CACHE.getEnd(),   //this one I can get rid of
+                index: this.INPUT_CACHE.LAST_SENT,
             }));
-            let INPUT = ["", forward, veritcal_input, horizontal_input];
-            // console.log("INPUT BEFORE: %s", INPUT);
-            this.updateMovement(INPUT);
-            // console.log("INPUT AFTER: %s", INPUT);
             this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
             this.movement.position = this.PREVIOUS_POSITION.clone();
             this.camera.position = this.PREVIOUS_POSITION.clone();
-            this.movement.rotation = new Vector3(0,this.camera.rotation.y,0);
-            this.NEXT_POSITION = INPUT[0];
-            this.INPUT_CACHE.addToWindow(INPUT);
-            // console.log(this.INPUT_CACHE.WINDOW);
+            this.movement.rotation = new Vector3(0, this.camera.rotation.y, 0);
+            this.NEXT_POSITION = INPUT[0].clone();
+        };
+        //End Testing
 
-            /* OLD CODE */
-            // //Client side prediction portion, same as server
-            // forward.x *= this.MAX_SPEED;
-            // forward.z *= this.MAX_SPEED;
-            // forward.y = 0;
-            // let backward = forward.scale(-1);
-            // let left = new Vector3(-forward.z, 0, forward.x);
-            // let right = left.scale(-1);
-            // if (this.controller.vertical) {
-            //     this.NEXT_POSITION.addInPlace((this.controller.vertical == "UP") ? forward : backward);
-            // }
-            // if (this.controller.horizontal) {
-            //     this.NEXT_POSITION.addInPlace((this.controller.horizontal == "LEFT") ? left : right);
-            // }
-            // this.movement.rotation = forward;
-            // this.movement.position = this.PREVIOUS_POSITION;
-            // this.INPUT_CACHE.addToWindow([this.NEXT_POSITION, forward, this.controller.vertical, this.controller.horizontal]);
-            // console.log(this.INPUT_CACHE.WINDOW);
+        // this.SOCKET.send(JSON.stringify({
+        //     timestamp: Date.now(),
+        //     type: "movement_input",
+        //     PID: this.PID,
+        //     vertical: veritcal_input,
+        //     horizontal: horizontal_input,
+        //     rotation: forward,
+        //     twist: this.camera.rotation.y,
+        //     // index: this.INPUT_CACHE2.getEnd(),   //this one I can get rid of
+        //     index: this.INPUT_CACHE.LAST_SENT,
+        // }));
+        // let INPUT = ["", forward, veritcal_input, horizontal_input];
+        // // console.log("INPUT BEFORE: %s", INPUT);
+        // this.updateMovement(INPUT);
+        // // console.log("INPUT AFTER: %s", INPUT);
+        // this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
+        // this.movement.position = this.PREVIOUS_POSITION.clone();
+        // this.camera.position = this.PREVIOUS_POSITION.clone();
+        // this.movement.rotation = new Vector3(0, this.camera.rotation.y, 0);
+        // this.NEXT_POSITION = INPUT[0];
+        // this.INPUT_CACHE.addToCache(INPUT);
+        // this.INPUT_CACHE2.addToWindow(INPUT);
+        // console.log(this.INPUT_CACHE.WINDOW);
+
+        /* OLD CODE */
+        // //Client side prediction portion, same as server
+        // forward.x *= this.MAX_SPEED;
+        // forward.z *= this.MAX_SPEED;
+        // forward.y = 0;
+        // let backward = forward.scale(-1);
+        // let left = new Vector3(-forward.z, 0, forward.x);
+        // let right = left.scale(-1);
+        // if (this.controller.vertical) {
+        //     this.NEXT_POSITION.addInPlace((this.controller.vertical == "UP") ? forward : backward);
+        // }
+        // if (this.controller.horizontal) {
+        //     this.NEXT_POSITION.addInPlace((this.controller.horizontal == "LEFT") ? left : right);
+        // }
+        // this.movement.rotation = forward;
+        // this.movement.position = this.PREVIOUS_POSITION;
+        // this.INPUT_CACHE.addToWindow([this.NEXT_POSITION, forward, this.controller.vertical, this.controller.horizontal]);
+        // console.log(this.INPUT_CACHE.WINDOW);
         // }
     }
 
@@ -236,15 +273,33 @@ export class Player {
         this.movement.rotation.y = this.camera.rotation.y;
     }
 
+    //New code to snap to the rollback
+    removeFromCache(pos, index) {
+            if (this.INPUT_CACHE.get(index) != null && !pos.equals(this.INPUT_CACHE.get(index)[0])) {
+                console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
+                console.log(index % 10, this.INPUT_CACHE.CACHE);
+                this.NEXT_POSITION = pos.clone();
+                for (let i = index + 1; i < this.INPUT_CACHE.LAST_SENT; i++) {
+                    let INPUT = this.INPUT_CACHE.get(i);
+                    this.updateMovement(INPUT);
+                    this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
+                    this.NEXT_POSITION = input[0];
+                    this.movement.position = this.PREVIOUS_POSITION.clone();
+                    this.camera.position = this.movement.position.clone();
+                }
+            }
+            this.INPUT_CACHE.removeFromCache(index);
+    }
+
     //Write code to set the correction to our current position
     //and apply the remaining inputs
-    removeFromCache(pos, index) {
+    removeFromCache2(pos, index) {
         // console.log(index);
-        if (this.INPUT_CACHE.get(index) != null && !this.INPUT_CACHE.get(index)[0].equals(pos)) {
-            console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
+        if (this.INPUT_CACHE2.get(index) != null && !this.INPUT_CACHE2.get(index)[0].equals(pos)) {
+            console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE2.get(index)[0]);
             this.NEXT_POSITION.position = pos;
-            for (let i = index + 1; i < this.INPUT_CACHE.END; i++) {
-                let input = this.INPUT_CACHE.WINDOW[i % this.INPUT_CACHE.WINDOW.length];
+            for (let i = index + 1; i < this.INPUT_CACHE2.END; i++) {
+                let input = this.INPUT_CACHE2.WINDOW[i % this.INPUT_CACHE2.WINDOW.length];
                 this.updateMovement(input);
                 this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
                 this.NEXT_POSITION = input[0];
@@ -270,7 +325,7 @@ export class Player {
                 // input[0] = (i == this.INPUT_CACHE.END - 1) ? this.NEXT_POSITION : this.movement.position;
             }
         }
-        this.INPUT_CACHE.removeFromWindow(index);
+        this.INPUT_CACHE2.removeFromWindow(index);
     }
 
     updateMovement(input) {

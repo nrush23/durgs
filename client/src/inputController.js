@@ -20,6 +20,11 @@ export class PlayerInput {
             this.inputMap[event.sourceEvent.key] = event.sourceEvent.type == "keydown";
         }));
 
+        //Code for registering left and right picks
+        // scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (event)=>{
+        //     this.inputMap[event.sourceEvent.key] = event.sourceEvent.type == ""
+        // }));
+
         this.grabbed = false;
 
         scene.onBeforeRenderObservable.add(() => {
