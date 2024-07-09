@@ -69,7 +69,8 @@ export class Game {
                                 username: player.username,
                                 position: player.movement.position,
                                 // rotation: new Vector3(0, player.movement.rotation.y, 0)
-                                rotation: player.movement.rotation
+                                // rotation: player.movement.rotation
+                                rotation: player.INPUT_BUFFER[player.INPUT_BUFFER.length-1][3]
                             }));
                             player.socket.send(JSON.stringify({
                                 timestamp: Date.now(),

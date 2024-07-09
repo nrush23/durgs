@@ -88,7 +88,7 @@ export default class Player {
         } else if (HORIZONTAL == "RIGHT") {
             this.movement.position.addInPlace(right);
         }
-        this.movement.rotation = new Vector3(0, TWIST, 0);
+        this.movement.rotation = new Vector3(0, TWIST._y, 0);
 
         // this.movement.rotation = new Vector3(ROTATION._x, 0, ROTATION._z);
     }

@@ -14,6 +14,9 @@ export class Member {
     constructor(username, scene, position, texture) {
         this.username = username;
         this.movement = new TransformNode(username, scene);
+        this.RIGHT_ARM = new TransformNode(username+".right_arm", scene);
+        this.RIGHT_ARM.position = new Vector3(0,0,0);
+        this.RIGHT_ARM.position = position;
         this.movement.position = new Vector3(0, 0, 0);
         this.movement.position = position;
         this.NEXT_POSITION = new Vector3(0,0,0);
@@ -34,15 +37,23 @@ export class Member {
                     mesh.isPickable = false;
                     mesh.enablePointerMoveEvents = false;
                 });
+                // this.RIGHT_ARM = new TransformNode(username+".right_arm", scene);
+                // meshes[4].position = this.RIGHT_ARM.position;
+                // meshes[4].rotation = new Vector3(-Math.PI / 2, 0, 0);
+                meshes[4].position._x -= .9;
+                meshes[4].parent = this.RIGHT_ARM;
+                this.RIGHT_ARM.position = this.movement.position.clone();
                 console.log(this.model);
+
+                scene.registerBeforeRender(()=>{
+                    if(this.right_hand){
+                        this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+                    }
+                    this.RIGHT_ARM.position = this.movement.position.clone();
+                });
             }
         });
 
-        scene.registerBeforeRender(()=>{
-            if(this.right_hand){
-                this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-            }
-        });
 
     }
 
@@ -56,10 +67,12 @@ export class Member {
     }
 
     updatePosition(position, rotation) {
+        console.log(rotation);
         this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
         this.movement.position = this.PREVIOUS_POSITION.clone();
         this.NEXT_POSITION = new Vector3(position._x, position._y, position._z);
         this.movement.rotation = new Vector3(0, rotation._y, 0);
+        this.RIGHT_ARM.rotation = new Vector3(rotation._x, rotation._y, rotation._z);
     }
     updatePosition2(position, rotation) {
         console.log(position);

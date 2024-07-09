@@ -67,6 +67,7 @@ class App {
                 case "delete":
                     if (this.Members.has(data.username)) {
                         this.scene.removeMesh(this.Members.get(data.username).movement, true);
+                        this.Members.delete(data.username);
                     }
                     break;
                 case "grabbed":
@@ -152,15 +153,17 @@ class App {
                     this.PLAYER.updateInteract();
                     this.PLAYER.sendPosition();
                     this.Members.forEach((member) => {
-                        member.render();
+                        // if (member.movement) {
+                            member.render();
+                        // }
                     });
                     accumulator -= FIXED_TIME;
                 }
             })
 
             this.scene.debugLayer.show();
-        }else{
-            setTimeout(()=>{
+        } else {
+            setTimeout(() => {
                 this.START();
             }, 200);
         }

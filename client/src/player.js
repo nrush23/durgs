@@ -72,7 +72,8 @@ export class Player {
                     mesh.enablePointerMoveEvents = false;
                 });
                 // console.log(this.model);
-                this.RIGHT_ARM = scene.getMeshByName("right_arm");
+                // this.RIGHT_ARM = scene.getMeshByName("right_arm");
+                this.RIGHT_ARM = meshes[4];
                 this.RIGHT_ARM.parent = null;
                 let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
                 position.y -= 0.2;
@@ -181,7 +182,7 @@ export class Player {
                 vertical: veritcal_input,
                 horizontal: horizontal_input,
                 rotation: forward,
-                twist: this.camera.rotation.y,
+                twist: this.camera.rotation,
                 index: this.INPUT_CACHE.LAST_SENT,
             }));
             this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
