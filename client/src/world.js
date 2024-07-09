@@ -17,6 +17,7 @@ export class World {
             meshes.forEach((mesh) => {
                 mesh.isPickable = false;
                 mesh.enablePointerMoveEvents = false;
+                new PhysicsAggregate(mesh, PhysicsShapeType.BOX, {mass:0}, scene);
             });
             this.DURGS = meshes[0];
             this.DURGS.name = "restaurant";

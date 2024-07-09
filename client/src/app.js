@@ -132,32 +132,38 @@ class App {
     }
 
     START() {
-        this.scene.clearColor = Color4.FromHexString("#c7f2f8");
-        this.engine.runRenderLoop(() => {
-            this.scene.render();
-        });
+        if (this.PLAYER != null && this.PLAYER.RIGHT_ARM != null) {
+            this.scene.clearColor = Color4.FromHexString("#c7f2f8");
+            this.engine.runRenderLoop(() => {
+                this.scene.render();
+            });
 
-        let startTime = performance.now();
-        let simulationSpeedFactor = 1;
-        let accumulator = 0;
-        let FIXED_TIME = 0.02;
-        this.scene.registerBeforeRender(() => {
-            const now = performance.now();
-            const delta = (now - startTime) / 1000;
-            startTime = now;
-            accumulator += delta;
+            let startTime = performance.now();
+            let simulationSpeedFactor = 1;
+            let accumulator = 0;
+            let FIXED_TIME = 0.02;
+            this.scene.registerBeforeRender(() => {
+                const now = performance.now();
+                const delta = (now - startTime) / 1000;
+                startTime = now;
+                accumulator += delta;
 
-            while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
-                this.PLAYER.updateInteract();
-                this.PLAYER.sendPosition();
-                this.Members.forEach((member) => {
-                    member.render();
-                });
-                accumulator -= FIXED_TIME;
-            }
-        })
+                while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
+                    this.PLAYER.updateInteract();
+                    this.PLAYER.sendPosition();
+                    this.Members.forEach((member) => {
+                        member.render();
+                    });
+                    accumulator -= FIXED_TIME;
+                }
+            })
 
-        this.scene.debugLayer.show();
+            this.scene.debugLayer.show();
+        }else{
+            setTimeout(()=>{
+                this.START();
+            }, 200);
+        }
     }
     async RUN() {
         //Initialize this.canvas and attach to webpage

@@ -24,6 +24,8 @@ export class Player {
 
     INPUT_CACHE;
 
+    RIGHT_ARM;
+
     //Sort by performance.now() values, send the index of the
     //NEXT_POSITION in the JSON
 
@@ -59,7 +61,7 @@ export class Player {
 
     createBody(scene, texture) {
         this.scene = scene;
-        SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
+        SceneLoader.ImportMesh("body", "", "./assets/player_og.glb", this.scene, (meshes) => {
             if (meshes.length > 0) {
                 // console.log(meshes);
                 this.model = meshes[0];
@@ -70,11 +72,19 @@ export class Player {
                     mesh.enablePointerMoveEvents = false;
                 });
                 // console.log(this.model);
+                this.RIGHT_ARM = scene.getMeshByName("right_arm");
+                this.RIGHT_ARM.parent = null;
+                let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
+                position.y -= 0.2;
+                position.x += 0.2;
+                this.RIGHT_ARM.position = position;
+                this.RIGHT_ARM.rotation = new Vector3(-Math.PI / 2, 0, 0);
+                this.RIGHT_ARM.parent = this.camera;
+                this.RIGHT_ARM.setEnabled(false);
             }
         });
         // this.controller = new PlayerInput(scene);
         this.camera.inputs.remove(this.camera.inputs.attached.keyboard);
-
         //Set up mouse pointer input
         this.setupPointer();
 
@@ -90,6 +100,13 @@ export class Player {
             this.render();
             if (this.right_hand) {
                 this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+                // this.RIGHT_ARM.position = this.camera.position.clone();
+                // this.RIGHT_ARM.position.z -= 0.4;
+                // this.RIGHT_ARM.rotation.x = this.camera.getForwardRay().direction.x;
+                // this.RIGHT_ARM.rotation.y = -Math.PI/2;
+                // this.RIGHT_ARM.position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
+                // this.RIGHT_ARM.rotation.x *= -1;
+                // this.RIGHT_ARM.rotation.z *= -1;
             }
         });
     }
@@ -152,11 +169,11 @@ export class Player {
         INPUT[2] = veritcal_input;
         INPUT[3] = horizontal_input;
         this.updateMovement(INPUT);
-        
+
         //If the input can be added, update and send to server
         //Otherwise, we are still waiting on input to be validated
         //and can't accept more
-        if(this.INPUT_CACHE.addToCache(INPUT)){
+        if (this.INPUT_CACHE.addToCache(INPUT)) {
             this.SOCKET.send(JSON.stringify({
                 timestamp: Date.now(),
                 type: "movement_input",
@@ -180,11 +197,24 @@ export class Player {
         this.grab = this.controller.grabbed;
         var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
         var hit = this.scene.pickWithRay(ray);
-        if ((hit.pickedMesh && this.grab)) {
-            hit.pickedMesh.metadata.classInstance.action(this);
-        } else if (!this.grab && this.right_hand) {
-            this.right_hand.metadata.classInstance.action(this);
+        if (this.grab) {
+            if (hit.pickedMesh) {
+                hit.pickedMesh.metadata.classInstance.action(this);
+            }
+            this.RIGHT_ARM.setEnabled(true);
+        } else {
+            if (this.right_hand) {
+                this.right_hand.metadata.classInstance.action(this);
+            }
+            this.RIGHT_ARM.setEnabled(false);
         }
+
+
+        // if ((hit.pickedMesh && this.grab)) {
+        //     hit.pickedMesh.metadata.classInstance.action(this);
+        // } else if (!this.grab && this.right_hand) {
+        //     this.right_hand.metadata.classInstance.action(this);
+        // }
 
     }
 
@@ -231,20 +261,20 @@ export class Player {
 
     //New code to snap to the rollback
     removeFromCache(pos, index) {
-            if (this.INPUT_CACHE.get(index) != null && !pos.equals(this.INPUT_CACHE.get(index)[0])) {
-                console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
-                console.log(index % 10, this.INPUT_CACHE.CACHE);
-                this.NEXT_POSITION = pos.clone();
-                for (let i = index + 1; i < this.INPUT_CACHE.LAST_SENT; i++) {
-                    let INPUT = this.INPUT_CACHE.get(i);
-                    this.updateMovement(INPUT);
-                    this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
-                    this.NEXT_POSITION = input[0];
-                    this.movement.position = this.PREVIOUS_POSITION.clone();
-                    this.camera.position = this.movement.position.clone();
-                }
+        if (this.INPUT_CACHE.get(index) != null && !pos.equals(this.INPUT_CACHE.get(index)[0])) {
+            console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
+            console.log(index % 10, this.INPUT_CACHE.CACHE);
+            this.NEXT_POSITION = pos.clone();
+            for (let i = index + 1; i < this.INPUT_CACHE.LAST_SENT; i++) {
+                let INPUT = this.INPUT_CACHE.get(i);
+                this.updateMovement(INPUT);
+                this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
+                this.NEXT_POSITION = input[0];
+                this.movement.position = this.PREVIOUS_POSITION.clone();
+                this.camera.position = this.movement.position.clone();
             }
-            this.INPUT_CACHE.removeFromCache(index);
+        }
+        this.INPUT_CACHE.removeFromCache(index);
     }
 
     updateMovement(input) {

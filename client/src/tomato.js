@@ -24,7 +24,7 @@ export class Tomato extends Food {
                 this.model.position = position;
                 this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
                 this.body.shape = shape;
-                this.body.setMassProperties({ mass: 1 });
+                this.body.setMassProperties({ mass: 0.5 });
 
                 //Set the metadata of the root and mesh to be this instance
                 meshes[1].metadata = { classInstance: this };

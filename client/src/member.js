@@ -9,6 +9,7 @@ export class Member {
     grab = false;
     NEXT_POSITION;
     PREVIOUS_POSITION;
+    RIGHT_ARM;
 
     constructor(username, scene, position, texture) {
         this.username = username;
