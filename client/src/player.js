@@ -202,10 +202,27 @@ export class Player {
             if (hit.pickedMesh) {
                 hit.pickedMesh.metadata.classInstance.action(this);
             }
+            // console.log(this.RIGHT_ARM.isEnabled(false));
+            if (!this.RIGHT_ARM.isEnabled(false)) {
+                this.SOCKET.send(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "arm_grab",
+                    arm: "right",
+                    PID: this.PID,
+                }));
+            }
             this.RIGHT_ARM.setEnabled(true);
         } else {
             if (this.right_hand) {
                 this.right_hand.metadata.classInstance.action(this);
+            }
+            if (this.RIGHT_ARM.isEnabled(false)) {
+                this.SOCKET.send(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "arm_retract",
+                    arm: "right",
+                    PID: this.PID,
+                }));
             }
             this.RIGHT_ARM.setEnabled(false);
         }

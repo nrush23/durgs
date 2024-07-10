@@ -129,6 +129,42 @@ wss.on('connection', function connection(ws) {
                 var player = game.players.get(msg.PID);
                 player.addInput(msg.vertical, msg.horizontal, msg.rotation, msg.twist, msg.index);
                 break;
+            case "arm_grab":
+                var player = game.players.get(msg.PID);
+                var right = (msg.arm == "right")? true:false;
+                var VALID = (right)? (player.RIGHT_ARM == false): (player.LEFT_ARM == false);
+                if(game.players.size > 1 && VALID){
+                    if(right){
+                        player.RIGHT_ARM = true;
+                    }else{
+                        player.LEFT_ARM = true;
+                    }
+                    broadcast(JSON.stringify({
+                        timestamp: Date.now(),
+                        type: "arm_update",
+                        arm: right,
+                        username: player.username
+                    }));
+                }
+                break;
+            case "arm_retract":
+                var player = game.players.get(msg.PID);
+                let side = (msg.arm == "right")? true:false;
+                var VALID = (side)? (player.RIGHT_ARM == true): (player.LEFT_ARM == true);
+                if(game.players.size > 1 && VALID){
+                    if(side){
+                        player.RIGHT_ARM = false;
+                    }else{
+                        player.LEFT_ARM = false;
+                    }
+                    broadcast(JSON.stringify({
+                        timestamp: Date.now(),
+                        type: "arm_retract",
+                        arm: side,
+                        username: player.username
+                    }));
+                }
+                break;
             case "grab":
                 console.log(msg);
                 //When a player grabs, get the associated player using the msg.PID

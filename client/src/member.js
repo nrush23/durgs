@@ -10,13 +10,15 @@ export class Member {
     NEXT_POSITION;
     PREVIOUS_POSITION;
     RIGHT_ARM;
+    LEFT_ARM;
+    ARM_ANGLE;
 
     constructor(username, scene, position, texture) {
         this.username = username;
         this.movement = new TransformNode(username, scene);
-        this.RIGHT_ARM = new TransformNode(username+".right_arm", scene);
-        this.RIGHT_ARM.position = new Vector3(0,0,0);
-        this.RIGHT_ARM.position = position;
+        this.ARM_ANGLE = new TransformNode(username+".right_arm", scene);
+        this.ARM_ANGLE.position = new Vector3(0,0,0);
+        this.ARM_ANGLE.position = position;
         this.movement.position = new Vector3(0, 0, 0);
         this.movement.position = position;
         this.NEXT_POSITION = new Vector3(0,0,0);
@@ -40,16 +42,23 @@ export class Member {
                 // this.RIGHT_ARM = new TransformNode(username+".right_arm", scene);
                 // meshes[4].position = this.RIGHT_ARM.position;
                 // meshes[4].rotation = new Vector3(-Math.PI / 2, 0, 0);
+                meshes[2].position._x += .9;
+                meshes[2].parent = this.ARM_ANGLE;
+                this.LEFT_ARM = meshes[2];
+                this.LEFT_ARM.setEnabled(false);
+
                 meshes[4].position._x -= .9;
-                meshes[4].parent = this.RIGHT_ARM;
-                this.RIGHT_ARM.position = this.movement.position.clone();
+                meshes[4].parent = this.ARM_ANGLE;
+                this.RIGHT_ARM = meshes[4];
+                this.RIGHT_ARM.setEnabled(false);
+                this.ARM_ANGLE.position = this.movement.position.clone();
                 console.log(this.model);
 
                 scene.registerBeforeRender(()=>{
                     if(this.right_hand){
                         this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
                     }
-                    this.RIGHT_ARM.position = this.movement.position.clone();
+                    this.ARM_ANGLE.position = this.movement.position.clone();
                 });
             }
         });
@@ -72,7 +81,7 @@ export class Member {
         this.movement.position = this.PREVIOUS_POSITION.clone();
         this.NEXT_POSITION = new Vector3(position._x, position._y, position._z);
         this.movement.rotation = new Vector3(0, rotation._y, 0);
-        this.RIGHT_ARM.rotation = new Vector3(rotation._x, rotation._y, rotation._z);
+        this.ARM_ANGLE.rotation = new Vector3(rotation._x, rotation._y, rotation._z);
     }
     updatePosition2(position, rotation) {
         console.log(position);
@@ -82,6 +91,21 @@ export class Member {
             this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
         }
         this.movement.rotation = new Vector3(0, rotation._y, 0);
+    }
+
+    arm_extend(right){
+        console.log(right);
+        if(right && this.RIGHT_ARM != null){
+            this.RIGHT_ARM.setEnabled(true);
+            this.LEFT_ARM.setEnabled(true); //Show left arm for debug right now
+        }
+    }
+
+    arm_retract(right){
+        if(right && this.RIGHT_ARM != null){
+            this.RIGHT_ARM.setEnabled(false);
+            this.LEFT_ARM.setEnabled(false);
+        }
     }
 
     updateGrab(item) {

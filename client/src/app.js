@@ -70,6 +70,18 @@ class App {
                         this.Members.delete(data.username);
                     }
                     break;
+                case "arm_update":
+                    if(this.Members.has(data.username)){
+                        let member = this.Members.get(data.username);
+                        member.arm_extend(data.arm);
+                    }
+                    break;
+                case "arm_retract":
+                    if(this.Members.has(data.username)){
+                        let member = this.Members.get(data.username);
+                        member.arm_retract(data.arm);
+                    }
+                    break;
                 case "grabbed":
                     var item = this.scene.getMeshByName(data.item);
                     // console.log(data);

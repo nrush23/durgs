@@ -18,6 +18,8 @@ export default class Player {
     NETWORK_CACHE;
     INPUT_BUFFER;
     MAX_SPEED;
+    RIGHT_ARM = false;
+    LEFT_ARM = false;
 
     constructor() {
         this.PID = -1;
