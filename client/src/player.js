@@ -1,4 +1,4 @@
-import { AbstractMesh, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PointerEventTypes, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int } from "@babylonjs/core";
+import { AbstractMesh, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
 import { Sliding_Window } from "./sliding_window";
 import { Input_Cache } from "./input_cache";
@@ -19,7 +19,7 @@ export class Player {
     SOCKET;
     NEXT_POSITION;
     PREVIOUS_POSITION;
-    MAX_SPEED = 1;
+    MAX_SPEED = .5;
     UPDATE_CACHE;
 
     INPUT_CACHE;
@@ -61,7 +61,7 @@ export class Player {
 
     createBody(scene, texture) {
         this.scene = scene;
-        SceneLoader.ImportMesh("body", "", "./assets/player_og.glb", this.scene, (meshes) => {
+        SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
             if (meshes.length > 0) {
                 // console.log(meshes);
                 this.model = meshes[0];
@@ -79,7 +79,6 @@ export class Player {
                 position.y -= 0.2;
                 position.x += 0.2;
                 this.RIGHT_ARM.position = position;
-                this.RIGHT_ARM.rotation = new Vector3(-Math.PI / 2, 0, 0);
                 this.RIGHT_ARM.parent = this.camera;
                 this.RIGHT_ARM.setEnabled(false);
             }
@@ -99,16 +98,21 @@ export class Player {
                 this.UPDATE_CACHE = "";
             }
             this.render();
-            if (this.right_hand) {
-                this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-                // this.RIGHT_ARM.position = this.camera.position.clone();
-                // this.RIGHT_ARM.position.z -= 0.4;
-                // this.RIGHT_ARM.rotation.x = this.camera.getForwardRay().direction.x;
-                // this.RIGHT_ARM.rotation.y = -Math.PI/2;
-                // this.RIGHT_ARM.position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
-                // this.RIGHT_ARM.rotation.x *= -1;
-                // this.RIGHT_ARM.rotation.z *= -1;
-            }
+            // if (this.right_hand) {
+            //     var position = this.RIGHT_ARM.getAbsolutePosition();
+            //     // this.right_hand.metadata.classInstance.body.transformNode.position.set(position.x, position.y, position.z);
+            //     this.right_hand.metadata.classInstance.body.transformNode.position = position.clone();
+
+            //     /* WORKING CODE */
+            //     // this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+            //     // this.RIGHT_ARM.position = this.camera.position.clone();
+            //     // this.RIGHT_ARM.position.z -= 0.4;
+            //     // this.RIGHT_ARM.rotation.x = this.camera.getForwardRay().direction.x;
+            //     // this.RIGHT_ARM.rotation.y = -Math.PI/2;
+            //     // this.RIGHT_ARM.position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
+            //     // this.RIGHT_ARM.rotation.x *= -1;
+            //     // this.RIGHT_ARM.rotation.z *= -1;
+            // }
         });
     }
 
@@ -199,7 +203,7 @@ export class Player {
         var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
         var hit = this.scene.pickWithRay(ray);
         if (this.grab) {
-            if (hit.pickedMesh) {
+            if (hit.pickedMesh && this.right_hand != null) {
                 hit.pickedMesh.metadata.classInstance.action(this);
             }
             // console.log(this.RIGHT_ARM.isEnabled(false));
@@ -266,15 +270,48 @@ export class Player {
 
     }
 
+
+    // render() {
+    //     const delta = this.scene.getEngine().getDeltaTime() / 1000;
+    //     const interpolationFactor = Math.min(1, delta * 60);
+    //     Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
+    //     this.camera.position.copyFrom(this.movement.position);
+    //     this.movement.rotation.y = this.camera.rotation.y;
+    //     if (this.object) {
+    //         this.object.metadata.classInstance.model.rotation = new Vector3(0,0,0);
+    //         this.object.metadata.classInstance.model.position.copyFrom(this.MESH.getAbsolutePosition());
+    //     }
+    // }
+
     render() {
-        // console.log(this.NEXT_POSITION);
         const delta = this.scene.getEngine().getDeltaTime() / 1000;
         const interpolationFactor = Math.min(1, delta * 60);
-        // this.movement.position.lerpTo(this.NEXT_POSITION, interpolationFactor);
         Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
-        this.camera.position = this.movement.position.clone();
-        // this.movement.rotation = this.camera.rotation;
+        this.camera.position.copyFrom(this.movement.position);
         this.movement.rotation.y = this.camera.rotation.y;
+        
+        // if(this.right_hand){
+        //     this.RIGHT_ARM.computeWorldMatrix(true);
+        //     this.right_hand.metadata.classInstance.model.rotation = this.camera.rotation.clone();
+        //     this.right_hand.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.getAbsolutePosition());
+        // }
+
+        /*Code that jitters */
+        // if (this.right_hand) {
+        //     // var position = this.RIGHT_ARM.getAbsolutePosition();
+        //     // this.right_hand.metadata.classInstance.body.transformNode.position.set(position.x, position.y, position.z);
+        //     // this.right_hand.metadata.classInstance.body.transformNode.position = position.clone();
+        //     // this.right_hand.metadata.classInstance.model.rotation = new Vector3(0,0,0);
+        //     this.RIGHT_ARM.computeWorldMatrix(true);
+        //     this.right_hand.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.getAbsolutePosition());
+        //     this.right_hand.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
+        //     // Vector3.LerpToRef(this.right_hand.metadata.classInstance.model.position, this.RIGHT_ARM.getAbsolutePosition(), interpolationFactor, this.right_hand.metadata.classInstance.model.position);
+        // }
+
+        // if(present){
+        // var position = this.mesh.getAbsolutePosition();
+        // this.item.position = position.clone();
+        // }
     }
 
     //New code to snap to the rollback
@@ -322,5 +359,32 @@ export class Player {
 
     applyFromCache(index) {
 
+    }
+
+    addGrab(item) {
+        var mesh = this.scene.getMeshByName(item);
+        mesh.metadata.classInstance.body.disablePreStep = false;
+        // mesh.metadata.classInstance.model.position.set(this.RIGHT_ARM.position);
+        // mesh.metadata.classInstance.model.parent = this.camera;
+
+        mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
+        this.RIGHT_ARM.computeWorldMatrix(true);
+        // mesh.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.getAbsolutePosition());
+        mesh.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.position);
+        mesh.metadata.classInstance.model.parent = this.camera;
+        // this.right_hand.metadata.classInstance.model.rotation = this.camera.rotation.clone();
+        // this.right_hand.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.getAbsolutePosition());
+
+        this.right_hand = mesh;
+    }
+
+    removeGrab() {
+        if (this.right_hand) {
+            this.right_hand.metadata.classInstance.body.disablePreStep = true;
+            this.right_hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+            this.right_hand.metadata.classInstance.model.parent = "";
+            // this.right_hand.metadata.classInstance.model.parent = "";
+            this.right_hand = "";
+        }
     }
 }

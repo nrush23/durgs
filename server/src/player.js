@@ -20,6 +20,7 @@ export default class Player {
     MAX_SPEED;
     RIGHT_ARM = false;
     LEFT_ARM = false;
+    ARM_ANGLE;
 
     constructor() {
         this.PID = -1;
@@ -32,7 +33,7 @@ export default class Player {
         this.moved = "";
         this.NETWORK_CACHE = [];
         this.INPUT_BUFFER = [];
-        this.MAX_SPEED = 1;
+        this.MAX_SPEED = .5;
     }
 
     joinGame(scene) {

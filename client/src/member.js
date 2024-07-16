@@ -14,6 +14,8 @@ export class Member {
     ARM_ANGLE;
 
     constructor(username, scene, position, texture) {
+
+        //Intialize the transform nodes and position vectors
         this.username = username;
         this.movement = new TransformNode(username, scene);
         this.ARM_ANGLE = new TransformNode(username+".right_arm", scene);
@@ -23,37 +25,42 @@ export class Member {
         this.movement.position = position;
         this.NEXT_POSITION = new Vector3(0,0,0);
         this.PREVIOUS_POSITION = new Vector3(0,0,0);
+
+        //Import the body into the scene
         this.scene = scene;
         SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
+
             if (meshes.length > 0) {
+
+                //Import the body mesh
                 console.log(meshes);
-
                 this.model = meshes[0];
-                // this.model.isPickable = false;
-                // this.model.enablePointerMoveEvents = false;
-
-                // this.model = this.model.parent;
                 this.model.name = "member";
                 this.model.parent = this.movement;
+
+                //Set everything to be uninteractable
                 meshes.forEach(mesh => {
                     mesh.isPickable = false;
                     mesh.enablePointerMoveEvents = false;
                 });
-                // this.RIGHT_ARM = new TransformNode(username+".right_arm", scene);
-                // meshes[4].position = this.RIGHT_ARM.position;
-                // meshes[4].rotation = new Vector3(-Math.PI / 2, 0, 0);
+
+                //Initialize the left arm
                 meshes[2].position._x += .9;
                 meshes[2].parent = this.ARM_ANGLE;
                 this.LEFT_ARM = meshes[2];
                 this.LEFT_ARM.setEnabled(false);
 
+                //Initialize the right arm
                 meshes[4].position._x -= .9;
                 meshes[4].parent = this.ARM_ANGLE;
                 this.RIGHT_ARM = meshes[4];
                 this.RIGHT_ARM.setEnabled(false);
+
+                //Initialize the arms parent
                 this.ARM_ANGLE.position = this.movement.position.clone();
                 console.log(this.model);
 
+                //Add the code to for updating the arms and grabbed items
                 scene.registerBeforeRender(()=>{
                     if(this.right_hand){
                         this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
@@ -66,6 +73,7 @@ export class Member {
 
     }
 
+    /*Lerp update for members*/
     render() {
         const delta = this.scene.getEngine().getDeltaTime() / 1000;
         const interpolationFactor = Math.min(1, delta * 60);

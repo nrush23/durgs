@@ -38,7 +38,8 @@ class App {
     //and player id (pid)
     connect() {
         console.log("Trying to connect");
-        this.SOCKET = new WebSocket('ws://192.168.0.27:3001');
+        // this.SOCKET = new WebSocket('ws://192.168.0.42:3001/');
+        this.SOCKET = new WebSocket('ws://localhost:3001');
         // this.PLAYER = new Player(this.scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
@@ -71,30 +72,33 @@ class App {
                     }
                     break;
                 case "arm_update":
-                    if(this.Members.has(data.username)){
+                    if (this.Members.has(data.username)) {
                         let member = this.Members.get(data.username);
                         member.arm_extend(data.arm);
                     }
                     break;
                 case "arm_retract":
-                    if(this.Members.has(data.username)){
+                    if (this.Members.has(data.username)) {
                         let member = this.Members.get(data.username);
                         member.arm_retract(data.arm);
                     }
                     break;
                 case "grabbed":
-                    var item = this.scene.getMeshByName(data.item);
-                    // console.log(data);
-                    // console.log(item.metadata.classInstance.body);
-                    item.metadata.classInstance.body.disablePreStep = false;
-                    // this.PLAYER.right_hand = item.parent.parent;
-                    this.PLAYER.right_hand = item;
+                    // var item = this.scene.getMeshByName(data.item);
+                    // // item.metadata.classInstance.body.physicsImposter.disable();
+                    // // console.log(data);
+                    // // console.log(item.metadata.classInstance.body);
+                    // item.metadata.classInstance.body.disablePreStep = false;
+                    // // this.PLAYER.right_hand = item.parent.parent;
+                    // this.PLAYER.right_hand = item;
+                    this.PLAYER.addGrab(data.item);
                     break;
                 case "released":
-                    if (this.PLAYER.right_hand) {
-                        this.PLAYER.right_hand.metadata.classInstance.body.disablePreStep = true;
-                        this.PLAYER.right_hand = "";
-                    }
+                    // if (this.PLAYER.right_hand) {
+                    //     this.PLAYER.right_hand.metadata.classInstance.body.disablePreStep = true;
+                    //     this.PLAYER.right_hand = "";
+                    // }
+                    this.PLAYER.removeGrab();
                     break;
                 case "member_grabbed":
                     console.log('Message received: %s', event.data);
@@ -166,7 +170,7 @@ class App {
                     this.PLAYER.sendPosition();
                     this.Members.forEach((member) => {
                         // if (member.movement) {
-                            member.render();
+                        member.render();
                         // }
                     });
                     accumulator -= FIXED_TIME;
