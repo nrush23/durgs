@@ -269,9 +269,9 @@ class App {
             while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
                 this.PLAYER.updateInteract();
                 // this.PLAYER.sendPosition();
-                this.Members.forEach((member) => {
-                    member.render();
-                });
+                // this.Members.forEach((member) => {
+                //     member.render();
+                // });
                 accumulator -= FIXED_TIME;
             }
         })

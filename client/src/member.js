@@ -62,10 +62,11 @@ export class Member {
 
                 //Add the code to for updating the arms and grabbed items
                 scene.registerBeforeRender(()=>{
-                    if(this.right_hand){
-                        this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-                    }
-                    this.ARM_ANGLE.position = this.movement.position.clone();
+                    this.render();
+                    // if(this.right_hand){
+                    //     this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+                    // }
+                    // this.ARM_ANGLE.position = this.movement.position.clone();
                 });
             }
         });
@@ -81,10 +82,11 @@ export class Member {
         if (this.right_hand) {
             this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
         }
+        this.ARM_ANGLE.position = this.movement.position.clone();
     }
 
     updatePosition(position, rotation) {
-        console.log(rotation);
+        // console.log(rotation);
         this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
         this.movement.position = this.PREVIOUS_POSITION.clone();
         this.NEXT_POSITION = new Vector3(position._x, position._y, position._z);
