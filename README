@@ -1,0 +1,23 @@
+To compile the project:
+    1. Open a terminal into the root project folder.
+    2. Change directory into the server folder
+    3. Install the node packages with: npm install
+    4. If you need to install nodemon, run: npm i nodemon
+    You have now installed the server packages.
+
+    5. Now open up another terminal inside the root project folder.
+    6. Change directory into the client folder
+    7. To install the client packages, run: npm install
+    You have now installed the client packages.
+
+To run the project:
+
+    1. Open a terminal inside the root project folder.
+    2. Change directory into the server folder.
+    3. To start the server, run: npm run debug
+    4. Now open another terminal inside the root project folder.
+    5. Change directory into the client folder.
+    6. To run the web application, run: npm start
+    7. Click on the link provided in the terminal or
+    inside a web browser go to: http://xxx.xxx.xxx.xxx:8080
+    where xxx.xxx.xxx.xxx is your local machine's IP address

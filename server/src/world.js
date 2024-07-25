@@ -12,7 +12,7 @@ export class World {
     //Need to finsih modifying how the world imports the restock icons
     constructor(scene, callback) {
         this.scene = scene;
-        SceneLoader.ImportMeshAsync("", "http://localhost:3001/assets/", "restaurant_furnishing1.glb", scene).then((result) => {
+        SceneLoader.ImportMeshAsync("", "http://localhost:3001/assets/", "restaurant_furnishing2.glb", scene).then((result) => {
             const meshes = result.meshes;
             meshes.forEach((mesh) => {
                 mesh.isPickable = false;

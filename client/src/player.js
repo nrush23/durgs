@@ -1,6 +1,5 @@
 import { AbstractMesh, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
-import { Sliding_Window } from "./sliding_window";
 import { Input_Cache } from "./input_cache";
 const pocket = {
     empty: 'EMPTY',
@@ -26,22 +25,14 @@ export class Player {
 
     RIGHT_ARM;
 
-    //Sort by performance.now() values, send the index of the
-    //NEXT_POSITION in the JSON
-
-    //On receive, check if index (or maybe perfomance.now() value) matches
-    //server value. If not, set that NEXT_POSITION value to server value
-    //and reapply all remaining inputs.
-    //In all cases, once you retrive a key from the server, discard all older
-    //keys
-    INPUT_CACHE2;
-
+    //Legacy attributes from Babylon.js tutorial
     static PLAYER_SPEED = 0.45;
     static JUMP_FORCE = 0.80;
     static GRAVITY = -2.8;
     static ORIGINAL_TILT = new Vector3(0.5934119456780721, 0, 0);
 
 
+    /*Initialize the player's attributes*/
     constructor(scene, camera, socket) {
         this.scene = scene;
         this.PID = -1;
@@ -54,25 +45,23 @@ export class Player {
         this.controller = new PlayerInput(scene);
         this.NEXT_POSITION = new Vector3(0, 0, 0);
         this.PREVIOUS_POSITION = new Vector3(0, 0, 0);
-        this.INPUT_CACHE2 = new Sliding_Window(10);
         this.UPDATE_CACHE = "";
         this.INPUT_CACHE = new Input_Cache(10);
     }
 
+    /*Create the meshes that make up the player model */
     createBody(scene, texture) {
         this.scene = scene;
         SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
             if (meshes.length > 0) {
                 // console.log(meshes);
+
+                //Create the main bean body
                 this.model = meshes[0];
                 this.model.name = "player_body";
                 this.model.parent = this.movement;
-                meshes.forEach(mesh => {
-                    mesh.isPickable = false;
-                    mesh.enablePointerMoveEvents = false;
-                });
-                // console.log(this.model);
-                // this.RIGHT_ARM = scene.getMeshByName("right_arm");
+
+                //Create the right arm and make it hidden by default
                 this.RIGHT_ARM = meshes[4];
                 this.RIGHT_ARM.parent = null;
                 let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
@@ -81,87 +70,33 @@ export class Player {
                 this.RIGHT_ARM.position = position;
                 this.RIGHT_ARM.parent = this.camera;
                 this.RIGHT_ARM.setEnabled(false);
+
+                //Now make each imported mesh unclickable
+                meshes.forEach(mesh => {
+                    mesh.isPickable = false;
+                    mesh.enablePointerMoveEvents = false;
+                });
             }
         });
-        // this.controller = new PlayerInput(scene);
+
+        //Remove the camera's built in keyboard functionality so it doesn't
+        //interfere with player input
         this.camera.inputs.remove(this.camera.inputs.attached.keyboard);
+
         //Set up mouse pointer input
         this.setupPointer();
 
-        // scene.registerBeforeRender(() => {
-        //     // this.updateInteract();
-        //     // this.updatePosition();
-        // });
+        //Add the player's render loop to the scene
         scene.registerBeforeRender(() => {
             if (this.UPDATE_CACHE) {
                 this.UPDATE_CACHE();
                 this.UPDATE_CACHE = "";
             }
             this.render();
-            // if (this.right_hand) {
-            //     var position = this.RIGHT_ARM.getAbsolutePosition();
-            //     // this.right_hand.metadata.classInstance.body.transformNode.position.set(position.x, position.y, position.z);
-            //     this.right_hand.metadata.classInstance.body.transformNode.position = position.clone();
-
-            //     /* WORKING CODE */
-            //     // this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-            //     // this.RIGHT_ARM.position = this.camera.position.clone();
-            //     // this.RIGHT_ARM.position.z -= 0.4;
-            //     // this.RIGHT_ARM.rotation.x = this.camera.getForwardRay().direction.x;
-            //     // this.RIGHT_ARM.rotation.y = -Math.PI/2;
-            //     // this.RIGHT_ARM.position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
-            //     // this.RIGHT_ARM.rotation.x *= -1;
-            //     // this.RIGHT_ARM.rotation.z *= -1;
-            // }
         });
     }
 
-    updateChildren() {
-        console.log(this.PID);
-        this.SOCKET.send(JSON.stringify({
-            timestamp: Date.now(),
-            type: "movement",
-            PID: this.PID,
-            position: this.movement.position,
-            rotation: this.camera.rotation,
-        }));
-        this.camera.position = this.movement.position.clone();
-        // this.model.position = this.movement.position.clone();
-        if (this.right_hand) {
-            // this.right_hand.position = this.movement.position.clone();
-            this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-            // this.right_hand.metadata.classInstance.body.position.set(this.movement.position.clone());
-        }
-    }
-
-    sendPosition2() {
-        let modifier = 5;
-        var forward = this.camera.getForwardRay().direction;
-        var right = Vector3.Cross(Axis.Y, forward, 100);
-        if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
-
-            var moveDirection = forward.scale(this.controller.vertical / modifier).add(right.scale(this.controller.horizontal / modifier));
-            this.movement.position.addInPlace(moveDirection);
-
-            this.SOCKET.send(JSON.stringify({
-                timestamp: Date.now(),
-                type: "movement",
-                PID: this.PID,
-                position: this.movement.position,
-                rotation: this.camera.rotation,
-            }));
-
-            this.camera.position = this.movement.position.clone();
-
-        }
-        this.movement.rotation = this.camera.rotation;
-        if (this.right_hand) {
-            this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-        }
-    }
     sendPosition() {
-
-        // if (this.controller.vertical != 0 || this.controller.horizontal != 0) {
 
         var forward = this.camera.getForwardRay().direction;
         var veritcal_input = this.controller.vertical;
@@ -206,7 +141,6 @@ export class Player {
             if (hit.pickedMesh && this.right_hand != null) {
                 hit.pickedMesh.metadata.classInstance.action(this);
             }
-            // console.log(this.RIGHT_ARM.isEnabled(false));
             if (!this.RIGHT_ARM.isEnabled(false)) {
                 this.SOCKET.send(JSON.stringify({
                     timestamp: Date.now(),
@@ -270,56 +204,26 @@ export class Player {
 
     }
 
-
-    // render() {
-    //     const delta = this.scene.getEngine().getDeltaTime() / 1000;
-    //     const interpolationFactor = Math.min(1, delta * 60);
-    //     Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
-    //     this.camera.position.copyFrom(this.movement.position);
-    //     this.movement.rotation.y = this.camera.rotation.y;
-    //     if (this.object) {
-    //         this.object.metadata.classInstance.model.rotation = new Vector3(0,0,0);
-    //         this.object.metadata.classInstance.model.position.copyFrom(this.MESH.getAbsolutePosition());
-    //     }
-    // }
-
+    /*Frame update of the player's movement and position */
     render() {
         const delta = this.scene.getEngine().getDeltaTime() / 1000;
         const interpolationFactor = Math.min(1, delta * 60);
         Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
         this.camera.position.copyFrom(this.movement.position);
         this.movement.rotation.y = this.camera.rotation.y;
-        
-        // if(this.right_hand){
-        //     this.RIGHT_ARM.computeWorldMatrix(true);
-        //     this.right_hand.metadata.classInstance.model.rotation = this.camera.rotation.clone();
-        //     this.right_hand.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.getAbsolutePosition());
-        // }
-
-        /*Code that jitters */
-        // if (this.right_hand) {
-        //     // var position = this.RIGHT_ARM.getAbsolutePosition();
-        //     // this.right_hand.metadata.classInstance.body.transformNode.position.set(position.x, position.y, position.z);
-        //     // this.right_hand.metadata.classInstance.body.transformNode.position = position.clone();
-        //     // this.right_hand.metadata.classInstance.model.rotation = new Vector3(0,0,0);
-        //     this.RIGHT_ARM.computeWorldMatrix(true);
-        //     this.right_hand.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.getAbsolutePosition());
-        //     this.right_hand.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
-        //     // Vector3.LerpToRef(this.right_hand.metadata.classInstance.model.position, this.RIGHT_ARM.getAbsolutePosition(), interpolationFactor, this.right_hand.metadata.classInstance.model.position);
-        // }
-
-        // if(present){
-        // var position = this.mesh.getAbsolutePosition();
-        // this.item.position = position.clone();
-        // }
     }
 
-    //New code to snap to the rollback
+    /*Verify player movement with server corrections and rollback when out of sync */
     removeFromCache(pos, index) {
+        
+        //We are out of sync when the index is valid and the positions do not match
         if (this.INPUT_CACHE.get(index) != null && !pos.equals(this.INPUT_CACHE.get(index)[0])) {
             console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
-            console.log(index % 10, this.INPUT_CACHE.CACHE);
+
+            //Correct by setting the NEXT_POSITION to the server position
             this.NEXT_POSITION = pos.clone();
+            
+            //Now manually reapply the movement cache to resync correct positions
             for (let i = index + 1; i < this.INPUT_CACHE.LAST_SENT; i++) {
                 let INPUT = this.INPUT_CACHE.get(i);
                 this.updateMovement(INPUT);
@@ -329,18 +233,26 @@ export class Player {
                 this.camera.position = this.movement.position.clone();
             }
         }
+
+        //Either way we update the INPUT_CACHE to reflect our last
+        //received index from the server
         this.INPUT_CACHE.removeFromCache(index);
     }
 
+    /*Applies the movement algorithm to the given set of input values*/
     updateMovement(input) {
         let ROTATION = input[1];
         let VERTICAL = input[2];
         let HORIZONTAL = input[3];
+
+        //Setting the y value to 0 = walking, non-zero = flying
         let forward = new Vector3(ROTATION.x * this.MAX_SPEED, ROTATION.y * this.MAX_SPEED, ROTATION.z * this.MAX_SPEED);
         let backward = forward.scale(-1);
         let left = new Vector3(-ROTATION._z * this.MAX_SPEED, ROTATION._y * this.MAX_SPEED, ROTATION._x * this.MAX_SPEED);
         // let left = new Vector3(-ROTATION.z * this.MAX_SPEED, 0, ROTATION.x * this.MAX_SPEED);
         let right = left.scale(-1);
+
+        //Apply inputs by adding the vectors to the a copy of NEXT_POSITION
         let NEW_POSITION = this.NEXT_POSITION.clone();
         if (VERTICAL == "UP") {
             NEW_POSITION.addInPlace(forward);
@@ -353,37 +265,45 @@ export class Player {
         } else if (HORIZONTAL == "RIGHT") {
             NEW_POSITION.addInPlace(right);
         }
+
+        //Store the NEW_POSITION in the zero index
         input[0] = NEW_POSITION;
-        // this.movement.rotation = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
     }
 
-    applyFromCache(index) {
 
-    }
 
+
+    /*Set the given item name to the player's right hand */
     addGrab(item) {
+
+        //Retrieve the mesh and disable its physics updates
         var mesh = this.scene.getMeshByName(item);
         mesh.metadata.classInstance.body.disablePreStep = false;
-        // mesh.metadata.classInstance.model.position.set(this.RIGHT_ARM.position);
-        // mesh.metadata.classInstance.model.parent = this.camera;
-
         mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
-        this.RIGHT_ARM.computeWorldMatrix(true);
-        // mesh.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.getAbsolutePosition());
-        mesh.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.position);
-        mesh.metadata.classInstance.model.parent = this.camera;
-        // this.right_hand.metadata.classInstance.model.rotation = this.camera.rotation.clone();
-        // this.right_hand.metadata.classInstance.model.position.copyFrom(this.RIGHT_ARM.getAbsolutePosition());
 
+        //Make sure RIGHT_ARM's position is up to date
+        this.RIGHT_ARM.computeWorldMatrix(true);
+
+        //Copy the RIGHT_ARM's position, push it a little bit forward, reset the rotation,
+        //and parent to the camera
+        let position = this.RIGHT_ARM.position.clone();
+        position.z += 0.3;
+        mesh.metadata.classInstance.model.position = position;
+        mesh.metadata.classInstance.model.rotation = new Vector3(0,0,0);
+        mesh.metadata.classInstance.model.parent = this.camera;
+        
+        //Set our right_hand to mesh
         this.right_hand = mesh;
     }
 
+    
+
+    /*Remove the current item from the player's right hand */
     removeGrab() {
         if (this.right_hand) {
             this.right_hand.metadata.classInstance.body.disablePreStep = true;
             this.right_hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
             this.right_hand.metadata.classInstance.model.parent = "";
-            // this.right_hand.metadata.classInstance.model.parent = "";
             this.right_hand = "";
         }
     }
