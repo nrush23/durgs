@@ -55,13 +55,6 @@ export default class Player {
         this.model = mesh;
     }
 
-    render(pos, rot) {
-        if (this.movement) {
-            this.movement.position = new Vector3(pos._x, pos._y, pos._z);
-            this.movement.rotation = new Vector3(rot._x, rot._y, rot._z);
-        }
-    }
-
     render2(input) {
         let CURRENT = input[4];
         let TWIST = input[3];
@@ -92,49 +85,11 @@ export default class Player {
             this.movement.position.addInPlace(right);
         }
         this.movement.rotation = new Vector3(0, TWIST._y, 0);
-
-        // this.movement.rotation = new Vector3(ROTATION._x, 0, ROTATION._z);
     }
 
-    // render2(input) {
-    //     console.log(input);
-    //     let CURRENT = input[3];
-    //     // let ROTATION = JSON.parse(input[2]);
-    //     let ROTATION = input[2];
-    //     let VERTICAL = input[0];
-    //     let HORIZONTAL = input[1];
-
-    //     if (VERTICAL == "UP") {
-    //         this.movement.position.x += this.MAX_SPEED;
-    //     } else if (VERTICAL == "DOWN") {
-    //         this.movement.position.x -= this.MAX_SPEED;
-    //     }
-
-    //     if (HORIZONTAL == "LEFT") {
-    //         this.movement.position.z -= this.MAX_SPEED;
-    //     } else if (HORIZONTAL == "RIGHT") {
-    //         this.movement.position.z += this.MAX_SPEED;
-    //     }
-
-    //     this.movement.rotation = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
-    // }
-
-    updatePosition(pos, rot) {
-        // if (this.model) {
-        // console.log(pos);
-        // this.previous_position = this.movement.position;
-        // this.movement.position = new Vector3(pos._x, pos._y, pos._z);
-        // console.log("%s: <%s,%s,%s>", this.username, this.movement.position.x, this.movement.position.y, this.movement.position.z);
-        this.NETWORK_CACHE.push([pos, rot]);
-        // }
-    }
-
+    /*Add new input messages to the buffer for processing on next
+    world update */
     addInput(vertical, horizontal, rotation, twist, index) {
         this.INPUT_BUFFER.push([vertical, horizontal, rotation, twist, index]);
-    }
-
-    //for adding actions to the network cache eventually
-    addAction(action) {
-
     }
 }

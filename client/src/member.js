@@ -18,13 +18,13 @@ export class Member {
         //Intialize the transform nodes and position vectors
         this.username = username;
         this.movement = new TransformNode(username, scene);
-        this.ARM_ANGLE = new TransformNode(username+".right_arm", scene);
-        this.ARM_ANGLE.position = new Vector3(0,0,0);
+        this.ARM_ANGLE = new TransformNode(username + ".right_arm", scene);
+        this.ARM_ANGLE.position = new Vector3(0, 0, 0);
         this.ARM_ANGLE.position = position;
         this.movement.position = new Vector3(0, 0, 0);
         this.movement.position = position;
-        this.NEXT_POSITION = new Vector3(0,0,0);
-        this.PREVIOUS_POSITION = new Vector3(0,0,0);
+        this.NEXT_POSITION = new Vector3(0, 0, 0);
+        this.PREVIOUS_POSITION = new Vector3(0, 0, 0);
 
         //Import the body into the scene
         this.scene = scene;
@@ -61,12 +61,8 @@ export class Member {
                 console.log(this.model);
 
                 //Add the code to for updating the arms and grabbed items
-                scene.registerBeforeRender(()=>{
+                scene.registerBeforeRender(() => {
                     this.render();
-                    // if(this.right_hand){
-                    //     this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-                    // }
-                    // this.ARM_ANGLE.position = this.movement.position.clone();
                 });
             }
         });
@@ -103,17 +99,21 @@ export class Member {
         this.movement.rotation = new Vector3(0, rotation._y, 0);
     }
 
-    arm_extend(right){
+    arm_extend(right) {
         console.log(right);
-        if(right && this.RIGHT_ARM != null){
+        if (right && this.RIGHT_ARM != null) {
             this.RIGHT_ARM.setEnabled(true);
+
+        } else if (!right && this.LEFT_ARM != null) {
             this.LEFT_ARM.setEnabled(true); //Show left arm for debug right now
         }
     }
 
-    arm_retract(right){
-        if(right && this.RIGHT_ARM != null){
+    arm_retract(right) {
+        if (right && this.RIGHT_ARM != null) {
             this.RIGHT_ARM.setEnabled(false);
+
+        } else if (!right && this.LEFT_ARM != null) {
             this.LEFT_ARM.setEnabled(false);
         }
     }
