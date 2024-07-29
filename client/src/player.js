@@ -13,7 +13,6 @@ export class Player {
     scene;
     camera;
     controller;
-    right_hand = "";
     grab = false;
     SOCKET;
     NEXT_POSITION;
@@ -23,6 +22,9 @@ export class Player {
 
     INPUT_CACHE;
 
+    left_hand = "";
+    right_hand = "";
+    LEFT_ARM;
     RIGHT_ARM;
 
     //Legacy attributes from Babylon.js tutorial
@@ -54,7 +56,7 @@ export class Player {
         this.scene = scene;
         SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
             if (meshes.length > 0) {
-                // console.log(meshes);
+                console.log(meshes);
 
                 //Create the main bean body
                 this.model = meshes[0];
@@ -66,10 +68,18 @@ export class Player {
                 this.RIGHT_ARM.parent = null;
                 let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
                 position.y -= 0.2;
-                position.x += 0.2;
+                position.x += 0.3;
                 this.RIGHT_ARM.position = position;
                 this.RIGHT_ARM.parent = this.camera;
                 this.RIGHT_ARM.setEnabled(false);
+
+                //TESTING
+                this.LEFT_ARM = meshes[2];
+                this.LEFT_ARM.parent = null;
+                this.LEFT_ARM.position = this.RIGHT_ARM.position.clone();
+                this.LEFT_ARM.position.x -= 0.6;
+                this.LEFT_ARM.parent = this.camera;
+                this.LEFT_ARM.setEnabled(false);
 
                 //Now make each imported mesh unclickable
                 meshes.forEach(mesh => {
@@ -133,14 +143,53 @@ export class Player {
         //End Testing
     }
 
+
+    /*Player function to signal item and player interactions */
     updateInteract() {
-        this.grab = this.controller.grabbed;
+
+        //Check our controller for grabs and picked rays
+        this.grab = this.controller.grab_right;
         var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
         var hit = this.scene.pickWithRay(ray);
-        if (this.grab) {
-            if (hit.pickedMesh && this.right_hand != null) {
+
+
+        //TESTING
+        if (this.controller.grab_left) {
+            if (!this.LEFT_ARM.isEnabled(false)) {
+                this.SOCKET.send(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "arm_grab",
+                    arm: "left",
+                    PID: this.PID,
+                }));
+                this.LEFT_ARM.setEnabled(true);
+            }
+            if (hit.pickedMesh && this.left_hand == null) {
                 hit.pickedMesh.metadata.classInstance.action(this);
             }
+        } else {
+            if (this.LEFT_ARM.isEnabled(false)) {
+                this.SOCKET.send(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "arm_retract",
+                    arm: "left",
+                    PID: this.PID,
+                }));
+                this.LEFT_ARM.setEnabled(false);
+            }
+            if(this.left_hand){
+                this.left_hand.metadata.classInstance.action(this);
+            }
+        }
+
+
+
+
+
+        //Run through the arm action and item actions
+        if (this.grab) {
+
+            //Extend the arm if not already extended
             if (!this.RIGHT_ARM.isEnabled(false)) {
                 this.SOCKET.send(JSON.stringify({
                     timestamp: Date.now(),
@@ -148,12 +197,16 @@ export class Player {
                     arm: "right",
                     PID: this.PID,
                 }));
+                this.RIGHT_ARM.setEnabled(true);
             }
-            this.RIGHT_ARM.setEnabled(true);
+
+            //If a pickable mesh was hit and right hand is empty, 
+            //trigger the mesh's class action
+            if (hit.pickedMesh && this.right_hand != null) {
+                hit.pickedMesh.metadata.classInstance.action(this);
+            }
         } else {
-            if (this.right_hand) {
-                this.right_hand.metadata.classInstance.action(this);
-            }
+            //No longer grabbing, retract the arm
             if (this.RIGHT_ARM.isEnabled(false)) {
                 this.SOCKET.send(JSON.stringify({
                     timestamp: Date.now(),
@@ -161,9 +214,19 @@ export class Player {
                     arm: "right",
                     PID: this.PID,
                 }));
+                this.RIGHT_ARM.setEnabled(false);
             }
-            this.RIGHT_ARM.setEnabled(false);
+
+            //If a item was being held, call its class action
+            if (this.right_hand) {
+                this.right_hand.metadata.classInstance.action(this);
+            }
         }
+
+
+
+
+
 
 
         // if ((hit.pickedMesh && this.grab)) {
@@ -215,14 +278,14 @@ export class Player {
 
     /*Verify player movement with server corrections and rollback when out of sync */
     removeFromCache(pos, index) {
-        
+
         //We are out of sync when the index is valid and the positions do not match
         if (this.INPUT_CACHE.get(index) != null && !pos.equals(this.INPUT_CACHE.get(index)[0])) {
             console.log("OUT OF SYNC %s=%s %s=%s", index, pos, index, this.INPUT_CACHE.get(index)[0]);
 
             //Correct by setting the NEXT_POSITION to the server position
             this.NEXT_POSITION = pos.clone();
-            
+
             //Now manually reapply the movement cache to resync correct positions
             for (let i = index + 1; i < this.INPUT_CACHE.LAST_SENT; i++) {
                 let INPUT = this.INPUT_CACHE.get(i);
@@ -289,14 +352,14 @@ export class Player {
         let position = this.RIGHT_ARM.position.clone();
         position.z += 0.3;
         mesh.metadata.classInstance.model.position = position;
-        mesh.metadata.classInstance.model.rotation = new Vector3(0,0,0);
+        mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
         mesh.metadata.classInstance.model.parent = this.camera;
-        
+
         //Set our right_hand to mesh
         this.right_hand = mesh;
     }
 
-    
+
 
     /*Remove the current item from the player's right hand */
     removeGrab() {

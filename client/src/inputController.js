@@ -2,13 +2,18 @@ import { ActionManager, ExecuteCodeAction, Scalar, Scene } from "@babylonjs/core
 //Class that monitors all the input from the Player
 //Game makes decision based off of these calculated inputs
 export class PlayerInput {
+
     inputMap;
     vertical;
     horizontal;
     verticalAxis;
     horizontalAxis;
-    grabbed;
+    grab_right;
+    grab_left;
+
     constructor(scene) {
+
+        //Create our action manager and input map
         scene.actionManager = new ActionManager(scene);
         this.inputMap = {};
 
@@ -20,54 +25,45 @@ export class PlayerInput {
             this.inputMap[event.sourceEvent.key] = event.sourceEvent.type == "keydown";
         }));
 
-        //Code for registering left and right picks
+        //WIP Code for registering left and right picks
         // scene.actionManager.registerAction(new ExecuteCodeAction(ActionManager.OnLeftPickTrigger, (event)=>{
         //     this.inputMap[event.sourceEvent.key] = event.sourceEvent.type == ""
         // }));
 
-        this.grabbed = false;
+        //By default, grabbing is false
+        this.grab_right = false;
 
+        //Add our keyboard updates to the scene
         scene.onBeforeRenderObservable.add(() => {
             this.updateFromKeyboard();
         })
     }
 
+
+ /*Function to process keyboard updates from the action manager */   
  updateFromKeyboard() {
+
+        //Check if the forward/backward movement keys are pressed
         if (this.inputMap["ArrowUp"] || this.inputMap["w"]) {
             this.vertical = "UP";
-            // this.vertical = Scalar.Lerp(this.vertical, 1, 0.2);
-            // this.verticalAxis = 1;
         } else if (this.inputMap["ArrowDown"] || this.inputMap["s"]) {
             this.vertical = "DOWN";
-            // this.vertical = Scalar.Lerp(this.vertical, -1, 0.2);
-            // this.verticalAxis = -1;
         } else {
             this.vertical = "";
-            // this.vertical = 0;
-            // this.verticalAxis = 0;
         }
 
+        //Check if the side to side movement keys are pressed
         if (this.inputMap["ArrowLeft"] || this.inputMap["a"]) {
             this.horizontal = "LEFT";
-            // this.horizontal = Scalar.Lerp(this.horizontal, -1, 0.2);
-            // this.horizontalAxis = -1;
-
         } else if (this.inputMap["ArrowRight"] || this.inputMap["d"]) {
             this.horizontal = "RIGHT";
-            // this.horizontal = Scalar.Lerp(this.horizontal, 1, 0.2);
-            // this.horizontalAxis = 1;
         }
         else {
             this.horizontal = "";
-            // this.horizontal = 0;
-            // this.horizontalAxis = 0;
         }
 
-        if(this.inputMap["e"]){
-            this.grabbed = true;
-            // console.log("grabbing");
-        }else{
-            this.grabbed = false;
-        }
+        //Check for left and right grabs
+        this.grab_left = this.inputMap["q"];
+        this.grab_right = this.inputMap["e"];
     }
 }
