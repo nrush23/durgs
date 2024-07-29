@@ -14,28 +14,44 @@ export class Food extends Interactable {
         this.cook_time = 0;
     }
 
-    action(player) {
-        // this.grab(input);
-        // console.log(player);
-        if (player.grab && !player.right_hand) {
-            player.SOCKET.send(JSON.stringify({
-                timestamp: Date.now(),
-                type: "grab",
-                PID: player.PID,
-                item: this.model.name,
-            }));
-        }else if (!player.grab && player.right_hand){
-            player.SOCKET.send(JSON.stringify({
-                timestamp: Date.now(),
-                type: "release",
-                PID: player.PID,
-                item: this.model.name,
-            }));
-        }
+    onAction(player) {
+
+        player.SOCKET.send(JSON.stringify({
+            timestamp: Date.now(),
+            type: "grab",
+            PID: player.PID,
+            item: this.model.name,
+        }));
+        // // this.grab(input);
+        // // console.log(player);
+        // if (player.grab && !player.right_hand) {
+        //     player.SOCKET.send(JSON.stringify({
+        //         timestamp: Date.now(),
+        //         type: "grab",
+        //         PID: player.PID,
+        //         item: this.model.name,
+        //     }));
+        // }else if (!player.grab && player.right_hand){
+        //     player.SOCKET.send(JSON.stringify({
+        //         timestamp: Date.now(),
+        //         type: "release",
+        //         PID: player.PID,
+        //         item: this.model.name,
+        //     }));
+        // }
+    }
+
+    offAction(player) {
+        player.SOCKET.send(JSON.stringify({
+            timestamp: Date.now(),
+            type: "release",
+            PID: player.PID,
+            item: this.model.name,
+        }));
     }
 
     cook() {
 
     }
-    
+
 }

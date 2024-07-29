@@ -164,8 +164,8 @@ export class Player {
                 }));
                 this.LEFT_ARM.setEnabled(true);
             }
-            if (hit.pickedMesh && this.left_hand == null) {
-                hit.pickedMesh.metadata.classInstance.action(this);
+            if (hit.pickedMesh && !this.left_hand) {
+                hit.pickedMesh.metadata.classInstance.onAction(this);
             }
         } else {
             if (this.LEFT_ARM.isEnabled(false)) {
@@ -178,7 +178,7 @@ export class Player {
                 this.LEFT_ARM.setEnabled(false);
             }
             if(this.left_hand){
-                this.left_hand.metadata.classInstance.action(this);
+                this.left_hand.metadata.classInstance.offAction(this);
             }
         }
 
@@ -202,8 +202,8 @@ export class Player {
 
             //If a pickable mesh was hit and right hand is empty, 
             //trigger the mesh's class action
-            if (hit.pickedMesh && this.right_hand != null) {
-                hit.pickedMesh.metadata.classInstance.action(this);
+            if (hit.pickedMesh && !this.right_hand) {
+                hit.pickedMesh.metadata.classInstance.onAction(this);
             }
         } else {
             //No longer grabbing, retract the arm
@@ -219,21 +219,9 @@ export class Player {
 
             //If a item was being held, call its class action
             if (this.right_hand) {
-                this.right_hand.metadata.classInstance.action(this);
+                this.right_hand.metadata.classInstance.offAction(this);
             }
         }
-
-
-
-
-
-
-
-        // if ((hit.pickedMesh && this.grab)) {
-        //     hit.pickedMesh.metadata.classInstance.action(this);
-        // } else if (!this.grab && this.right_hand) {
-        //     this.right_hand.metadata.classInstance.action(this);
-        // }
 
     }
 

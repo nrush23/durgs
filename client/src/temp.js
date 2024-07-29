@@ -198,11 +198,6 @@ class App {
                     case "update_mesh":
                         console.log('Message received: %s', event.data);
                         break;
-                    case "movement_cache":
-                        if (data.cache.length > 0) {
-                            console.log(data);
-                        }
-                        break;
                     case "movement":
                         console.log("MOVEMENT MSG: %s", event.data);
                         this.PLAYER.UPDATE_CACHE = () => this.PLAYER.removeFromCache(new Vector3(data.position._x, data.position._y, data.position._z), data.index);

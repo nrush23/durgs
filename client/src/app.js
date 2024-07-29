@@ -104,18 +104,20 @@ class App {
                     console.log('Message received: %s', event.data);
                     if (this.Members.has(data.username)) {
                         var member = this.Members.get(data.username);
-                        var item = this.scene.getMeshByName(data.item);
-                        member.updateGrab(item);
+                        // var item = this.scene.getMeshByName(data.item);
+                        // member.updateGrab(item);
+                        member.addGrab(data.item, true);
                     }
                     break;
                 case "member_released":
                     console.log('Message received: %s', event.data);
                     if (this.Members.has(data.username)) {
                         var member = this.Members.get(data.username);
-                        // member.right_hand.position.y = 0;
-                        // console.log(member);
-                        member.right_hand.metadata.classInstance.body.disablePreStep = true;
-                        member.updateGrab("");
+                        // // member.right_hand.position.y = 0;
+                        // // console.log(member);
+                        // member.right_hand.metadata.classInstance.body.disablePreStep = true;
+                        // member.updateGrab("");
+                        member.removeGrab(true);
                     }
                     break;
                 case "spawn_response":

@@ -31,4 +31,12 @@ export class Restock_Icon extends Interactable {
             item: this.item
         }));
     }
+
+    onAction(player){
+        this.action(player);
+    }
+
+    offAction(player){
+        this.action(player);
+    }
 }

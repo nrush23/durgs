@@ -6,6 +6,7 @@ export class Member {
     movement;
     scene;
     right_hand = "";
+    left_hand = "";
     grab = false;
     NEXT_POSITION;
     PREVIOUS_POSITION;
@@ -45,13 +46,13 @@ export class Member {
                 });
 
                 //Initialize the left arm
-                meshes[2].position._x += .9;
+                // meshes[2].position._x += .9;
                 meshes[2].parent = this.ARM_ANGLE;
                 this.LEFT_ARM = meshes[2];
                 this.LEFT_ARM.setEnabled(false);
 
                 //Initialize the right arm
-                meshes[4].position._x -= .9;
+                // meshes[4].position._x -= .9;
                 meshes[4].parent = this.ARM_ANGLE;
                 this.RIGHT_ARM = meshes[4];
                 this.RIGHT_ARM.setEnabled(false);
@@ -75,9 +76,9 @@ export class Member {
         const delta = this.scene.getEngine().getDeltaTime() / 1000;
         const interpolationFactor = Math.min(1, delta * 60);
         Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
-        if (this.right_hand) {
-            this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
-        }
+        // if (this.right_hand) {
+        //     this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
+        // }
         this.ARM_ANGLE.position = this.movement.position.clone();
     }
 
@@ -124,5 +125,31 @@ export class Member {
             // item.metadata.classInstance.body.motionType = PhysicsMotionType.STATIC;
         }
         this.right_hand = item;
+    }
+
+    addGrab(item, right) {
+        let mesh = this.scene.getMeshByName(item);
+        if (mesh) {
+            mesh.metadata.classInstance.body.disablePreStep = false;
+            mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
+            mesh.metadata.classInstance.body.transformNode.position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
+            mesh.metadata.classInstance.body.transformNode.position.z += (right) ? 0.3 : -0.3;
+            mesh.metadata.classInstance.body.transformNode.parent = this.ARM_ANGLE;
+            if (right) {
+                this.right_hand = mesh;
+            } else {
+                this.left_hand = mesh;
+            }
+        }
+    }
+
+    removeGrab(right) {
+        let mesh = (right)? this.right_hand:this.left_hand;
+        if (mesh) {
+            mesh.metadata.classInstance.body.disablePreStep = true;
+            mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+            mesh.metadata.classInstance.body.transformNode.parent = "";
+            mesh = "";
+        }
     }
 }
