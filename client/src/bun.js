@@ -1,4 +1,4 @@
-import { TransformNode, PhysicsAggregate, PhysicsBody, PhysicsMotionType, PhysicsShapeBox, PhysicsShapeType, Quaternion, Scene, SceneLoader, Vector3 } from "@babylonjs/core";
+import { TransformNode, PhysicsViewer, PhysicsAggregate, PhysicsBody, PhysicsMotionType, PhysicsShapeBox, PhysicsShapeType, Quaternion, Scene, SceneLoader, Vector3 } from "@babylonjs/core";
 import { Food, cook_state } from "./food";
 
 export class Bun extends Food {
@@ -34,6 +34,9 @@ export class Bun extends Food {
                 meshes[1].metadata = {classInstance: this};
                 meshes[1].name = name;
                 this.model.metadata = {classInstance: this};
+
+                var viewer = new PhysicsViewer(scene);
+                viewer.showBody(this.body);
 
 
                 // this.model.isPickable = true;

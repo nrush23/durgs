@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, PointLight, Scene, ArcRotateCamera, Vector3, HemisphericLight, PointerEventTypes, StandardMaterial, Color3, MeshBuilder, Mesh, Axis, Space, CSG, Color4, FollowCamera, ExecuteCodeAction, UniversalCamera, HavokPlugin } from "@babylonjs/core";
+import { Engine, PhysicsViewer, PointLight, Scene, ArcRotateCamera, Vector3, HemisphericLight, PointerEventTypes, StandardMaterial, Color3, MeshBuilder, Mesh, Axis, Space, CSG, Color4, FollowCamera, ExecuteCodeAction, UniversalCamera, HavokPlugin } from "@babylonjs/core";
 import HavokPhysics from "@babylonjs/havok";
 import * as GUI from "@babylonjs/gui";
 import { World } from "./world"
@@ -30,6 +30,7 @@ class App {
         const hk = await HavokPhysics();
         const havokPlugin = new HavokPlugin(true, hk);
         this.scene.enablePhysics(new Vector3(0, -9.81, 0), havokPlugin);
+        this.scene.hk = havokPlugin;
     }
 
 
@@ -38,7 +39,7 @@ class App {
     //and player id (pid)
     connect() {
         console.log("Trying to connect");
-        this.SOCKET = new WebSocket('ws://192.168.0.45:3001/');
+        this.SOCKET = new WebSocket('ws://192.168.0.11:3001/');
         // this.SOCKET = new WebSocket('ws://localhost:3001');
         // this.PLAYER = new Player(this.scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('message', (event) => {
@@ -151,7 +152,7 @@ class App {
     }
 
     START() {
-        if (this.PLAYER != null && this.PLAYER.RIGHT_ARM != null) {
+        if (this.PLAYER != null && this.PLAYER.RIGHT_ARM != null && this.PLAYER.RIGHT_ARM.body) {
             this.scene.clearColor = Color4.FromHexString("#c7f2f8");
             this.engine.runRenderLoop(() => {
                 this.scene.render();
@@ -179,6 +180,12 @@ class App {
                 }
             })
 
+            let viewer = new PhysicsViewer(this.scene);
+            for (let mesh of this.scene.meshes) {
+                if (mesh.physicsBody) {
+                    viewer.showBody(mesh.physicsBody);
+                }
+            }
             this.scene.debugLayer.show();
         } else {
             setTimeout(() => {

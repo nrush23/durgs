@@ -1,4 +1,4 @@
-import { AbstractMesh, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int } from "@babylonjs/core";
+import { AbstractMesh, PhysicsViewer, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsBody, PhysicsShapeBox, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int, HavokPlugin, PhysicsShapeMesh } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
 import { Input_Cache } from "./input_cache";
 const pocket = {
@@ -54,7 +54,7 @@ export class Player {
     /*Create the meshes that make up the player model */
     createBody(scene, texture) {
         this.scene = scene;
-        SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
+        SceneLoader.ImportMesh("body", "", "./assets/player_adjust.glb", this.scene, (meshes) => {
             if (meshes.length > 0) {
                 console.log(meshes);
 
@@ -63,23 +63,26 @@ export class Player {
                 this.model.name = "player_body";
                 this.model.parent = this.movement;
 
+
+                //Create the main position for the arms
+                let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
+                position.y -= 0.2;
+                position.x += 0.4;
+
+                //Create the left arm and make it hidden by default
+                this.LEFT_ARM = meshes[2];
+                this.LEFT_ARM.parent = null;
+                this.LEFT_ARM.position = position.clone();
+                this.LEFT_ARM.position.x -= 0.8;
+                this.LEFT_ARM.parent = this.camera;
+                this.createArm(false);
+
                 //Create the right arm and make it hidden by default
                 this.RIGHT_ARM = meshes[4];
                 this.RIGHT_ARM.parent = null;
-                let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
-                position.y -= 0.2;
-                position.x += 0.3;
                 this.RIGHT_ARM.position = position;
                 this.RIGHT_ARM.parent = this.camera;
-                this.RIGHT_ARM.setEnabled(false);
-
-                //TESTING
-                this.LEFT_ARM = meshes[2];
-                this.LEFT_ARM.parent = null;
-                this.LEFT_ARM.position = this.RIGHT_ARM.position.clone();
-                this.LEFT_ARM.position.x -= 0.6;
-                this.LEFT_ARM.parent = this.camera;
-                this.LEFT_ARM.setEnabled(false);
+                this.createArm(true);
 
                 //Now make each imported mesh unclickable
                 meshes.forEach(mesh => {
@@ -104,6 +107,24 @@ export class Player {
             }
             this.render();
         });
+    }
+
+    createArm(right) {
+        var arm = (right) ? this.RIGHT_ARM : this.LEFT_ARM;
+        const shape = new PhysicsShapeMesh(arm, this.scene);
+        arm.body = new PhysicsBody(arm, PhysicsMotionType.STATIC, false, this.scene);
+        arm.body.shape = shape;
+        arm.body.setMassProperties({ mass: 1 });
+        arm.body.setCollisionCallbackEnabled(true);
+        arm.body.disablePreStep = false;
+
+        var viewer = new PhysicsViewer(this.scene);
+        viewer.showBody(arm.body);
+        arm.body.getCollisionObservable().add((collision) => {
+            console.log("COLLISION %s", (right) ? "RIGHT" : "LEFT");
+        });
+
+        this.enableArm(false, right);
     }
 
     sendPosition() {
@@ -162,7 +183,8 @@ export class Player {
                     arm: "left",
                     PID: this.PID,
                 }));
-                this.LEFT_ARM.setEnabled(true);
+                // this.LEFT_ARM.setEnabled(true);
+                this.enableArm(true, false);
             }
             if (hit.pickedMesh && !this.left_hand) {
                 hit.pickedMesh.metadata.classInstance.onAction(this);
@@ -175,9 +197,10 @@ export class Player {
                     arm: "left",
                     PID: this.PID,
                 }));
-                this.LEFT_ARM.setEnabled(false);
+                // this.LEFT_ARM.setEnabled(false);
+                this.enableArm(false, false);
             }
-            if(this.left_hand){
+            if (this.left_hand) {
                 this.left_hand.metadata.classInstance.offAction(this);
             }
         }
@@ -197,7 +220,7 @@ export class Player {
                     arm: "right",
                     PID: this.PID,
                 }));
-                this.RIGHT_ARM.setEnabled(true);
+                this.enableArm(true, true);
             }
 
             //If a pickable mesh was hit and right hand is empty, 
@@ -214,7 +237,7 @@ export class Player {
                     arm: "right",
                     PID: this.PID,
                 }));
-                this.RIGHT_ARM.setEnabled(false);
+                this.enableArm(false, true);
             }
 
             //If a item was being held, call its class action
@@ -223,6 +246,18 @@ export class Player {
             }
         }
 
+    }
+
+
+    /*Enable or disable the right or left arms completely */
+    enableArm(enable, right) {
+        var arm = (right) ? this.RIGHT_ARM : this.LEFT_ARM;
+        if (enable) {
+            this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, arm.body._pluginData.hpBodyId, false);
+        } else {
+            this.scene.hk._hknp.HP_World_RemoveBody(this.scene.hk.world, arm.body._pluginData.hpBodyId);
+        }
+        arm.setEnabled(enable);
     }
 
     setupPointer() {
@@ -338,7 +373,7 @@ export class Player {
         //Copy the RIGHT_ARM's position, push it a little bit forward, reset the rotation,
         //and parent to the camera
         let position = this.RIGHT_ARM.position.clone();
-        position.z += 0.3;
+        position.z += 1;
         mesh.metadata.classInstance.model.position = position;
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
         mesh.metadata.classInstance.model.parent = this.camera;

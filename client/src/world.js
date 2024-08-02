@@ -2,30 +2,35 @@ import { Axis, Color3, Mesh, MeshBuilder, PhysicsAggregate, PhysicsShapeType, Sc
 import { Bun } from "./bun";
 import { Restocker } from "./restocker";
 import { Grill } from "./grill";
+import { Fryer } from "./fryer";
 export class World {
     DURGS;
     GROUND;
     GRILL;
     scene;
     env;
-
+    FRYER;
     //Need to finsih modifying how the world imports the restock icons
     constructor(scene, callback) {
         this.scene = scene;
-        SceneLoader.ImportMeshAsync("", "./", "./assets/restaurant_furnishing2.glb", scene).then((result) => {
+        var names = ["grill", "grill_top", "fryer", "right_oil"];
+        SceneLoader.ImportMeshAsync("", "./", "./assets/restaurant_furnishing3.glb", scene).then((result) => {
             const meshes = result.meshes;
             meshes.forEach((mesh) => {
                 mesh.isPickable = false;
                 mesh.enablePointerMoveEvents = false;
-                new PhysicsAggregate(mesh, PhysicsShapeType.BOX, {mass:0}, scene);
+                if (!names.includes(mesh.name)) {
+                    new PhysicsAggregate(mesh, PhysicsShapeType.BOX, { mass: 0 }, scene);
+                }
             });
             this.DURGS = meshes[0];
             this.DURGS.name = "restaurant";
-            this.GROUND = new PhysicsAggregate(scene.getMeshByName("ground"), PhysicsShapeType.BOX, {mass: 0}, scene);
-            if(typeof callback == 'function'){
+            this.GROUND = new PhysicsAggregate(scene.getMeshByName("ground"), PhysicsShapeType.BOX, { mass: 0 }, scene);
+            if (typeof callback == 'function') {
                 callback();
             }
             this.GRILL = new Grill(scene);
+            this.FRYER = new Fryer(scene);
             // new Restocker(scene);
         }).catch((error) => {
             console.log("Loading mesh error: ", error);

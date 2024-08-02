@@ -18,14 +18,13 @@ export default class Player {
     NETWORK_CACHE;
     INPUT_BUFFER;
     MAX_SPEED;
-    RIGHT_ARM = false;
-    LEFT_ARM = false;
+    RIGHT_ARM = ""
+    LEFT_ARM = ""
     ARM_ANGLE;
 
     constructor() {
         this.PID = -1;
         this.username = null;
-        // this.WID = -1;
         this.socket = null;
         this.texture = null;
         this.position = new Vector3(0, 0, 0);
@@ -46,6 +45,11 @@ export default class Player {
                 this.movement = new TransformNode(this.PID, this.scene);
                 this.movement.position = new Vector3(0, 0, 0);
                 this.model.parent = this.movement;
+
+                //TESTING, ADDING ARMS
+
+
+                //END TESTING
                 console.log("%s entered the scene", this.username);
             }
         })
