@@ -29,6 +29,7 @@ export class Bun extends Food {
                 this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
                 this.body.shape = shape;
                 this.body.setMassProperties({mass: 1});
+                // this.body.metadata = {classInstance: this};
 
                 //Set the metadata of the root and mesh to be this instance
                 meshes[1].metadata = {classInstance: this};

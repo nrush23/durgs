@@ -179,7 +179,7 @@ export class Player {
             if (!this.LEFT_ARM.isEnabled(false)) {
                 this.SOCKET.send(JSON.stringify({
                     timestamp: Date.now(),
-                    type: "arm_grab",
+                    type: "arm_extend",
                     arm: "left",
                     PID: this.PID,
                 }));
@@ -216,7 +216,7 @@ export class Player {
             if (!this.RIGHT_ARM.isEnabled(false)) {
                 this.SOCKET.send(JSON.stringify({
                     timestamp: Date.now(),
-                    type: "arm_grab",
+                    type: "arm_extend",
                     arm: "right",
                     PID: this.PID,
                 }));
@@ -373,6 +373,7 @@ export class Player {
         //Copy the RIGHT_ARM's position, push it a little bit forward, reset the rotation,
         //and parent to the camera
         let position = this.RIGHT_ARM.position.clone();
+        console.log(position);
         position.z += 1;
         mesh.metadata.classInstance.model.position = position;
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);

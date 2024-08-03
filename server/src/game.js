@@ -45,7 +45,7 @@ export class Game {
             this.scene.enablePhysics(new Vector3(0, -9.81, 0), havokPlugin);
             this.world = new World(this.scene, () => {
                 this.restock_manager = new Restock_Manager(this.scene);
-            });
+            }, this);
 
             let startTime = performance.now();
             let accumulator = 0;
@@ -61,7 +61,7 @@ export class Game {
                         if (player.INPUT_BUFFER.length > 0) {
                             player.INPUT_BUFFER.forEach((input) => {
                                 player.render2(input);
-                                console.log(player.movement.position);
+                                // console.log(player.movement.position);
                             })
                             this.broadcast(JSON.stringify({
                                 timestamp: Date.now(),

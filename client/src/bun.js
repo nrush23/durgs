@@ -37,19 +37,6 @@ export class Bun extends Food {
 
                 var viewer = new PhysicsViewer(scene);
                 viewer.showBody(this.body);
-
-
-                // this.model.isPickable = true;
-                // this.model.enablePointerMoveEvents = true;
-                // this.model.metadata = { classInstance: this };
-                // this.model = meshes[0];
-                // this.model.position = position;
-                // this.model.isPickable = false;
-                // this.model.enablePointerMoveEvents = false;
-                // this.model.name = name;
-                // this.model.metadata = { classInstance: this };
-                // new PhysicsAggregate(meshes[1], PhysicsShapeType.CYLINDER, {mass: 1}, scene);
-                // console.log("bun:",meshes);
             }
         });
         this.doneness = cook_state.perfect;

@@ -112,19 +112,21 @@ wss.on('connection', function connection(ws) {
                 }));
                 break;
             case "movement_input":
-                console.log(msg);
+                // console.log(msg);
                 var player = game.players.get(msg.PID);
                 player.addInput(msg.vertical, msg.horizontal, msg.rotation, msg.twist, msg.index);
                 break;
-            case "arm_grab":
+            case "arm_extend":
                 var player = game.players.get(msg.PID);
                 var right = (msg.arm == "right")? true:false;
-                var VALID = (right)? (player.RIGHT_ARM == false): (player.LEFT_ARM == false);
+                var VALID = (right)? (!player.RIGHT_ARM.isEnabled(false)): (!player.LEFT_ARM.isEnabled(false));
                 if(game.players.size > 1 && VALID){
                     if(right){
-                        player.RIGHT_ARM = true;
+                        player.extendArm(true);
+                        // player.RIGHT_ARM = true;
                     }else{
-                        player.LEFT_ARM = true;
+                        player.extendArm(false);
+                        // player.LEFT_ARM = true;
                     }
                     broadcast(JSON.stringify({
                         timestamp: Date.now(),
@@ -140,9 +142,11 @@ wss.on('connection', function connection(ws) {
                 var VALID = (side)? (player.RIGHT_ARM == true): (player.LEFT_ARM == true);
                 if(game.players.size > 1 && VALID){
                     if(side){
-                        player.RIGHT_ARM = false;
+                        player.retractArm(true);
+                        // player.RIGHT_ARM = false;
                     }else{
-                        player.LEFT_ARM = false;
+                        player.retractArm(false);
+                        // player.LEFT_ARM = false;
                     }
                     broadcast(JSON.stringify({
                         timestamp: Date.now(),
@@ -157,8 +161,9 @@ wss.on('connection', function connection(ws) {
                 //When a player grabs, get the associated player using the msg.PID
                 //and the item they grabbed
                 var player = game.players.get(msg.PID);
-                player.right_hand = msg.item;
-
+                // player.right_hand = msg.item;
+                player.addGrab(msg.item, true);
+                game.world.GRILL.removeItem(msg.item);
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player
                 if (game.players.size > 1) {
@@ -179,7 +184,8 @@ wss.on('connection', function connection(ws) {
                 break;
             case "release":
                 var player = game.players.get(msg.PID);
-                player.right_hand = "";
+                // player.right_hand = "";
+                player.removeGrab(true);
 
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player

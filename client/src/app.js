@@ -139,6 +139,13 @@ class App {
                     }
                     this.PLAYER.UPDATE_CACHE = () => this.PLAYER.removeFromCache(new Vector3(data.position._x, data.position._y, data.position._z), data.index);
                     break;
+                case "sizzle":
+                    console.log("SIZZLE TIME");
+                    this.WORLD.GRILL.enableSizzle(true);
+                    break;
+                case "sizzle_end":
+                    console.log("SIZZLE END");
+                    this.WORLD.GRILL.enableSizzle(false);
                 default:
                     console.log('Unknown type: %s', data.type);
             }
