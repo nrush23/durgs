@@ -161,9 +161,7 @@ wss.on('connection', function connection(ws) {
                 //When a player grabs, get the associated player using the msg.PID
                 //and the item they grabbed
                 var player = game.players.get(msg.PID);
-                // player.right_hand = msg.item;
                 player.addGrab(msg.item, true);
-                game.world.GRILL.removeItem(msg.item);
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player
                 if (game.players.size > 1) {
@@ -171,6 +169,7 @@ wss.on('connection', function connection(ws) {
                         timestamp: Date.now(),
                         type: "member_grabbed",
                         item: msg.item,
+                        arm: msg.arm,
                         username: player.username
                     }));
                 }
@@ -179,7 +178,8 @@ wss.on('connection', function connection(ws) {
                 ws.send(JSON.stringify({
                     timestamp: Date.now(),
                     type: "grabbed",
-                    item: msg.item
+                    item: msg.item,
+                    arm: msg.arm,
                 }));
                 break;
             case "release":
@@ -193,13 +193,15 @@ wss.on('connection', function connection(ws) {
                     timestamp: Date.now(),
                     type: "member_released",
                     item: msg.item,
+                    arm: msg.arm,
                     username: player.username
                 }));
 
                 //Finally, give the okay to the player who grabbed to pick it up
                 ws.send(JSON.stringify({
                     timestamp: Date.now(),
-                    type: "released"
+                    type: "released",
+                    arm: msg.arm,
                 }));
                 break;
             case "spawn_request":

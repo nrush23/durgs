@@ -184,11 +184,11 @@ export default class Player {
             hand.metadata.classInstance.body.disablePreStep = true;
             hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
             hand.metadata.classInstance.model.parent = "";
+            console.log("Released %s: %s vs %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition(), this.movement.position);
         }
 
         // console.log(this.movement.position);
         // console.log(hand.metadata.classInstance.model.getAbsolutePosition());
-        console.log("Released %s: %s vs %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition(), this.movement.position);
         if(right){
             this.right_hand = "";
         }else{

@@ -10,11 +10,11 @@ export class Interactable {
         this.scene = scene;
     }
 
-    onAction(input){
+    onAction(input, right){
         throw new Error('Method onAction(input) must be implemented');
     }
     
-    offAction(input){
+    offAction(input, right){
         throw new Error('Method offAction(input) must be implemented');
     }
     

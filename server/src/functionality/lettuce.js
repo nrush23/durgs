@@ -36,6 +36,7 @@ export class Lettuce extends Food{
     }
 
     cook(){
+        this.cook_time += 0.1;
         if(this.cook_time > 0.5){
             this.doneness = burnt;
         }

@@ -48,6 +48,7 @@ export class Patty extends Food{
     }
 
     cook(){
+        this.cook_time += .1;
         if(this.cook_time > 0.3){
             this.doneness = cook_state.perfect;
         }else if(this.cook_time > 0.6){

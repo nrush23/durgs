@@ -92,14 +92,14 @@ class App {
                     // item.metadata.classInstance.body.disablePreStep = false;
                     // // this.PLAYER.right_hand = item.parent.parent;
                     // this.PLAYER.right_hand = item;
-                    this.PLAYER.addGrab(data.item);
+                    this.PLAYER.addGrab(data.item, data.arm);
                     break;
                 case "released":
                     // if (this.PLAYER.right_hand) {
                     //     this.PLAYER.right_hand.metadata.classInstance.body.disablePreStep = true;
                     //     this.PLAYER.right_hand = "";
                     // }
-                    this.PLAYER.removeGrab();
+                    this.PLAYER.removeGrab(data.arm);
                     break;
                 case "member_grabbed":
                     console.log('Message received: %s', event.data);
@@ -141,11 +141,16 @@ class App {
                     break;
                 case "sizzle":
                     console.log("SIZZLE TIME");
-                    this.WORLD.GRILL.enableSizzle(true);
+                    console.log(data.item);
+                    this.WORLD.GRILL.addSizzle(data.item);
                     break;
                 case "sizzle_end":
                     console.log("SIZZLE END");
-                    this.WORLD.GRILL.enableSizzle(false);
+                    this.WORLD.GRILL.removeSizzle(data.item, data.play);
+                    break;
+                case "cook":
+                    this.WORLD.GRILL.checkCook(data.item, data.time, new Vector3(data.position._x, data.position._y, data.position._z));
+                    break;
                 default:
                     console.log('Unknown type: %s', data.type);
             }

@@ -41,6 +41,7 @@ export class Bun extends Food {
     }
 
     cook() {
+        this.cook_time += 0.1;
         this.doneness = (this.cook_time > 0.3)? cook_state.burnt : cook_state.perfect;
     }
 }

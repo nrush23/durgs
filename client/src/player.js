@@ -1,4 +1,4 @@
-import { AbstractMesh, PhysicsViewer, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsBody, PhysicsShapeBox, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int, HavokPlugin, PhysicsShapeMesh } from "@babylonjs/core";
+import { AbstractMesh, PhysicsEventType, PhysicsViewer, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsBody, PhysicsShapeBox, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int, HavokPlugin, PhysicsShapeMesh } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
 import { Input_Cache } from "./input_cache";
 const pocket = {
@@ -56,7 +56,7 @@ export class Player {
         this.scene = scene;
         SceneLoader.ImportMesh("body", "", "./assets/player_adjust.glb", this.scene, (meshes) => {
             if (meshes.length > 0) {
-                console.log(meshes);
+                // console.log(meshes);
 
                 //Create the main bean body
                 this.model = meshes[0];
@@ -120,8 +120,12 @@ export class Player {
 
         var viewer = new PhysicsViewer(this.scene);
         viewer.showBody(arm.body);
+        arm.hit = null
         arm.body.getCollisionObservable().add((collision) => {
-            console.log("COLLISION %s", (right) ? "RIGHT" : "LEFT");
+            if (collision.type === PhysicsEventType.COLLISION_STARTED && !arm.hit) {
+                arm.hit = collision.collidedAgainst.transformNode;
+            }
+            // console.log("COLLISION %s", (right) ? "RIGHT" : "LEFT");
         });
 
         this.enableArm(false, right);
@@ -168,10 +172,11 @@ export class Player {
     /*Player function to signal item and player interactions */
     updateInteract() {
 
-        //Check our controller for grabs and picked rays
+        //RAY METHOD
+        // //Check our controller for grabs and picked rays
         this.grab = this.controller.grab_right;
-        var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
-        var hit = this.scene.pickWithRay(ray);
+        // var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
+        // var hit = this.scene.pickWithRay(ray);
 
 
         //TESTING
@@ -186,9 +191,12 @@ export class Player {
                 // this.LEFT_ARM.setEnabled(true);
                 this.enableArm(true, false);
             }
-            if (hit.pickedMesh && !this.left_hand) {
-                hit.pickedMesh.metadata.classInstance.onAction(this);
+            if(this.LEFT_ARM.hit && !this.left_hand){
+                this.LEFT_ARM.hit.metadata.classInstance.onAction(this, false);
             }
+            // if (hit.pickedMesh && !this.left_hand) {
+            //     hit.pickedMesh.metadata.classInstance.onAction(this);
+            // }
         } else {
             if (this.LEFT_ARM.isEnabled(false)) {
                 this.SOCKET.send(JSON.stringify({
@@ -201,7 +209,7 @@ export class Player {
                 this.enableArm(false, false);
             }
             if (this.left_hand) {
-                this.left_hand.metadata.classInstance.offAction(this);
+                this.left_hand.metadata.classInstance.offAction(this, false);
             }
         }
 
@@ -223,11 +231,14 @@ export class Player {
                 this.enableArm(true, true);
             }
 
-            //If a pickable mesh was hit and right hand is empty, 
-            //trigger the mesh's class action
-            if (hit.pickedMesh && !this.right_hand) {
-                hit.pickedMesh.metadata.classInstance.onAction(this);
+            if (this.RIGHT_ARM.hit && !this.right_hand) {
+                this.RIGHT_ARM.hit.metadata.classInstance.onAction(this, true);
             }
+            // //If a pickable mesh was hit and right hand is empty, 
+            // //trigger the mesh's class action
+            // if (hit.pickedMesh && !this.right_hand) {
+            //     hit.pickedMesh.metadata.classInstance.onAction(this);
+            // }
         } else {
             //No longer grabbing, retract the arm
             if (this.RIGHT_ARM.isEnabled(false)) {
@@ -242,7 +253,7 @@ export class Player {
 
             //If a item was being held, call its class action
             if (this.right_hand) {
-                this.right_hand.metadata.classInstance.offAction(this);
+                this.right_hand.metadata.classInstance.offAction(this, true);
             }
         }
 
@@ -256,6 +267,7 @@ export class Player {
             this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, arm.body._pluginData.hpBodyId, false);
         } else {
             this.scene.hk._hknp.HP_World_RemoveBody(this.scene.hk.world, arm.body._pluginData.hpBodyId);
+            arm.hit = null;
         }
         arm.setEnabled(enable);
     }
@@ -360,38 +372,51 @@ export class Player {
 
 
     /*Set the given item name to the player's right hand */
-    addGrab(item) {
+    addGrab(item, right) {
 
         //Retrieve the mesh and disable its physics updates
         var mesh = this.scene.getMeshByName(item);
         mesh.metadata.classInstance.body.disablePreStep = false;
         mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
 
-        //Make sure RIGHT_ARM's position is up to date
-        this.RIGHT_ARM.computeWorldMatrix(true);
+        if (right) {
+            //Make sure RIGHT_ARM's position is up to date
+            this.RIGHT_ARM.computeWorldMatrix(true);
+        } else {
+            this.LEFT_ARM.computeWorldMatrix(true);
+        }
 
         //Copy the RIGHT_ARM's position, push it a little bit forward, reset the rotation,
         //and parent to the camera
-        let position = this.RIGHT_ARM.position.clone();
+        let position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
         console.log(position);
         position.z += 1;
         mesh.metadata.classInstance.model.position = position;
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
         mesh.metadata.classInstance.model.parent = this.camera;
 
-        //Set our right_hand to mesh
-        this.right_hand = mesh;
+        if (right) {
+            //Set our right_hand to mesh
+            this.right_hand = mesh;
+        } else {
+            this.left_hand = mesh;
+        }
     }
 
 
 
     /*Remove the current item from the player's right hand */
-    removeGrab() {
-        if (this.right_hand) {
-            this.right_hand.metadata.classInstance.body.disablePreStep = true;
-            this.right_hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
-            this.right_hand.metadata.classInstance.model.parent = "";
-            this.right_hand = "";
+    removeGrab(right) {
+        var hand = (right)? this.right_hand: this.left_hand;
+        if (hand) {
+            hand.metadata.classInstance.body.disablePreStep = true;
+            hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+            hand.metadata.classInstance.model.parent = "";
+            if(right){
+                this.right_hand = "";
+            }else{
+                this.left_hand ="";
+            }
         }
     }
 }
