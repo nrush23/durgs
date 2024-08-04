@@ -156,13 +156,17 @@ export default class Player {
         mesh.metadata.classInstance.body.disablePreStep = false;
         mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
 
+        var arm = (right)? this.RIGHT_ARM:this.LEFT_ARM;
         //Make sure RIGHT_ARM's position is up to date
-        this.RIGHT_ARM.computeWorldMatrix(true);
+        // this.RIGHT_ARM.computeWorldMatrix(true);
+        arm.computeWorldMatrix(true);
 
         //Copy the RIGHT_ARM's position, push it a little bit forward, reset the rotation,
         //and parent to the camera
-        let position = this.RIGHT_ARM.position.clone();
-        console.log("%s vs %s", this.camera.position, this.RIGHT_ARM.position);
+        // let position = this.RIGHT_ARM.position.clone();
+        let position = arm.position.clone();
+        // console.log("%s vs %s", this.camera.position, this.RIGHT_ARM.position);
+        console.log("%s vs %s", this.camera.position, arm.position);
         position.z += 1;
         mesh.metadata.classInstance.model.position = position;
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
@@ -175,7 +179,7 @@ export default class Player {
             this.left_hand = mesh;
         }
 
-        console.log("Grabbed %s: %s vs. %s", this.right_hand.name, position, this.movement.position);
+        console.log("Grabbed %s: %s vs. %s", mesh.name, position, this.movement.position);
     }
 
     removeGrab(right){
@@ -184,15 +188,15 @@ export default class Player {
             hand.metadata.classInstance.body.disablePreStep = true;
             hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
             hand.metadata.classInstance.model.parent = "";
+            if(right){
+                this.right_hand = "";
+            }else{
+                this.left_hand = "";
+            }
             console.log("Released %s: %s vs %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition(), this.movement.position);
         }
 
         // console.log(this.movement.position);
         // console.log(hand.metadata.classInstance.model.getAbsolutePosition());
-        if(right){
-            this.right_hand = "";
-        }else{
-            this.left_hand = "";
-        }
     }
 }

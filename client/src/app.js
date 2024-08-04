@@ -82,6 +82,7 @@ class App {
                     if (this.Members.has(data.username)) {
                         let member = this.Members.get(data.username);
                         member.arm_retract(data.arm);
+                        console.log(data);
                     }
                     break;
                 case "grabbed":
@@ -107,7 +108,7 @@ class App {
                         var member = this.Members.get(data.username);
                         // var item = this.scene.getMeshByName(data.item);
                         // member.updateGrab(item);
-                        member.addGrab(data.item, true);
+                        member.addGrab(data.item, data.arm);
                     }
                     break;
                 case "member_released":
@@ -118,7 +119,7 @@ class App {
                         // // console.log(member);
                         // member.right_hand.metadata.classInstance.body.disablePreStep = true;
                         // member.updateGrab("");
-                        member.removeGrab(true);
+                        member.removeGrab(data.arm);
                     }
                     break;
                 case "spawn_response":

@@ -1,4 +1,4 @@
-import { AbstractMesh, PhysicsEventType, PhysicsViewer, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsBody, PhysicsShapeBox, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int, HavokPlugin, PhysicsShapeMesh } from "@babylonjs/core";
+import { AbstractMesh, RayHelper, PhysicsEventType, PhysicsViewer, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsBody, PhysicsShapeBox, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int, HavokPlugin, PhysicsShapeMesh } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
 import { Input_Cache } from "./input_cache";
 const pocket = {
@@ -178,7 +178,15 @@ export class Player {
         // var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
         // var hit = this.scene.pickWithRay(ray);
 
+        // //DOUBLE TESTING
+        // var direction = Vector3.Normalize(Vector3.TransformCoordinates(new Vector3(0,0,1), this.LEFT_ARM.getWorldMatrix()).subtract(this.LEFT_ARM.position));
+        // var left_ray = new Ray(this.LEFT_ARM.getAbsolutePosition(), direction, 2);
+        // var left_hit = this.scene.pickWithRay(left_ray);
 
+        // let rayHelper = new RayHelper(left_ray);		
+		// rayHelper.show(this.scene);	
+
+        var left_hit = null;
         //TESTING
         if (this.controller.grab_left) {
             if (!this.LEFT_ARM.isEnabled(false)) {
@@ -191,7 +199,9 @@ export class Player {
                 // this.LEFT_ARM.setEnabled(true);
                 this.enableArm(true, false);
             }
-            if(this.LEFT_ARM.hit && !this.left_hand){
+            if(left_hit){
+                left_hit.pickedMesh.metadata.classInstance.onAction(this, false);
+            }else if(this.LEFT_ARM.hit && !this.left_hand){
                 this.LEFT_ARM.hit.metadata.classInstance.onAction(this, false);
             }
             // if (hit.pickedMesh && !this.left_hand) {

@@ -101,21 +101,31 @@ export class Member {
     }
 
     arm_extend(right) {
-        console.log(right);
-        if (right && this.RIGHT_ARM != null) {
-            this.RIGHT_ARM.setEnabled(true);
+        // console.log(right);
+        // if (right && this.RIGHT_ARM != null) {
+        //     this.RIGHT_ARM.setEnabled(true);
 
-        } else if (!right && this.LEFT_ARM != null) {
-            this.LEFT_ARM.setEnabled(true); //Show left arm for debug right now
+        // } else if (!right && this.LEFT_ARM != null) {
+        //     this.LEFT_ARM.setEnabled(true); //Show left arm for debug right now
+        // }
+        if(right && !this.RIGHT_ARM.isEnabled(false)){
+            this.RIGHT_ARM.setEnabled(true);
+        }else if(!right && !this.LEFT_ARM.isEnabled(false)){
+            this.LEFT_ARM.setEnabled(true);
         }
     }
 
     arm_retract(right) {
-        if (right && this.RIGHT_ARM != null) {
-            this.RIGHT_ARM.setEnabled(false);
+        // if (right && this.RIGHT_ARM != null) {
+        //     this.RIGHT_ARM.setEnabled(false);
 
-        } else if (!right && this.LEFT_ARM != null) {
-            this.LEFT_ARM.setEnabled(false);
+        // } else if (!right && this.LEFT_ARM != null) {
+        //     this.LEFT_ARM.setEnabled(false);
+        // }
+        if (right && this.RIGHT_ARM.isEnabled(false)) {
+            this.RIGHT_ARM.setEnabled(false);
+        } else if (!right && this.LEFT_ARM.isEnabled(false)) {
+                this.LEFT_ARM.setEnabled(false);
         }
     }
 
@@ -133,7 +143,7 @@ export class Member {
             mesh.metadata.classInstance.body.disablePreStep = false;
             mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
             mesh.metadata.classInstance.body.transformNode.position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
-            mesh.metadata.classInstance.body.transformNode.position.z += (right) ? 0.3 : -0.3;
+            mesh.metadata.classInstance.body.transformNode.position.z += 1;
             mesh.metadata.classInstance.body.transformNode.parent = this.ARM_ANGLE;
             if (right) {
                 this.right_hand = mesh;
@@ -144,12 +154,13 @@ export class Member {
     }
 
     removeGrab(right) {
-        let mesh = (right)? this.right_hand:this.left_hand;
+        let mesh = (right) ? this.right_hand : this.left_hand;
         if (mesh) {
             mesh.metadata.classInstance.body.disablePreStep = true;
             mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
             mesh.metadata.classInstance.body.transformNode.parent = "";
             mesh = "";
+            this.arm_retract(right);
         }
     }
 }

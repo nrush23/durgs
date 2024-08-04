@@ -139,7 +139,7 @@ wss.on('connection', function connection(ws) {
             case "arm_retract":
                 var player = game.players.get(msg.PID);
                 let side = (msg.arm == "right")? true:false;
-                var VALID = (side)? (player.RIGHT_ARM == true): (player.LEFT_ARM == true);
+                var VALID = (side)? (player.RIGHT_ARM.isEnabled(false)): (player.LEFT_ARM.isEnabled(false));
                 if(game.players.size > 1 && VALID){
                     if(side){
                         player.retractArm(true);
