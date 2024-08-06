@@ -1,4 +1,4 @@
-import { PhysicsMotionType, SceneLoader, TransformNode, Vector3 } from "@babylonjs/core";
+import { PhysicsMotionType, StandardMaterial, Texture, SceneLoader, TransformNode, Vector3 } from "@babylonjs/core";
 //Class for controlling other players who join the world
 export class Member {
     username;
@@ -14,7 +14,7 @@ export class Member {
     LEFT_ARM;
     ARM_ANGLE;
 
-    constructor(username, scene, position, texture) {
+    constructor(username, scene, position, texture, creepy) {
 
         //Intialize the transform nodes and position vectors
         this.username = username;
@@ -29,7 +29,7 @@ export class Member {
 
         //Import the body into the scene
         this.scene = scene;
-        SceneLoader.ImportMesh("body", "", "./assets/player.glb", this.scene, (meshes) => {
+        SceneLoader.ImportMesh("body", "", "./assets/player_adjust.glb", this.scene, (meshes) => {
 
             if (meshes.length > 0) {
 
@@ -38,7 +38,12 @@ export class Member {
                 this.model = meshes[0];
                 this.model.name = "member";
                 this.model.parent = this.movement;
-
+                if (creepy) {
+                    var NEW_MAT = new StandardMaterial("body_map", scene);
+                    NEW_MAT.diffuseTexture = new Texture("./assets/skins/skin1.png", scene);
+                    // meshes[5].material = NEW_MAT;
+                    meshes[5].material.albedoTexture = NEW_MAT.diffuseTexture;
+                }
                 //Set everything to be uninteractable
                 meshes.forEach(mesh => {
                     mesh.isPickable = false;
@@ -108,9 +113,9 @@ export class Member {
         // } else if (!right && this.LEFT_ARM != null) {
         //     this.LEFT_ARM.setEnabled(true); //Show left arm for debug right now
         // }
-        if(right && !this.RIGHT_ARM.isEnabled(false)){
+        if (right && !this.RIGHT_ARM.isEnabled(false)) {
             this.RIGHT_ARM.setEnabled(true);
-        }else if(!right && !this.LEFT_ARM.isEnabled(false)){
+        } else if (!right && !this.LEFT_ARM.isEnabled(false)) {
             this.LEFT_ARM.setEnabled(true);
         }
     }
@@ -125,7 +130,7 @@ export class Member {
         if (right && this.RIGHT_ARM.isEnabled(false)) {
             this.RIGHT_ARM.setEnabled(false);
         } else if (!right && this.LEFT_ARM.isEnabled(false)) {
-                this.LEFT_ARM.setEnabled(false);
+            this.LEFT_ARM.setEnabled(false);
         }
     }
 

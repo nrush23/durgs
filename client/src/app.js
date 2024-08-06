@@ -57,7 +57,7 @@ class App {
                     console.log(data);
                     if (!this.Members.has(data.username)) {
                         var position = new Vector3(data.position.x, data.position.y, data.position.z);
-                        var member = new Member(data.username, this.scene, position, data.texture);
+                        var member = new Member(data.username, this.scene, position, data.texture, (this.Members.size == 0)?true:false);
                         this.Members.set(member.username, member);
                     }
                     break;
@@ -147,6 +147,7 @@ class App {
                     break;
                 case "sizzle_end":
                     console.log("SIZZLE END");
+                    console.log(data);
                     this.WORLD.GRILL.removeSizzle(data.item, data.play);
                     break;
                 case "cook":
@@ -193,12 +194,12 @@ class App {
                 }
             })
 
-            let viewer = new PhysicsViewer(this.scene);
-            for (let mesh of this.scene.meshes) {
-                if (mesh.physicsBody) {
-                    viewer.showBody(mesh.physicsBody);
-                }
-            }
+            // let viewer = new PhysicsViewer(this.scene);
+            // for (let mesh of this.scene.meshes) {
+            //     if (mesh.physicsBody) {
+            //         viewer.showBody(mesh.physicsBody);
+            //     }
+            // }
             this.scene.debugLayer.show();
         } else {
             setTimeout(() => {

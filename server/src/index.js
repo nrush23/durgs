@@ -185,7 +185,9 @@ wss.on('connection', function connection(ws) {
             case "release":
                 var player = game.players.get(msg.PID);
                 // player.right_hand = "";
-                player.removeGrab(true);
+                console.log("RELEASE: %s", msg.position);
+                var position = new Vector3(msg.position._x, msg.position._y, msg.position._z);
+                player.removeGrab(true, position);
 
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player

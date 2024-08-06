@@ -119,7 +119,7 @@ export default class Player {
         }
         this.movement.rotation = new Vector3(0, TWIST._y, 0);
         this.camera.position.copyFrom(this.movement.position);
-        this.camera.rotation._x = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
+        this.camera.rotation = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
     }
 
     /*Add new input messages to the buffer for processing on next
@@ -180,20 +180,24 @@ export default class Player {
         }
 
         console.log("Grabbed %s: %s vs. %s", mesh.name, position, this.movement.position);
+        console.log("%s", this.RIGHT_ARM.position.add(this.camera.position).add(this.movement.position));
     }
 
-    removeGrab(right){
+    removeGrab(right, position){
         var hand = (right)? this.right_hand:this.left_hand;
+        console.log("SENT: %s",position);
         if(hand){
+            hand.metadata.classInstance.model.parent = "";
+            hand.metadata.classInstance.model.setAbsolutePosition(position);
             hand.metadata.classInstance.body.disablePreStep = true;
             hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
-            hand.metadata.classInstance.model.parent = "";
             if(right){
                 this.right_hand = "";
             }else{
                 this.left_hand = "";
             }
             console.log("Released %s: %s vs %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition(), this.movement.position);
+            setTimeout(()=>{console.log("%s: %s (%s)",hand.name, hand.position, position)}, 500);
         }
 
         // console.log(this.movement.position);

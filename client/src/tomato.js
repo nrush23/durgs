@@ -1,5 +1,5 @@
 import { Food, cook_state } from "./food";
-import { SceneLoader, TransformNode, Vector3, PhysicsShapeBox, PhysicsBody, PhysicsMotionType, Quaternion } from "@babylonjs/core";
+import { SceneLoader, MultiMaterial, SubMesh, TransformNode, Vector3, PhysicsShapeBox, PhysicsBody, PhysicsMotionType, Quaternion } from "@babylonjs/core";
 export class Tomato extends Food {
     constructor(scene, position, name) {
         super(scene);
@@ -31,16 +31,25 @@ export class Tomato extends Food {
                 meshes[1].name = name;
                 this.model.metadata = { classInstance: this };
 
+                // Assuming meshes[1] is your mesh
+                var mesh = meshes[1];
+                var verticesCount = mesh.getTotalVertices();
+                var indicesCount = mesh.getTotalIndices()
 
-                // this.model = meshes[0];
-                // // console.log("tomato:",this.model);
-                // this.model.position = position;
-                // this.model.isPickable = false;
-                // this.model.enablePointerMoveEvents = false;
-                // // this.model.name = "tomato";
-                // this.model.name = name;
-                // this.model.metadata = { classInstance: this };
-                // // console.log("tomato:",meshes);
+                // Clear existing subMeshes
+                mesh.subMeshes = [];
+
+                // Define subMeshes
+                new SubMesh(0, 0, verticesCount, 0, indicesCount, mesh);
+                new SubMesh(1, 0, verticesCount, 0, indicesCount, mesh);
+
+                // Create MultiMaterial
+                var NEW_MAT = new MultiMaterial("test_black", this.scene);
+                NEW_MAT.subMaterials.push(mesh.material); // Original material
+                NEW_MAT.subMaterials.push(this.OVERLAY); // Overlay material
+
+                // Apply MultiMaterial to the mesh
+                mesh.material = NEW_MAT;
             }
         });
         this.doneness = cook_state.perfect;
@@ -51,5 +60,6 @@ export class Tomato extends Food {
         if (this.cook_time > 0.5) {
             this.doneness = cook_state.burnt;
         }
+        this.OVERLAY.alpha = this.cook_time;
     }
 }

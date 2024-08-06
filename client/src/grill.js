@@ -1,4 +1,4 @@
-import { Vector3, PhysicsBody, PhysicsShapeBox, Quaternion, PhysicsMotionType, PhysicsShapeType, PhysicsAggregate, PhysicsShapeMesh, Sound } from "@babylonjs/core";
+import { Vector3, PhysicsBody, PhysicsEventType, PhysicsShapeBox, Quaternion, PhysicsMotionType, PhysicsShapeType, PhysicsAggregate, PhysicsShapeMesh, Sound } from "@babylonjs/core";
 export class Grill {
     Grill_Top;
     Items;
@@ -17,6 +17,25 @@ export class Grill {
         var top_shape = new PhysicsShapeMesh(this.Grill_Top, scene);
         this.Grill_Top.body = new PhysicsBody(this.Grill_Top, PhysicsMotionType.STATIC, false, scene);
         this.Grill_Top.body.shape = top_shape;
+
+
+        this.Grill_Top.body.setCollisionCallbackEnabled(true);
+        this.Grill_Top.body.getCollisionObservable().add((collision) => {
+            if (collision.type === PhysicsEventType.COLLISION_STARTED) {
+                console.log("%s", collision.collidedAgainst.transformNode.name);
+                setTimeout(() => {
+                    console.log("%s: %s", collision.collidedAgainst.transformNode.name, collision.collidedAgainst.transformNode.position);
+                }, 500);
+            }
+        });
+        this.Grill_Top.body.getCollisionEndedObservable().add((collision) => {
+            console.log("ENDED %s", collision.collidedAgainst.transformNode.name);
+            setTimeout(()=>{
+                console.log("%s: %s", collision.collidedAgainst.transformNode.name, collision.collidedAgainst.transformNode.position);
+            }, 1000);
+            // this.removeItem(collision.collidedAgainst.transformNode.name);
+        })
+
         this.Grill = scene.getMeshByName("grill");
         var grill_shape = new PhysicsShapeMesh(this.Grill, scene);
         this.Grill.body = new PhysicsBody(this.Grill, PhysicsMotionType.STATIC, false, scene);
@@ -28,20 +47,33 @@ export class Grill {
     }
 
     enableSizzle(play) {
-        switch (play) {
-            case true:
-                if (this.sizzle.isReady || this.sizzle.isPaused) {
-                    this.sizzle.play();
-                }
-                break;
-            case false:
-                if (this.sizzle.isPlaying) {
-                    this.sizzle.stop();
-                }
-                break;
-            default:
-                break
+        if (play && !this.sizzle.isPlaying) {
+            this.sizzle.play(0);
+        } else if (!play) {
+            this.sizzle.stop(0);
         }
+        console.log("%s: %s", play, this.sizzle.isPaused);
+        // if(play && (this.sizzle.isReady || this.sizzle.isPaused)){
+        //     this.sizzle.play();
+        // }else if(!play && this.sizzle.isPlaying){
+        //     this.sizzle.stop();
+        //     console.log("stop playing");
+        // }
+        // console.log(play);
+        // switch (play) {
+        //     case true:
+        //         if (this.sizzle.isReady || this.sizzle.isPaused) {
+        //             this.sizzle.play();
+        //         }
+        //         break;
+        //     case false:
+        //         // if (this.sizzle.isPlaying) {
+        //             this.sizzle.stop();
+        //         // }
+        //         break;
+        //     default:
+        //         break
+        // }
     }
 
     addSizzle(item) {
@@ -55,7 +87,11 @@ export class Grill {
 
     removeSizzle(item, play) {
         this.Items.delete(item);
-        this.enableSizzle(play);
+        console.log(this.Items.size);
+        // this.enableSizzle(play);
+        if (this.Items.size == 0) {
+            this.enableSizzle(false);
+        }
     }
 
     cookItem(item) {
@@ -76,13 +112,6 @@ export class Grill {
                 mesh.metadata.classInstance.cook_time = time;
                 console.log("Corrected %s to %s", item, time);
             }
-
-            // if(!mesh.metadata.classInstance.model.position.equals(position)){
-            //     console.log("unequal positions");
-            //     mesh.metadata.classInstance.body.disablePreStep = false;
-            //     mesh.metadata.classInstance.model.position.copyFrom(position);
-            //     mesh.metadata.classInstance.body.disablePreStep = true;
-            // }
         }
     }
 }

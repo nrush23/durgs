@@ -33,7 +33,6 @@ export class Player {
     static GRAVITY = -2.8;
     static ORIGINAL_TILT = new Vector3(0.5934119456780721, 0, 0);
 
-
     /*Initialize the player's attributes*/
     constructor(scene, camera, socket) {
         this.scene = scene;
@@ -68,7 +67,7 @@ export class Player {
                 let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
                 position.y -= 0.2;
                 position.x += 0.4;
-
+                console.log("POS: %s", position);
                 //Create the left arm and make it hidden by default
                 this.LEFT_ARM = meshes[2];
                 this.LEFT_ARM.parent = null;
@@ -118,15 +117,13 @@ export class Player {
         arm.body.setCollisionCallbackEnabled(true);
         arm.body.disablePreStep = false;
 
-        var viewer = new PhysicsViewer(this.scene);
-        viewer.showBody(arm.body);
-        arm.hit = null
-        arm.body.getCollisionObservable().add((collision) => {
-            if (collision.type === PhysicsEventType.COLLISION_STARTED && !arm.hit) {
-                arm.hit = collision.collidedAgainst.transformNode;
-            }
-            // console.log("COLLISION %s", (right) ? "RIGHT" : "LEFT");
-        });
+        arm.RAY = new Ray();
+        arm.RAY_HELPER = new RayHelper(arm.RAY);
+        arm.RAY_HELPER.attachToMesh(arm, new Vector3(0,0,1), Vector3.Zero(), 2);
+        // arm.RAY_HELPER.show(this.scene);
+
+        // var viewer = new PhysicsViewer(this.scene);
+        // viewer.showBody(arm.body);
 
         this.enableArm(false, right);
     }
@@ -171,22 +168,9 @@ export class Player {
 
     /*Player function to signal item and player interactions */
     updateInteract() {
-
-        //RAY METHOD
-        // //Check our controller for grabs and picked rays
         this.grab = this.controller.grab_right;
-        // var ray = new Ray(this.camera.position, this.camera.getForwardRay().direction);
-        // var hit = this.scene.pickWithRay(ray);
 
-        // //DOUBLE TESTING
-        // var direction = Vector3.Normalize(Vector3.TransformCoordinates(new Vector3(0,0,1), this.LEFT_ARM.getWorldMatrix()).subtract(this.LEFT_ARM.position));
-        // var left_ray = new Ray(this.LEFT_ARM.getAbsolutePosition(), direction, 2);
-        // var left_hit = this.scene.pickWithRay(left_ray);
 
-        // let rayHelper = new RayHelper(left_ray);		
-		// rayHelper.show(this.scene);	
-
-        var left_hit = null;
         //TESTING
         if (this.controller.grab_left) {
             if (!this.LEFT_ARM.isEnabled(false)) {
@@ -196,17 +180,12 @@ export class Player {
                     arm: "left",
                     PID: this.PID,
                 }));
-                // this.LEFT_ARM.setEnabled(true);
                 this.enableArm(true, false);
             }
-            if(left_hit){
+            var left_hit = this.scene.pickWithRay(this.LEFT_ARM.RAY);
+            if(left_hit.pickedMesh && !this.left_hand){
                 left_hit.pickedMesh.metadata.classInstance.onAction(this, false);
-            }else if(this.LEFT_ARM.hit && !this.left_hand){
-                this.LEFT_ARM.hit.metadata.classInstance.onAction(this, false);
             }
-            // if (hit.pickedMesh && !this.left_hand) {
-            //     hit.pickedMesh.metadata.classInstance.onAction(this);
-            // }
         } else {
             if (this.LEFT_ARM.isEnabled(false)) {
                 this.SOCKET.send(JSON.stringify({
@@ -215,7 +194,6 @@ export class Player {
                     arm: "left",
                     PID: this.PID,
                 }));
-                // this.LEFT_ARM.setEnabled(false);
                 this.enableArm(false, false);
             }
             if (this.left_hand) {
@@ -240,15 +218,10 @@ export class Player {
                 }));
                 this.enableArm(true, true);
             }
-
-            if (this.RIGHT_ARM.hit && !this.right_hand) {
-                this.RIGHT_ARM.hit.metadata.classInstance.onAction(this, true);
+            var right_hit = this.scene.pickWithRay(this.RIGHT_ARM.RAY);
+            if (right_hit.pickedMesh && !this.right_hand) {
+                right_hit.pickedMesh.metadata.classInstance.onAction(this, true);
             }
-            // //If a pickable mesh was hit and right hand is empty, 
-            // //trigger the mesh's class action
-            // if (hit.pickedMesh && !this.right_hand) {
-            //     hit.pickedMesh.metadata.classInstance.onAction(this);
-            // }
         } else {
             //No longer grabbing, retract the arm
             if (this.RIGHT_ARM.isEnabled(false)) {
@@ -277,7 +250,7 @@ export class Player {
             this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, arm.body._pluginData.hpBodyId, false);
         } else {
             this.scene.hk._hknp.HP_World_RemoveBody(this.scene.hk.world, arm.body._pluginData.hpBodyId);
-            arm.hit = null;
+
         }
         arm.setEnabled(enable);
     }
@@ -336,7 +309,7 @@ export class Player {
                 let INPUT = this.INPUT_CACHE.get(i);
                 this.updateMovement(INPUT);
                 this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
-                this.NEXT_POSITION = input[0];
+                this.NEXT_POSITION = INPUT[0];
                 this.movement.position = this.PREVIOUS_POSITION.clone();
                 this.camera.position = this.movement.position.clone();
             }
@@ -411,6 +384,8 @@ export class Player {
         } else {
             this.left_hand = mesh;
         }
+
+        // console.log("%s", this.RIGHT_ARM.getAbsolutePosition());
     }
 
 
@@ -422,6 +397,7 @@ export class Player {
             hand.metadata.classInstance.body.disablePreStep = true;
             hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
             hand.metadata.classInstance.model.parent = "";
+            // console.log("%s", hand.metadata.classInstance.model.getAbsolutePosition());
             if(right){
                 this.right_hand = "";
             }else{
