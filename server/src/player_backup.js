@@ -19,8 +19,8 @@ export default class Player {
     MAX_SPEED;
     RIGHT_ARM = ""
     LEFT_ARM = ""
-    right_hand = "";
-    left_hand = "";
+    right_hand="";
+    left_hand="";
     ARM_ANGLE;
     camera;
 
@@ -44,52 +44,34 @@ export default class Player {
             if (meshes.length > 0) {
                 this.model = meshes[0];
                 this.model.name = this.username;
-                this.movement = new TransformNode(this.PID, scene);
-                this.movement.position = this.position;
+                this.movement = new TransformNode(this.PID, this.scene);
+                this.movement.position = new Vector3(0, 0, 0);
                 this.model.parent = this.movement;
+                this.camera = new TransformNode(this.PID + "_camera", this.scene);
+                this.camera.position = new Vector3(0,0,0);
+                this.camera.rotation = new Vector3(0,0,0);
 
-                this.camera = new TransformNode(this.PID + "_camera", scene);
-                this.camera.position = new Vector3(0, 0, 0);
+                //TESTING, ADDING ARMS
 
-                meshes[2].parent = this.camera;
+                // let position = new Vector3(0.4, -0.20, 1.20);
+
                 this.LEFT_ARM = meshes[2];
+                this.LEFT_ARM.parent = null;
+                // this.LEFT_ARM.position = position.clone();
+                // this.LEFT_ARM.position.x -= 0.8;
+                this.LEFT_ARM.parent = this.camera;
+
+                this.createArm(false);
                 this.LEFT_ARM.setEnabled(false);
 
-                meshes[4].parent = this.camera;
                 this.RIGHT_ARM = meshes[4];
+                this.RIGHT_ARM.parent = null;
+                // this.RIGHT_ARM.position = position;
+                this.RIGHT_ARM.parent = this.camera;
+                
+                this.createArm(true);
                 this.RIGHT_ARM.setEnabled(false);
-
-                this.camera.position = this.movement.position;
-                // this.model = meshes[0];
-                // this.model.name = this.username;
-                // this.movement = new TransformNode(this.PID, this.scene);
-                // this.movement.position = new Vector3(0, 0, 0);
-                // this.model.parent = this.movement;
-                // this.camera = new TransformNode(this.PID + "_camera", this.scene);
-                // this.camera.position = new Vector3(0,0,0);
-                // this.camera.rotation = new Vector3(0,0,0);
-
-                // //TESTING, ADDING ARMS
-
-                // // let position = new Vector3(0.4, -0.20, 1.20);
-
-                // this.LEFT_ARM = meshes[2];
-                // this.LEFT_ARM.parent = null;
-                // // this.LEFT_ARM.position = position.clone();
-                // // this.LEFT_ARM.position.x -= 0.8;
-                // this.LEFT_ARM.parent = this.camera;
-
-                // this.createArm(false);
-                // this.LEFT_ARM.setEnabled(false);
-
-                // this.RIGHT_ARM = meshes[4];
-                // this.RIGHT_ARM.parent = null;
-                // // this.RIGHT_ARM.position = position;
-                // this.RIGHT_ARM.parent = this.camera;
-
-                // this.createArm(true);
-                // this.RIGHT_ARM.setEnabled(false);
-                // //END TESTING
+                //END TESTING
                 console.log("%s entered the scene", this.username);
             }
         })
@@ -136,7 +118,8 @@ export default class Player {
             this.movement.position.addInPlace(right);
         }
         this.movement.rotation = new Vector3(0, TWIST._y, 0);
-        this.camera.rotation = new Vector3(TWIST._x, TWIST._y, TWIST._z);
+        this.camera.position.copyFrom(this.movement.position);
+        this.camera.rotation = new Vector3(ROTATION._x, ROTATION._y, ROTATION._z);
     }
 
     /*Add new input messages to the buffer for processing on next
@@ -145,21 +128,21 @@ export default class Player {
         this.INPUT_BUFFER.push([vertical, horizontal, rotation, twist, index]);
     }
 
-    extendArm(right) {
-        if (right) {
+    extendArm(right){
+        if(right){
             this.RIGHT_ARM.setEnabled(true);
-        } else {
+        }else{
             this.LEFT_ARM.setEnabled(true);
         }
     }
 
-    retractArm(right) {
-        if (right) {
+    retractArm(right){
+        if(right){
             this.RIGHT_ARM.setEnabled(false);
             // if(this.right_hand){
-            // this.removeGrab(true);
+                // this.removeGrab(true);
             // }
-        } else {
+        }else{
             this.LEFT_ARM.setEnabled(false);
             // if(this.left_hand){
             //     this.removeGrab(false);
@@ -167,40 +150,57 @@ export default class Player {
         }
     }
 
-    addGrab(item, right) {
-
+    addGrab(item, right){
+        //Retrieve the mesh and disable its physics updates
         var mesh = this.scene.getMeshByName(item);
-        if (item) {
-            mesh.metadata.classInstance.body.disablePreStep = false;
-            mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
-            mesh.metadata.classInstance.body.transformNode.position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
-            mesh.metadata.classInstance.body.transformNode.position.z += 1;
-            mesh.metadata.classInstance.body.transformNode.parent = this.camera;
-            if (right) {
-                this.right_hand = mesh;
-            } else {
-                this.left_hand = mesh;
-            }
-            console.log("grabbed %s: %s", mesh.name,(right) ? this.RIGHT_ARM.getAbsolutePosition() : this.LEFT_ARM.getAbsolutePosition());
+        mesh.metadata.classInstance.body.disablePreStep = false;
+        mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
+
+        var arm = (right)? this.RIGHT_ARM:this.LEFT_ARM;
+        //Make sure RIGHT_ARM's position is up to date
+        // this.RIGHT_ARM.computeWorldMatrix(true);
+        // arm.computeWorldMatrix(true);
+
+        //Copy the RIGHT_ARM's position, push it a little bit forward, reset the rotation,
+        //and parent to the camera
+        // let position = this.RIGHT_ARM.position.clone();
+        let position = arm.position.clone();
+        // console.log("%s vs %s", this.camera.position, this.RIGHT_ARM.position);
+        console.log("%s vs %s", this.camera.position, arm.position);
+        position.z += 1;
+        mesh.metadata.classInstance.model.position = position;
+        mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
+        mesh.metadata.classInstance.model.parent = this.camera;
+
+        //Set our hand to mesh
+        if(right){
+            this.right_hand =  mesh;
+        }else{
+            this.left_hand = mesh;
         }
+
+        console.log("Grabbed %s: %s vs. %s", mesh.name, position, this.movement.position);
+        console.log("%s", this.RIGHT_ARM.position.add(this.camera.position).add(this.movement.position));
     }
 
-    removeGrab(right, position) {
-        console.log("Movement: %s Cam: %s", this.movement.position, this.camera.position);
-        console.log("Cam Rot: %s", this.camera.rotation);
-        var mesh = (right) ? this.right_hand : this.left_hand;
-        if (mesh) {
-            mesh.metadata.classInstance.body.disablePreStep = true;
-            mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
-            mesh.metadata.classInstance.body.transformNode.parent = "";
-            console.log("%s: %s", mesh.name, mesh.metadata.classInstance.model.getAbsolutePosition());
-            setTimeout(() => { console.log("Released %s: %s (%s)", mesh.name, mesh.position, mesh.metadata.classInstance.model.getAbsolutePosition()) }, 2000);
-            if (right) {
+    removeGrab(right, position){
+        var hand = (right)? this.right_hand:this.left_hand;
+        console.log("SENT: %s",position);
+        if(hand){
+            // hand.metadata.classInstance.model.setAbsolutePosition(position);
+            hand.metadata.classInstance.body.disablePreStep = true;
+            hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+            hand.metadata.classInstance.model.parent = "";
+            if(right){
                 this.right_hand = "";
-            } else {
+            }else{
                 this.left_hand = "";
             }
-            this.retractArm(right);
+            // console.log("Released %s: %s vs %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition(), this.movement.position);
+            setTimeout(()=>{console.log("Released %s: %s (%s)",hand.name, hand.position, hand.getAbsolutePosition())}, 2000);
         }
+
+        // console.log(this.movement.position);
+        // console.log(hand.metadata.classInstance.model.getAbsolutePosition());
     }
 }

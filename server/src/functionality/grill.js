@@ -20,46 +20,29 @@ export class Grill {
         this.Grill_Top.body.setCollisionCallbackEnabled(true);
         this.Grill_Top.body.getCollisionObservable().add((collision) => {
             if (collision.type === PhysicsEventType.COLLISION_STARTED) {
-                console.log("%s", collision.collidedAgainst.transformNode.name);
-                setTimeout(() => {
-                    console.log("%s: %s", collision.collidedAgainst.transformNode.name, collision.collidedAgainst.transformNode.position);
-                }, 500);
-                // if (!this.Items.has(collision.collidedAgainst.transformNode.name)) {
-                //     this.Items.set(collision.collidedAgainst.transformNode.name, collision.collidedAgainst.transformNode);
-                //     // this.Items.add(collision.collider.metadata.classInstance.model.name, collision.collider);
-                //     this.GAME.broadcast(JSON.stringify({
-                //         timestamp: Date.now(),
-                //         type: "sizzle",
-                //         item: collision.collidedAgainst.transformNode.name,
-                //         position: collision.collidedAgainst.transformNode.metadata.classInstance.model.position,
-                //     }));
-                //     console.log("COOKING %s", collision.collidedAgainst.transformNode.name);
-                //     setTimeout(() => { this.cookItem(collision.collidedAgainst.transformNode.name) }, this.COOK_TIMER);
-                // }
+                console.log("COLLIDED %s", collision.collidedAgainst.transformNode.name);
+                if (!this.Items.has(collision.collidedAgainst.transformNode.name)) {
+                    setTimeout(() => {
+                        console.log("%s: %s", collision.collidedAgainst.transformNode.name, collision.collidedAgainst.transformNode.position);
+                    }, 500);
+                    this.Items.set(collision.collidedAgainst.transformNode.name, collision.collidedAgainst.transformNode);
+                    this.GAME.broadcast(JSON.stringify({
+                        timestamp: Date.now(),
+                        type: "sizzle",
+                        item: collision.collidedAgainst.transformNode.name,
+                        position: collision.collidedAgainst.transformNode.metadata.classInstance.model.position,
+                    }));
+                    console.log("COOKING %s", collision.collidedAgainst.transformNode.name);
+                    setTimeout(() => { this.cookItem(collision.collidedAgainst.transformNode.name) }, this.COOK_TIMER);
+                }
             }
         });
         this.Grill_Top.body.getCollisionEndedObservable().add((collision) => {
             console.log("ENDED %s", collision.collidedAgainst.transformNode.name);
-            // this.removeItem(collision.collidedAgainst.transformNode.name);
+            this.removeItem(collision.collidedAgainst.transformNode.name);
         })
 
-        
-        // var test1 = new CreateBox("test1", {size: 0.5}, scene);
-        // var test2 = new CreateBox("test2", {size: 0.5}, scene);
-        // test1.position = this.Grill_Top.position.clone();
-        // test1.position.y += 0.5;
-        // test1.position.x -= 0.2
-
-        // test2.position = this.Grill_Top.position.clone();
-        // test2.position.y += 0.5;
-        // test2.position.x += 0.2
-
-        // test1.shape = new PhysicsShapeMesh(test1, scene);
-        // test2.shape = new PhysicsShapeMesh(test2, scene);
-        // test1.body = new PhysicsBody(test1, PhysicsMotionType.DYNAMIC, false, scene);
-        // test2.body = new PhysicsBody(test2, PhysicsMotionType.DYNAMIC, false, scene);
-        // test1.body.shape = test1.shape;
-        // test2.body.shape = test2.shape;
+        console.log(this.Grill_Top.position);
 
         this.Grill = scene.getMeshByName("grill");
         var grill_shape = new PhysicsShapeMesh(this.Grill, scene);
@@ -73,7 +56,7 @@ export class Grill {
                 timestamp: Date.now(),
                 type: "sizzle_end",
                 item: item,
-                play: (this.Items.size == 0)? false: true,
+                play: (this.Items.size == 0) ? false : true,
             }));
         };
     }
@@ -92,5 +75,24 @@ export class Grill {
             }))
             setTimeout(() => { this.cookItem(item) }, this.COOK_TIMER);
         }
+    }
+
+    grillCollisionTest() {
+        var test1 = new CreateBox("test1", { size: 0.5 }, scene);
+        var test2 = new CreateBox("test2", { size: 0.5 }, scene);
+        test1.position = this.Grill_Top.position.clone();
+        test1.position.y += 0.5;
+        test1.position.x -= 0.2
+
+        test2.position = this.Grill_Top.position.clone();
+        test2.position.y += 0.5;
+        test2.position.x += 0.2
+
+        test1.shape = new PhysicsShapeMesh(test1, scene);
+        test2.shape = new PhysicsShapeMesh(test2, scene);
+        test1.body = new PhysicsBody(test1, PhysicsMotionType.DYNAMIC, false, scene);
+        test2.body = new PhysicsBody(test2, PhysicsMotionType.DYNAMIC, false, scene);
+        test1.body.shape = test1.shape;
+        test2.body.shape = test2.shape;
     }
 }

@@ -62,6 +62,7 @@ export class Game {
                             player.INPUT_BUFFER.forEach((input) => {
                                 player.render2(input);
                                 // console.log(player.movement.position);
+                                // console.log("%s",player.camera.rotation);
                             })
                             this.broadcast(JSON.stringify({
                                 timestamp: Date.now(),

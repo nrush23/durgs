@@ -48,12 +48,14 @@ export class Player {
         this.PREVIOUS_POSITION = new Vector3(0, 0, 0);
         this.UPDATE_CACHE = "";
         this.INPUT_CACHE = new Input_Cache(10);
+
+        this.camera.parent = this.movement;
     }
 
     /*Create the meshes that make up the player model */
     createBody(scene, texture) {
         this.scene = scene;
-        SceneLoader.ImportMesh("body", "", "./assets/player_adjust.glb", this.scene, (meshes) => {
+        SceneLoader.ImportMesh("body", "", "./assets/player2.glb", this.scene, (meshes) => {
             if (meshes.length > 0) {
                 // console.log(meshes);
 
@@ -61,25 +63,35 @@ export class Player {
                 this.model = meshes[0];
                 this.model.name = "player_body";
                 this.model.parent = this.movement;
+                this.model.setEnabled(false);
 
 
-                //Create the main position for the arms
-                let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
-                position.y -= 0.2;
-                position.x += 0.4;
-                console.log("POS: %s", position);
+                // //Create the main position for the arms
+                // let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
+                // position.y -= 0.2;
+                // position.x += 0.4;
+
+                //TESTING
+
+                let position = this.camera.position.scale(-1);
+                // let position = new Vector3(0, -0.2, 1);
+
                 //Create the left arm and make it hidden by default
                 this.LEFT_ARM = meshes[2];
                 this.LEFT_ARM.parent = null;
-                this.LEFT_ARM.position = position.clone();
-                this.LEFT_ARM.position.x -= 0.8;
+                // this.LEFT_ARM.position.addInPlace(position);
+                // this.LEFT_ARM.position = position.clone();
+                // this.LEFT_ARM.position.x -= 0.8;
+                this.LEFT_ARM.hand = meshes[3];
                 this.LEFT_ARM.parent = this.camera;
                 this.createArm(false);
 
                 //Create the right arm and make it hidden by default
                 this.RIGHT_ARM = meshes[4];
                 this.RIGHT_ARM.parent = null;
-                this.RIGHT_ARM.position = position;
+                // this.RIGHT_ARM.position = position;
+                // this.RIGHT_ARM.position.addInPlace(position);
+                // this.RIGHT_ARM.setAbsolutePosition(this.RIGHT_ARM.getAbsolutePosition().add(position));
                 this.RIGHT_ARM.parent = this.camera;
                 this.createArm(true);
 
@@ -158,9 +170,12 @@ export class Player {
             }));
             this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
             this.movement.position = this.PREVIOUS_POSITION.clone();
-            this.camera.position = this.PREVIOUS_POSITION.clone();
-            this.movement.rotation = new Vector3(0, this.camera.rotation.y, 0);
+            // this.camera.position = this.PREVIOUS_POSITION.clone();
+            // this.movement.rotation = new Vector3(0, this.camera.rotation.y, 0);
             this.NEXT_POSITION = INPUT[0].clone();
+
+            //TESTING
+            this.model.rotation = new Vector3(0, this.camera.rotation.y, 0);
         };
         //End Testing
     }
@@ -288,10 +303,12 @@ export class Player {
     /*Frame update of the player's movement and position */
     render() {
         const delta = this.scene.getEngine().getDeltaTime() / 1000;
-        const interpolationFactor = Math.min(1, delta * 60);
+        const interpolationFactor = Math.min(0.5, delta * 60);
         Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
-        this.camera.position.copyFrom(this.movement.position);
-        this.movement.rotation.y = this.camera.rotation.y;
+        // this.camera.position.copyFrom(this.movement.position);
+        // this.movement.rotation.y = this.camera.rotation.y;
+
+        this.model.rotation.y = this.camera.rotation.y;
     }
 
     /*Verify player movement with server corrections and rollback when out of sync */
@@ -311,7 +328,7 @@ export class Player {
                 this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
                 this.NEXT_POSITION = INPUT[0];
                 this.movement.position = this.PREVIOUS_POSITION.clone();
-                this.camera.position = this.movement.position.clone();
+                // this.camera.position = this.movement.position.clone();
             }
         }
 
@@ -372,11 +389,14 @@ export class Player {
         //Copy the RIGHT_ARM's position, push it a little bit forward, reset the rotation,
         //and parent to the camera
         let position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
+        // let position = Vector3.Zero();
         console.log(position);
         position.z += 1;
         mesh.metadata.classInstance.model.position = position;
+        // mesh.metadata.classInstance.model.setAbsolutePosition((right)?this.RIGHT_ARM.getAbsolutePosition(): this.LEFT_ARM.getAbsolutePosition());
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
         mesh.metadata.classInstance.model.parent = this.camera;
+        // mesh.metadata.classInstance.model.parent = (right)? this.RIGHT_ARM: this.LEFT_ARM;
 
         if (right) {
             //Set our right_hand to mesh
@@ -385,7 +405,7 @@ export class Player {
             this.left_hand = mesh;
         }
 
-        // console.log("%s", this.RIGHT_ARM.getAbsolutePosition());
+        console.log("arm: %s", this.RIGHT_ARM.getAbsolutePosition());
     }
 
 
@@ -403,6 +423,7 @@ export class Player {
             }else{
                 this.left_hand ="";
             }
+            console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
         }
     }
 }

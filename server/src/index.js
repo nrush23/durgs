@@ -161,7 +161,7 @@ wss.on('connection', function connection(ws) {
                 //When a player grabs, get the associated player using the msg.PID
                 //and the item they grabbed
                 var player = game.players.get(msg.PID);
-                player.addGrab(msg.item, true);
+                player.addGrab(msg.item, msg.arm);
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player
                 if (game.players.size > 1) {
@@ -187,7 +187,8 @@ wss.on('connection', function connection(ws) {
                 // player.right_hand = "";
                 console.log("RELEASE: %s", msg.position);
                 var position = new Vector3(msg.position._x, msg.position._y, msg.position._z);
-                player.removeGrab(true, position);
+                console.log(msg.arm);
+                player.removeGrab(msg.arm, position);
 
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player

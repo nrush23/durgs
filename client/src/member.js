@@ -29,7 +29,7 @@ export class Member {
 
         //Import the body into the scene
         this.scene = scene;
-        SceneLoader.ImportMesh("body", "", "./assets/player_adjust.glb", this.scene, (meshes) => {
+        SceneLoader.ImportMesh("body", "", "./assets/player2.glb", this.scene, (meshes) => {
 
             if (meshes.length > 0) {
 
@@ -79,7 +79,7 @@ export class Member {
     /*Lerp update for members*/
     render() {
         const delta = this.scene.getEngine().getDeltaTime() / 1000;
-        const interpolationFactor = Math.min(1, delta * 60);
+        const interpolationFactor = Math.min(0.5, delta * 60);
         Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
         // if (this.right_hand) {
         //     this.right_hand.metadata.classInstance.body.transformNode.position.set(this.movement.position.x, this.movement.position.y, this.movement.position.z);
@@ -155,6 +155,7 @@ export class Member {
             } else {
                 this.left_hand = mesh;
             }
+            console.log("arm: %s", this.RIGHT_ARM.getAbsolutePosition());
         }
     }
 
@@ -164,6 +165,7 @@ export class Member {
             mesh.metadata.classInstance.body.disablePreStep = true;
             mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
             mesh.metadata.classInstance.body.transformNode.parent = "";
+            console.log("%s: %s", mesh.name, mesh.metadata.classInstance.model.getAbsolutePosition());
             mesh = "";
             this.arm_retract(right);
         }

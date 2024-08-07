@@ -166,7 +166,7 @@ class App {
     }
 
     START() {
-        if (this.PLAYER != null && this.PLAYER.RIGHT_ARM != null && this.PLAYER.RIGHT_ARM.body) {
+        if (this.PLAYER != null && this.PLAYER.RIGHT_ARM != null) {
             this.scene.clearColor = Color4.FromHexString("#c7f2f8");
             this.engine.runRenderLoop(() => {
                 this.scene.render();
@@ -185,21 +185,21 @@ class App {
                 while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
                     this.PLAYER.updateInteract();
                     this.PLAYER.sendPosition();
-                    this.Members.forEach((member) => {
-                        // if (member.movement) {
-                        member.render();
-                        // }
-                    });
+                    // this.Members.forEach((member) => {
+                    //     // if (member.movement) {
+                    //     // member.render();
+                    //     // }
+                    // });
                     accumulator -= FIXED_TIME;
                 }
             })
 
-            // let viewer = new PhysicsViewer(this.scene);
-            // for (let mesh of this.scene.meshes) {
-            //     if (mesh.physicsBody) {
-            //         viewer.showBody(mesh.physicsBody);
-            //     }
-            // }
+            let viewer = new PhysicsViewer(this.scene);
+            for (let mesh of this.scene.meshes) {
+                if (mesh.physicsBody) {
+                    viewer.showBody(mesh.physicsBody);
+                }
+            }
             this.scene.debugLayer.show();
         } else {
             setTimeout(() => {
@@ -229,6 +229,7 @@ class App {
         });
 
         this.camera = new UniversalCamera("camera", new Vector3(0, 0, 0), this.scene);
+        this.camera.minZ = 0;
         this.camera.attachControl(this.canvas, true);
 
         var SUN = new HemisphericLight("SUN", new Vector3(0, 3, 0), this.scene);

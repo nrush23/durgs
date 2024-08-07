@@ -34,6 +34,7 @@ export class Grill {
                 console.log("%s: %s", collision.collidedAgainst.transformNode.name, collision.collidedAgainst.transformNode.position);
             }, 1000);
             // this.removeItem(collision.collidedAgainst.transformNode.name);
+            this.removeSizzle(collision.collidedAgainst.transformNode.name, false);
         })
 
         this.Grill = scene.getMeshByName("grill");
