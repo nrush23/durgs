@@ -93,6 +93,7 @@ class App {
                     // item.metadata.classInstance.body.disablePreStep = false;
                     // // this.PLAYER.right_hand = item.parent.parent;
                     // this.PLAYER.right_hand = item;
+                    console.log(data);
                     this.PLAYER.addGrab(data.item, data.arm);
                     break;
                 case "released":
@@ -103,7 +104,7 @@ class App {
                     this.PLAYER.removeGrab(data.arm);
                     break;
                 case "member_grabbed":
-                    console.log('Message received: %s', event.data);
+                    // console.log('Message received: %s', event.data);
                     if (this.Members.has(data.username)) {
                         var member = this.Members.get(data.username);
                         // var item = this.scene.getMeshByName(data.item);
@@ -112,7 +113,7 @@ class App {
                     }
                     break;
                 case "member_released":
-                    console.log('Message received: %s', event.data);
+                    // console.log('Message received: %s', event.data);
                     if (this.Members.has(data.username)) {
                         var member = this.Members.get(data.username);
                         // // member.right_hand.position.y = 0;
@@ -194,12 +195,12 @@ class App {
                 }
             })
 
-            let viewer = new PhysicsViewer(this.scene);
-            for (let mesh of this.scene.meshes) {
-                if (mesh.physicsBody) {
-                    viewer.showBody(mesh.physicsBody);
-                }
-            }
+            // let viewer = new PhysicsViewer(this.scene);
+            // for (let mesh of this.scene.meshes) {
+            //     if (mesh.physicsBody) {
+            //         viewer.showBody(mesh.physicsBody);
+            //     }
+            // }
             this.scene.debugLayer.show();
         } else {
             setTimeout(() => {

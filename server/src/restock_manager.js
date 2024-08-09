@@ -8,6 +8,7 @@ export class Restock_Manager {
     lettuce;
     tomato;
     patty;
+    tray;
 
     //For making sure restocks can only be pressed once every second
     timer = 0;
@@ -18,6 +19,7 @@ export class Restock_Manager {
         this.lettuce = new Item_Manager("lettuce");
         this.tomato = new Item_Manager("tomato");
         this.patty = new Item_Manager("patty");
+        this.tray = new Item_Manager("tray");
         this.restocker = new Restocker(scene);
     }
 

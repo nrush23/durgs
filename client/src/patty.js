@@ -5,7 +5,7 @@ export class Patty extends Food {
 
     constructor(scene, position, name) {
         super(scene);
-        SceneLoader.ImportMesh("patty", "", "./assets/burger.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh("patty", "", "./assets/burger2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
 
                 //Get .glb root and set it to unpickable

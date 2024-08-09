@@ -3,6 +3,7 @@ import { Bun } from "./bun";
 import { Restocker } from "./restocker";
 import { Grill } from "./grill";
 import { Fryer } from "./fryer";
+import { Tray } from "./tray";
 export class World {
     DURGS;
     GROUND;
@@ -36,5 +37,6 @@ export class World {
             console.log("Loading mesh error: ", error);
         });
         var bun = new Bun(scene, true, new Vector3(0, 1, 0), "test_bun");
+        var tray = new Tray(scene);
     }
 }

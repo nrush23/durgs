@@ -38,12 +38,12 @@ export class Member {
                 this.model = meshes[0];
                 this.model.name = "member";
                 this.model.parent = this.movement;
-                if (creepy) {
-                    var NEW_MAT = new StandardMaterial("body_map", scene);
-                    NEW_MAT.diffuseTexture = new Texture("./assets/skins/skin1.png", scene);
-                    // meshes[5].material = NEW_MAT;
-                    meshes[5].material.albedoTexture = NEW_MAT.diffuseTexture;
-                }
+                // if (creepy) {
+                //     var NEW_MAT = new StandardMaterial("body_map", scene);
+                //     NEW_MAT.diffuseTexture = new Texture("./assets/skins/skin1.png", scene);
+                //     // meshes[5].material = NEW_MAT;
+                //     meshes[5].material.albedoTexture = NEW_MAT.diffuseTexture;
+                // }
                 //Set everything to be uninteractable
                 meshes.forEach(mesh => {
                     mesh.isPickable = false;
@@ -149,6 +149,7 @@ export class Member {
             mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
             mesh.metadata.classInstance.body.transformNode.position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
             mesh.metadata.classInstance.body.transformNode.position.z += 1;
+            mesh.metadata.classInstance.body.transformNode.rotation = Vector3.Zero();
             mesh.metadata.classInstance.body.transformNode.parent = this.ARM_ANGLE;
             if (right) {
                 this.right_hand = mesh;

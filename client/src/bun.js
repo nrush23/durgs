@@ -8,7 +8,7 @@ export class Bun extends Food {
         super(scene);
         this.top = top;
         let bun = (this.top) ? "top_bun" : "bottom_bun";
-        SceneLoader.ImportMesh(bun, "", "./assets/burger.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh(bun, "", "./assets/burger2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
                 this.createBody(meshes, position, name);
                 // console.log(meshes);

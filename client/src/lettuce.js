@@ -4,7 +4,7 @@ import { SceneLoader, MultiMaterial, SubMesh, TransformNode, Vector3, PhysicsSha
 export class Lettuce extends Food {
     constructor(scene, position, name) {
         super(scene);
-        SceneLoader.ImportMesh("lettuce", "", "./assets/burger.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh("lettuce", "", "./assets/burger2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
 
                 //Get .glb root and set it to unpickable

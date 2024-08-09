@@ -107,8 +107,8 @@ export class Food extends Interactable {
         mesh.material = NEW_MAT;
 
 
-        var viewer = new PhysicsViewer(this.scene);
-        viewer.showBody(this.body);
+        // var viewer = new PhysicsViewer(this.scene);
+        // viewer.showBody(this.body);
     }
 
 }

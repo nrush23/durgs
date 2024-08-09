@@ -170,11 +170,12 @@ export default class Player {
     addGrab(item, right) {
 
         var mesh = this.scene.getMeshByName(item);
-        if (item) {
+        if (mesh) {
             mesh.metadata.classInstance.body.disablePreStep = false;
             mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
             mesh.metadata.classInstance.body.transformNode.position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
             mesh.metadata.classInstance.body.transformNode.position.z += 1;
+            mesh.metadata.classInstance.body.transformNode.rotationa = Vector3.Zero();
             mesh.metadata.classInstance.body.transformNode.parent = this.camera;
             if (right) {
                 this.right_hand = mesh;

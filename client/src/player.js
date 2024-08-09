@@ -378,7 +378,7 @@ export class Player {
         var mesh = this.scene.getMeshByName(item);
         mesh.metadata.classInstance.body.disablePreStep = false;
         mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
-
+        console.log(mesh);
         if (right) {
             //Make sure RIGHT_ARM's position is up to date
             this.RIGHT_ARM.computeWorldMatrix(true);

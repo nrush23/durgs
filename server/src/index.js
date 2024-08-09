@@ -189,7 +189,6 @@ wss.on('connection', function connection(ws) {
                 var position = new Vector3(msg.position._x, msg.position._y, msg.position._z);
                 console.log(msg.arm);
                 player.removeGrab(msg.arm, position);
-
                 //Next, broadcast the update to the other players so their scene
                 //can parent the item to necessary player
                 broadcast(JSON.stringify({
