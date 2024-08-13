@@ -7,11 +7,12 @@ import { Patty } from "./patty.js";
 export class Restock_Platform {
     model;
     scene;
-    top;
+    platform;
+    dumpster;
     constructor(scene) {
         this.scene = scene;
         this.model = scene.getMeshByName("stock_platform");
-        this.top = this.model.position.clone();
+        this.platform = this.model.position.clone();
     }
  
     //When physics is implemented, these will just fall from the sky
@@ -42,14 +43,14 @@ export class Restock_Platform {
             if(check){
                 check.dispose();
             }
-            let position = this.top.clone();
+            let position = this.platform.clone();
             position.x *= -1;
             if(type == Bun){
                 check = new type(this.scene, (item == 'top_bun')?true:false, position, item + pool[i]);
             }else{
                 check = new type(this.scene, position, item + pool[i]);
             }
-            this.top.y += 0.2;
+            this.platform.y += 0.2;
             console.log("%s: %s",item+pool[i],position);
         }
     }

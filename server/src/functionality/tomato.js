@@ -3,7 +3,7 @@ import { SceneLoader, TransformNode, Vector3, PhysicsShapeBox, PhysicsBody, Phys
 export class Tomato extends Food {
     constructor(scene, position, name) {
         super(scene);
-        SceneLoader.ImportMesh("tomato", "http://localhost:3001/assets/", "burger.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh("tomato", "http://localhost:3001/assets/", "burger2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
 
 

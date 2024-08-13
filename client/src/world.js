@@ -15,7 +15,7 @@ export class World {
     constructor(scene, callback) {
         this.scene = scene;
         var names = ["grill", "grill_top", "fryer", "right_oil", "ground"];
-        SceneLoader.ImportMeshAsync("", "./", "./assets/server_world.glb", scene).then((result) => {
+        SceneLoader.ImportMeshAsync("", "./", "./assets/restaurant_furnishing4.glb", scene).then((result) => {
             const meshes = result.meshes;
             meshes.forEach((mesh) => {
                 mesh.isPickable = false;

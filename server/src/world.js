@@ -18,7 +18,7 @@ export class World {
         this.scene = scene;
         this.GAME = game;
         var ignore = ["grill", "grill_top", "fryer", "right_oil", "ground"];
-        SceneLoader.ImportMeshAsync("", "http://localhost:3001/assets/", "restaurant_furnishing3.glb", scene).then((result) => {
+        SceneLoader.ImportMeshAsync("", "http://localhost:3001/assets/", "restaurant_furnishing4.glb", scene).then((result) => {
             const meshes = result.meshes;
             meshes.forEach((mesh) => {
                 mesh.isPickable = false;

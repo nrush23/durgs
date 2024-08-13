@@ -44,6 +44,8 @@ export class Restock_Manager {
                 case "patty":
                     pool = this.patty.getPool();
                     break;
+                case "tray":
+                    pool = this.tray.getPool();
                 default:
                     console.log("Error: Invalid restock %s", item);
                     return null;

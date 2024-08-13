@@ -8,7 +8,7 @@ export class Bun extends Food {
         super(scene);
         this.top = top;
         let bun = (this.top) ? "top_bun" : "bottom_bun";
-        SceneLoader.ImportMesh(bun, "http://localhost:3001/assets/", "burger.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh(bun, "http://localhost:3001/assets/", "burger2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
 
                 //Get the root of the mesh and set it to be unpickable
