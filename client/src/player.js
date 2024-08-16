@@ -131,7 +131,7 @@ export class Player {
 
         arm.RAY = new Ray();
         arm.RAY_HELPER = new RayHelper(arm.RAY);
-        arm.RAY_HELPER.attachToMesh(arm, new Vector3(0,0,1), Vector3.Zero(), 2);
+        arm.RAY_HELPER.attachToMesh(arm, new Vector3(0, 0, 1), Vector3.Zero(), 2);
         // arm.RAY_HELPER.show(this.scene);
 
         // var viewer = new PhysicsViewer(this.scene);
@@ -198,7 +198,7 @@ export class Player {
                 this.enableArm(true, false);
             }
             var left_hit = this.scene.pickWithRay(this.LEFT_ARM.RAY);
-            if(left_hit.pickedMesh && !this.left_hand){
+            if (left_hit.pickedMesh && !this.left_hand) {
                 left_hit.pickedMesh.metadata.classInstance.onAction(this, false);
             }
         } else {
@@ -376,9 +376,10 @@ export class Player {
 
         //Retrieve the mesh and disable its physics updates
         var mesh = this.scene.getMeshByName(item);
-        mesh.metadata.classInstance.body.disablePreStep = false;
-        mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
         console.log(mesh);
+        mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
+        mesh.metadata.classInstance.body.disablePreStep = false;
+        this.scene.hk._hknp.HP_World_RemoveBody(this.scene.hk.world, mesh.metadata.classInstance.body._pluginData.hpBodyId);
         if (right) {
             //Make sure RIGHT_ARM's position is up to date
             this.RIGHT_ARM.computeWorldMatrix(true);
@@ -395,8 +396,27 @@ export class Player {
         mesh.metadata.classInstance.model.position = position;
         // mesh.metadata.classInstance.model.setAbsolutePosition((right)?this.RIGHT_ARM.getAbsolutePosition(): this.LEFT_ARM.getAbsolutePosition());
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
+        if(mesh.metadata.classInstance.model.parent){
+            mesh.metadata.classInstance.breakLink();
+        }
+        // if (mesh.metadata.classInstance.model.parent) {
+        //     var parent = mesh.metadata.classInstance.model.parent;
+        //     parent.metadata.classInstance.top_stack = null;
+        //     if (parent.metadata.classInstance.bottom == null) {
+        //         parent.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        //     }
+        //     mesh.metadata.classInstance.bottom = null;
+        // }
         mesh.metadata.classInstance.model.parent = this.camera;
         // mesh.metadata.classInstance.model.parent = (right)? this.RIGHT_ARM: this.LEFT_ARM;
+        // if(mesh.metadata.classInstance.bottom){
+        //     // mesh.metadata.classInstance.bottom.metadata.classInstance.top_stack = null;
+        //     var bottom = mesh.metadata.classInstance.bottom;
+        //     mesh.metadata.classInstance.bottom = null;
+        //     bottom.top_stack = null;
+        // }
+
+
 
         if (right) {
             //Set our right_hand to mesh
@@ -412,16 +432,18 @@ export class Player {
 
     /*Remove the current item from the player's right hand */
     removeGrab(right) {
-        var hand = (right)? this.right_hand: this.left_hand;
+        var hand = (right) ? this.right_hand : this.left_hand;
         if (hand) {
+            console.log(hand);
             hand.metadata.classInstance.body.disablePreStep = true;
             hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
             hand.metadata.classInstance.model.parent = "";
+            this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, hand.metadata.classInstance.body._pluginData.hpBodyId, false);
             // console.log("%s", hand.metadata.classInstance.model.getAbsolutePosition());
-            if(right){
+            if (right) {
                 this.right_hand = "";
-            }else{
-                this.left_hand ="";
+            } else {
+                this.left_hand = "";
             }
             console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
         }

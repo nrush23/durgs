@@ -1,4 +1,4 @@
-import { PhysicsBody, PhysicsMotionType, PhysicsShapeMesh, PhysicsViewer, SceneLoader } from "@babylonjs/core";
+import { PhysicsBody, PhysicsMotionType, PhysicsShapeMesh, PhysicsViewer, SceneLoader, TransformNode } from "@babylonjs/core";
 import { Interactable } from "./Interactable";
 
 export class Tray extends Interactable {
@@ -7,22 +7,25 @@ export class Tray extends Interactable {
     scene;
     model;
     body;
+    top_stack = null;
+    bottom = null;
     constructor(scene) {
         super(scene);
         SceneLoader.ImportMesh("tray", "", "./assets/burger2.glb", scene, (meshes) => {
-            this.model = meshes[0];
+            this.model = new TransformNode("tray", scene);
+            meshes[0].parent = this.model;
             this.model.metadata = { classInstance: this };
-            this.model.name = "tray_root";
+            meshes[0].name = "tray_root";
             this.model.isPickable = false;
             this.model.enablePointerMoveEvents = false;
             meshes[1].metadata = { classInstance: this };
             var shape = new PhysicsShapeMesh(meshes[1], scene);
-            this.model.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
-            this.model.body.shape = shape;
-            this.model.body.setMassProperties({ mass: 1 });
-            this.body = this.model.body;
+            this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
+            this.body.shape = shape;
+            this.body.setMassProperties({ mass: 0.5 });
+            // this.body = this.model.body;
             var view = new PhysicsViewer(scene);
-            view.showBody(this.model.body);
+            view.showBody(this.body);
         });
     }
 
