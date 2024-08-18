@@ -12,6 +12,7 @@ export class Food extends Interactable {
     MATERIAL;
     bottom = null;
     top_stack = null;
+    joint_distance = null;
     constructor(scene) {
         super(scene);
         this.scene = scene;
@@ -95,15 +96,29 @@ export class Food extends Interactable {
         root.parent = this.model;
         // root.name = name + "_model";
 
+        //TESTING
+
         //Generate the Physics shape and body
         const { min, max } = this.model.getHierarchyBoundingVectors();
         const size = max.subtract(min);
         const center = min.add(max).scale(0.5);
-        const shape = new PhysicsShapeBox(new Vector3(center.x, center.y, center.z), Quaternion.Identity(), size, this.scene);
+        // const shape = new PhysicsShapeBox(new Vector3(center.x, center.y, center.z), Quaternion.Identity(), size, this.scene);
+        // var info = meshes[1].getBoundingInfo();
+        // console.log("%s", info.boundingBox.center);
+        // const shape = new PhysicsShapeBox(info.centerWorld, Quaternion.Identity(), info.extendSizeWorld, this.scene);
+
+        // const shape = new PhysicsShapeMesh(meshes[1], this.scene);
+
+        var box = meshes[1].getBoundingInfo().boundingBox;
+        meshes[1].showBoundingBox = true;
+        if(box.extendSize.y < 0.05){
+            box.extendSize.y = 0.03;
+        } 
+        const shape = new PhysicsShapeBox(box.centerWorld, Quaternion.Identity(), box.extendSize.scale(2), this.scene);
         this.model.position = position;
         this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, this.scene);
         this.body.shape = shape;
-        this.body.setMassProperties({ mass: 0.5 });
+        this.body.setMassProperties({ mass: 1 });
         this.body.setCollisionCallbackEnabled(true);
         this.body.getCollisionObservable().add((collision) => {
             // console.log("collision detected");
@@ -174,11 +189,12 @@ export class Food extends Interactable {
             //Same thing from, but from the top's POV
             var under = collision.collidedAgainst.transformNode;
             if (collision.type === PhysicsEventType.COLLISION_STARTED && under?.metadata?.classInstance && this.top_stack != under && under.metadata.classInstance.top_stack == null && under.getAbsolutePosition().y < this.model.getAbsolutePosition().y) {
-                
+
                 console.log("joint started %s %s %s", this.model.name, under.name);
                 this.body.disablePreStep = false;
                 this.body.setMotionType(PhysicsMotionType.STATIC);
-                this.model.position = new Vector3(0, size.y, 0);
+                // this.model.position = new Vector3(0, size.y, 0);
+                this.model.position = new Vector3(0,Math.min(0.1, box.extendSize.y * 2 + 0.01), 0);
                 this.model.rotation = Vector3.Zero();
                 this.model.parent = under;
                 this.bottom = under;
@@ -188,8 +204,8 @@ export class Food extends Interactable {
                 console.log("joint code finished, bottom: %s top: %s", under.name, this.model.name);
 
             } //else if (under?.metadata?.classInstance) {
-                // console.log("%s: %s %s", under.name, under.metadata.classInstance.bottom, under.metadata.classInstance.top_stack);
-                // console.log("top(%s): %s bottom(%s): %s", this.model.name, this.model.position, against.name, against.position);
+            // console.log("%s: %s %s", under.name, under.metadata.classInstance.bottom, under.metadata.classInstance.top_stack);
+            // console.log("top(%s): %s bottom(%s): %s", this.model.name, this.model.position, against.name, against.position);
             // }
         });
 
@@ -232,8 +248,17 @@ export class Food extends Interactable {
         mesh.material = NEW_MAT;
 
 
-        var viewer = new PhysicsViewer(this.scene);
-        viewer.showBody(this.body);
+        // var viewer = new PhysicsViewer(this.scene);
+        // viewer.showBody(this.body);
+    }
+
+    setEnabled(enable) {
+        if (enable) {
+            this.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        } else {
+            this.body.disablePreStep = false;
+            this.body.setMotionType(PhysicsMotionType.STATIC);
+        }
     }
 
 }

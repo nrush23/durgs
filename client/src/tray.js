@@ -22,7 +22,7 @@ export class Tray extends Interactable {
             var shape = new PhysicsShapeMesh(meshes[1], scene);
             this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, scene);
             this.body.shape = shape;
-            this.body.setMassProperties({ mass: 0.5 });
+            this.body.setMassProperties({ mass: 1 });
             // this.body = this.model.body;
             var view = new PhysicsViewer(scene);
             view.showBody(this.body);
@@ -55,6 +55,15 @@ export class Tray extends Interactable {
 
     addToStack(item) {
 
+    }
+
+    setEnabled(enable) {
+        if (enable) {
+            this.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        } else {
+            this.body.disablePreStep = false;
+            this.body.setMotionType(PhysicsMotionType.STATIC);
+        }
     }
 
 }

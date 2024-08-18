@@ -377,8 +377,9 @@ export class Player {
         //Retrieve the mesh and disable its physics updates
         var mesh = this.scene.getMeshByName(item);
         console.log(mesh);
-        mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
-        mesh.metadata.classInstance.body.disablePreStep = false;
+        // mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
+        // mesh.metadata.classInstance.body.disablePreStep = false;
+        mesh.metadata.classInstance.setEnabled(false);
         this.scene.hk._hknp.HP_World_RemoveBody(this.scene.hk.world, mesh.metadata.classInstance.body._pluginData.hpBodyId);
         if (right) {
             //Make sure RIGHT_ARM's position is up to date
