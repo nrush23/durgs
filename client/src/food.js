@@ -1,4 +1,4 @@
-import { PhysicsViewer, Vector3, TransformNode, MultiMaterial, SubMesh, PhysicsShapeBox, Quaternion, PhysicsBody, PhysicsMotionType, StandardMaterial, Color3, PhysicsShapeMesh, PhysicsEventType, PhysicsJoint, Axis, DistanceJoint, DistanceConstraint } from '@babylonjs/core';
+import { PhysicsViewer, Vector3, TransformNode, MultiMaterial, SubMesh, PhysicsShapeBox, Quaternion, PhysicsBody, PhysicsMotionType, StandardMaterial, Color3, PhysicsShapeMesh, PhysicsEventType, PhysicsJoint, Axis, DistanceJoint, DistanceConstraint, AnaglyphGamepadCamera } from '@babylonjs/core';
 import { Interactable } from './Interactable';
 export const cook_state = { raw: 'RAW', perfect: 'PERFECT', burnt: 'BURNT' };
 export class Food extends Interactable {
@@ -102,89 +102,20 @@ export class Food extends Interactable {
         const { min, max } = this.model.getHierarchyBoundingVectors();
         const size = max.subtract(min);
         const center = min.add(max).scale(0.5);
-        // const shape = new PhysicsShapeBox(new Vector3(center.x, center.y, center.z), Quaternion.Identity(), size, this.scene);
-        // var info = meshes[1].getBoundingInfo();
-        // console.log("%s", info.boundingBox.center);
-        // const shape = new PhysicsShapeBox(info.centerWorld, Quaternion.Identity(), info.extendSizeWorld, this.scene);
-
-        // const shape = new PhysicsShapeMesh(meshes[1], this.scene);
 
         var box = meshes[1].getBoundingInfo().boundingBox;
-        meshes[1].showBoundingBox = true;
-        if(box.extendSize.y < 0.05){
-            box.extendSize.y = 0.03;
-        } 
+        // meshes[1].showBoundingBox = true;
+        if (box.extendSize.y < 0.05) {
+            box.extendSize.y = 0.02;
+        }
         const shape = new PhysicsShapeBox(box.centerWorld, Quaternion.Identity(), box.extendSize.scale(2), this.scene);
         this.model.position = position;
         this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, this.scene);
         this.body.shape = shape;
         this.body.setMassProperties({ mass: 1 });
         this.body.setCollisionCallbackEnabled(true);
+        this.joint_distance = box.extendSize.y;
         this.body.getCollisionObservable().add((collision) => {
-            // console.log("collision detected");
-            // console.log(!this.top);
-            // if (collision.type === PhysicsEventType.COLLISION_STARTED) {
-            //     console.log("%s %s %s %s %s %s %s", collision.type === PhysicsEventType.COLLISION_STARTED, this.top_stack == null, collision.collidedAgainst.transformNode?.metadata, (collision.collidedAgainst.transformNode?.metadata) ? 'classInstance' in collision.collidedAgainst.transformNode.metadata : false, collision.collidedAgainst.transformNode.metadata.classInstance.body.motionType == PhysicsMotionType.DYNAMIC, collision.collidedAgainst.transformNode.metadata.classInstance.bottom == null, collision.collidedAgainst.transformNode.metadata.classInstance.model.position.y > this.model.y);
-            // }
-
-            // if (collision.type === PhysicsEventType.COLLISION_STARTED && this.top_stack == null && collision.collidedAgainst.transformNode?.metadata?.classInstance?.body?.motionType == PhysicsMotionType.DYNAMIC) {
-            //     mesh.metadata.classInstance.body.disablePreStep = false;
-            //     mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
-            //     mesh.metadata.classInstance.model.position = new Vector3(0, size.y, 0);
-            //     // console.log("size: %s", size);
-            //     console.log("bottom: %s", mesh.metadata.classInstance.bottom);
-            //     mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
-            //     mesh.metadata.classInstance.model.parent = this.model;
-            //     this.top_stack = collision.collidedAgainst.transformNode;
-            // }
-
-
-            //OLD CODE THAT KINDA DID STUFF
-            // if (collision.type === PhysicsEventType.COLLISION_STARTED && this.top_stack == null && collision.collidedAgainst.transformNode?.metadata && 'classInstance' in collision.collidedAgainst.transformNode.metadata && collision.collidedAgainst.transformNode.metadata.classInstance.bottom == null && collision.collidedAgainst.transformNode.metadata.classInstance.model.position.y > this.model.position.y) {
-            //     console.log("%s %s %s", this.model.name, collision.collidedAgainst.transformNode.name, collision.collidedAgainst.transformNode.metadata.classInstance.body.motionType);
-            //     var mesh = collision.collidedAgainst.transformNode;
-            //     mesh.metadata.classInstance.body.disablePreStep = false;
-            //     mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
-            //     mesh.metadata.classInstance.model.position = new Vector3(0, size.y, 0);
-            //     // console.log("size: %s", size);
-            //     console.log("bottom: %s", mesh.metadata.classInstance.bottom);
-            //     mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
-            //     mesh.metadata.classInstance.model.parent = this.model;
-            //     mesh.metadata.classInstance.bottom = this;
-            //     this.top_stack = mesh;
-            // }else if( collision.type == PhysicsEventType.COLLISION_STARTED && this.top_stack?.metadata.classInstance.top_stack == null){
-            //     console.log("no collision: %s %s %s %s", this.model.name, (this.top_stack)?this.top_stack.name:this.top_stack,collision.collidedAgainst.transformNode.name, (collision.collidedAgainst.transformNode?.metadata?.classInstance?.bottom)? collision.collidedAgainst.transformNode.metadata.classInstance.bottom.model.name:"empty");
-            // }
-
-
-            //NEW CODE
-
-
-            //This works for one item falling on top of another and being picked up again
-
-            //Also works for multiple stacks but not for preventing multiple objects to be placed
-            //in the same spot
-
-            //Think this stops working for already stacked because of the against.model.position = new Vector3(0, size.y, 0)
-            //Probably fix this with creating hidden snap points
-            // var against = collision.collidedAgainst.transformNode;
-            // if(collision.type === PhysicsEventType.COLLISION_STARTED && against?.metadata?.classInstance && against.metadata.classInstance.bottom == null && against.metadata.classInstance.model.getAbsolutePosition().y + size.y> this.model.getAbsolutePosition().y){
-            //     console.log(against);
-            //     against = against.metadata.classInstance;
-            //     against.body.disablePreStep = false;
-            //     against.body.setMotionType(PhysicsMotionType.STATIC);
-            //     against.model.position = new Vector3(0,size.y, 0);
-            //     against.model.rotation = Vector3.Zero();
-            //     against.model.parent = this.model;
-            //     against.bottom = this;
-
-            // }else if(collision.type == PhysicsEventType.COLLISION_STARTED && against?.metadata?.classInstance?.bottom){
-            //     console.log("top(%s): %s, bottom(%s): %s, %s", against.name, against.metadata.classInstance.model.position.y, this.model.name, this.model.position.y, against.metadata.classInstance.model.position.y > this.model.position.y);
-            //     console.log("top: %s, bottom: %s, %s", against.metadata.classInstance.model.getAbsolutePosition().y + size.y, this.model.getAbsolutePosition().y, against.metadata.classInstance.model.getAbsolutePosition().y > this.model.getAbsolutePosition().y);
-            // }else if (collision.type == PhysicsEventType.COLLISION_STARTED && against?.metadata?.classInstance){
-            //     console.log("%s", against.name);
-            // }
-
             //Now trying new approach
             //Same thing from, but from the top's POV
             var under = collision.collidedAgainst.transformNode;
@@ -193,8 +124,8 @@ export class Food extends Interactable {
                 console.log("joint started %s %s %s", this.model.name, under.name);
                 this.body.disablePreStep = false;
                 this.body.setMotionType(PhysicsMotionType.STATIC);
-                // this.model.position = new Vector3(0, size.y, 0);
-                this.model.position = new Vector3(0,Math.min(0.1, box.extendSize.y * 2 + 0.01), 0);
+                this.model.position = new Vector3(0, this.joint_distance + under.metadata.classInstance.joint_distance, 0);
+                console.log("%s and %s distance: %s", this.model.name, under.name, this.model.position.y);
                 this.model.rotation = Vector3.Zero();
                 this.model.parent = under;
                 this.bottom = under;
@@ -203,24 +134,8 @@ export class Food extends Interactable {
                 under.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
                 console.log("joint code finished, bottom: %s top: %s", under.name, this.model.name);
 
-            } //else if (under?.metadata?.classInstance) {
-            // console.log("%s: %s %s", under.name, under.metadata.classInstance.bottom, under.metadata.classInstance.top_stack);
-            // console.log("top(%s): %s bottom(%s): %s", this.model.name, this.model.position, against.name, against.position);
-            // }
+            }
         });
-
-        // var joint = new DistanceJoint({maxDistance: 0, mainAxis: Axis.Y});
-        // var joint = new DistanceConstraint(size.y, this.scene);
-        // this.body.addConstraint(against.metadata.classInstance.body, joint);
-        // against.metadata.classInstance.body.addConstraint(this.body, joint);
-        // against.metadata.classInstance.top_stack = this;
-
-        // this.body.getCollisionEndedObservable().add((collision) => {
-        //     if (this.top_stack == collision.collidedAgainst.transformNode) {
-        //         console.log("ENDED %s", collision.collidedAgainst.transformNode.name);
-        //         this.top_stack = null;
-        //     }
-        // });
 
         //Set the metadata of the root and mesh to be this instance
         meshes[1].metadata = { classInstance: this };

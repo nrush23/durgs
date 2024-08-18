@@ -9,6 +9,7 @@ export class Tray extends Interactable {
     body;
     top_stack = null;
     bottom = null;
+    joint_distance;
     constructor(scene) {
         super(scene);
         SceneLoader.ImportMesh("tray", "", "./assets/burger2.glb", scene, (meshes) => {
@@ -24,8 +25,13 @@ export class Tray extends Interactable {
             this.body.shape = shape;
             this.body.setMassProperties({ mass: 1 });
             // this.body = this.model.body;
-            var view = new PhysicsViewer(scene);
-            view.showBody(this.body);
+
+
+            this.joint_distance = meshes[1].getBoundingInfo().boundingBox.extendSize.y;
+            console.log("tray joint_distance: %s", this.joint_distance);
+
+            // var view = new PhysicsViewer(scene);
+            // view.showBody(this.body);
         });
     }
 

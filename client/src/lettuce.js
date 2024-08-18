@@ -7,12 +7,12 @@ export class Lettuce extends Food {
         SceneLoader.ImportMesh("lettuce", "", "./assets/burger2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
                 this.createBody(meshes, position, name);
-                meshes[1].showBoundingBox = true;
+                // meshes[1].showBoundingBox = true;
                 // console.log(meshes[1].getBoundingInfo());
             }
         });
         this.doneness = cook_state.perfect;
-        this.joint_distance = 0.015;
+        // this.joint_distance = 0.131;
     }
 
     cook() {

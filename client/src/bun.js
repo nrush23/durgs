@@ -14,7 +14,7 @@ export class Bun extends Food {
             }
         });
         this.doneness = cook_state.perfect;
-        this.joint_distance = (!top) ? 0.085 : 0.105;
+        // this.joint_distance = (!top) ? 0.142 : 0.175;
     }
 
     cook() {

@@ -11,7 +11,7 @@ export class Patty extends Food {
             }
         });
         this.doneness = cook_state.raw;
-        this.joint_distance = 0.05;
+        // this.joint_distance = 0.05;
     }
 
     cook() {

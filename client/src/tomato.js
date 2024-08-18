@@ -9,7 +9,7 @@ export class Tomato extends Food {
             }
         });
         this.doneness = cook_state.perfect;
-        this.joint_distance = 0.015;
+        // this.joint_distance = 0.131;
     }
 
     cook() {
