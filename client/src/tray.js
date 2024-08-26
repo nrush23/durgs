@@ -10,8 +10,10 @@ export class Tray extends Interactable {
     top_stack = null;
     bottom = null;
     joint_distance;
+    box;
     constructor(scene) {
         super(scene);
+        this.valid = true;
         SceneLoader.ImportMesh("tray", "", "./assets/burger2.glb", scene, (meshes) => {
             this.model = new TransformNode("tray", scene);
             meshes[0].parent = this.model;
@@ -27,6 +29,7 @@ export class Tray extends Interactable {
             // this.body = this.model.body;
 
 
+            this.box = meshes[1].getBoundingInfo().boundingBox;
             this.joint_distance = meshes[1].getBoundingInfo().boundingBox.extendSize.y;
             console.log("tray joint_distance: %s", this.joint_distance);
 
@@ -70,6 +73,15 @@ export class Tray extends Interactable {
             this.body.disablePreStep = false;
             this.body.setMotionType(PhysicsMotionType.STATIC);
         }
+    }
+
+    checkParent(name){
+        if(this.model.parent && name == this.model.parent.name){
+            return true;
+        }else if(this.model.parent){
+            return this.model.parent.metadata.classInstance.checkParent(name);
+        }
+        return false;
     }
 
 }

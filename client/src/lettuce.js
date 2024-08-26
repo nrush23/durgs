@@ -4,8 +4,9 @@ import { SceneLoader, MultiMaterial, SubMesh, TransformNode, Vector3, PhysicsSha
 export class Lettuce extends Food {
     constructor(scene, position, name) {
         super(scene);
-        SceneLoader.ImportMesh("lettuce", "", "./assets/burger2.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh("lettuce", "", "./assets/burger_test2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
+                this.joint_distance = 0.03;
                 this.createBody(meshes, position, name);
                 // meshes[1].showBoundingBox = true;
                 // console.log(meshes[1].getBoundingInfo());

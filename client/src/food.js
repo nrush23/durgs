@@ -1,4 +1,4 @@
-import { PhysicsViewer, Vector3, TransformNode, MultiMaterial, SubMesh, PhysicsShapeBox, Quaternion, PhysicsBody, PhysicsMotionType, StandardMaterial, Color3, PhysicsShapeMesh, PhysicsEventType, PhysicsJoint, Axis, DistanceJoint, DistanceConstraint, AnaglyphGamepadCamera } from '@babylonjs/core';
+import { PhysicsViewer, Vector3, TransformNode, MultiMaterial, SubMesh, PhysicsShapeBox, Quaternion, PhysicsBody, PhysicsMotionType, StandardMaterial, Color3, PhysicsShapeMesh, PhysicsEventType, PhysicsJoint, Axis, DistanceJoint, DistanceConstraint, AnaglyphGamepadCamera, PhysicsShapeCylinder } from '@babylonjs/core';
 import { Interactable } from './Interactable';
 export const cook_state = { raw: 'RAW', perfect: 'PERFECT', burnt: 'BURNT' };
 export class Food extends Interactable {
@@ -12,7 +12,8 @@ export class Food extends Interactable {
     MATERIAL;
     bottom = null;
     top_stack = null;
-    joint_distance = null;
+    joint_distance = 0.0000;
+    box;
     constructor(scene) {
         super(scene);
         this.scene = scene;
@@ -77,6 +78,7 @@ export class Food extends Interactable {
             bottom.top_stack = null;
             if (bottom.bottom == null) {
                 bottom.body.setMotionType(PhysicsMotionType.DYNAMIC);
+                bottom.body.disablePreStep = true;
             }
             this.bottom = null;
             console.log("break link top_stack: %s", this.top_stack?.name);
@@ -94,48 +96,23 @@ export class Food extends Interactable {
         //Create the actual root transform node
         this.model = new TransformNode(name);
         root.parent = this.model;
-        // root.name = name + "_model";
+        this.model.position = position;
 
         //TESTING
+        var bound = meshes[1].getBoundingInfo().boundingBox.extendSize;
+        var height = bound.y * 2;
+        var radius = bound.x;
 
-        //Generate the Physics shape and body
-        const { min, max } = this.model.getHierarchyBoundingVectors();
-        const size = max.subtract(min);
-        const center = min.add(max).scale(0.5);
-
-        var box = meshes[1].getBoundingInfo().boundingBox;
-        // meshes[1].showBoundingBox = true;
-        if (box.extendSize.y < 0.05) {
-            box.extendSize.y = 0.02;
-        }
-        const shape = new PhysicsShapeBox(box.centerWorld, Quaternion.Identity(), box.extendSize.scale(2), this.scene);
-        this.model.position = position;
-        this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, this.scene);
+        const shape = new PhysicsShapeCylinder(new Vector3(0, -bound.y, 0), new Vector3(0, bound.y, 0), radius, this.scene);
+        this.body = new PhysicsBody(this.model, PhysicsMotionType.STATIC, false, this.scene);
         this.body.shape = shape;
-        this.body.setMassProperties({ mass: 1 });
+        this.body.setMassProperties({ mass: 0.5 });
+        this.body.centerOfMass = new Vector3(0, 0, 0);
+        this.body.rotationQuaternion = meshes[1].rotationQuaternion.clone();
+        this.body.scaling = meshes[1].scaling;
         this.body.setCollisionCallbackEnabled(true);
-        this.joint_distance = box.extendSize.y;
-        this.body.getCollisionObservable().add((collision) => {
-            //Now trying new approach
-            //Same thing from, but from the top's POV
-            var under = collision.collidedAgainst.transformNode;
-            if (collision.type === PhysicsEventType.COLLISION_STARTED && under?.metadata?.classInstance && this.top_stack != under && under.metadata.classInstance.top_stack == null && under.getAbsolutePosition().y < this.model.getAbsolutePosition().y) {
-
-                console.log("joint started %s %s %s", this.model.name, under.name);
-                this.body.disablePreStep = false;
-                this.body.setMotionType(PhysicsMotionType.STATIC);
-                this.model.position = new Vector3(0, this.joint_distance + under.metadata.classInstance.joint_distance, 0);
-                console.log("%s and %s distance: %s", this.model.name, under.name, this.model.position.y);
-                this.model.rotation = Vector3.Zero();
-                this.model.parent = under;
-                this.bottom = under;
-                under.metadata.classInstance.top_stack = this.model;
-                under.metadata.classInstance.body.disablePreStep = false;
-                under.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
-                console.log("joint code finished, bottom: %s top: %s", under.name, this.model.name);
-
-            }
-        });
+        this.joint_distance = height / 2;
+        console.log("%s %s", this.model.name, this.joint_distance);
 
         //Set the metadata of the root and mesh to be this instance
         meshes[1].metadata = { classInstance: this };
@@ -161,19 +138,58 @@ export class Food extends Interactable {
 
         // Apply MultiMaterial to the mesh
         mesh.material = NEW_MAT;
-
+        this.box = meshes[1].getBoundingInfo().boundingBox;
 
         // var viewer = new PhysicsViewer(this.scene);
         // viewer.showBody(this.body);
     }
 
+    addCollision() {
+        this.body.getCollisionObservable().add((collision) => {
+            this.collide(collision);
+        });
+        this.valid = true;
+        console.log("%s added collision", this.model.name);
+    }
+
+    //Need to check they are not in the same stack
+    collide(collision) {
+        var against = collision.collidedAgainst.transformNode;
+        if (collision.type === PhysicsEventType.COLLISION_STARTED && against.metadata?.classInstance && against.metadata.classInstance.top_stack == null && against.getAbsolutePosition().y < this.model.getAbsolutePosition().y + this.joint_distance && !against.metadata.classInstance.checkParent(this.model.name)) {
+            console.log("%s %s", this.model.name, against.name);
+            this.setEnabled(false);
+            var height = this.joint_distance + against.metadata.classInstance.joint_distance;
+            console.log("this joint: %s against joint: %s height: %s", this.joint_distance, against.metadata.classInstance.joint_distance, height);
+            height = +height.toFixed(4);
+            console.log("this joint: %s against joint: %s height: %s", this.joint_distance, against.metadata.classInstance.joint_distance, height);
+            this.model.position = new Vector3(0, height + 0.005, 0);
+            this.model.rotation = Vector3.Zero();
+            this.model.parent = against;
+            against.metadata.classInstance.top_stack = this;
+            against.metadata.classInstance.setEnabled(false);
+            this.bottom = against;
+        }
+    }
+
     setEnabled(enable) {
         if (enable) {
             this.body.setMotionType(PhysicsMotionType.DYNAMIC);
+            this.body.disablePreStep = true;
+            console.log("%s %s", this.model.name, this.body.getMotionType());
         } else {
             this.body.disablePreStep = false;
             this.body.setMotionType(PhysicsMotionType.STATIC);
+            console.log("%s %s", this.model.name, this.body.getMotionType());
         }
+    }
+
+    checkParent(name) {
+        if (this.model.parent && name == this.model.parent.name) {
+            return true;
+        } else if (this.model.parent) {
+            return this.model.parent.metadata.classInstance.checkParent(name);
+        }
+        return false;
     }
 
 }

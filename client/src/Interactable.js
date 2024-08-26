@@ -5,7 +5,7 @@ export class Interactable {
     // action(input);
     model;
     scene;
-
+    valid = false;
     constructor(scene){
         this.scene = scene;
     }

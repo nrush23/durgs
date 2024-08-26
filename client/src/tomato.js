@@ -3,8 +3,9 @@ import { SceneLoader, MultiMaterial, SubMesh, TransformNode, Vector3, PhysicsSha
 export class Tomato extends Food {
     constructor(scene, position, name) {
         super(scene);
-        SceneLoader.ImportMesh("tomato", "", "./assets/burger2.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh("tomato", "", "./assets/burger_test2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
+                this.joint_distance = 0.03;
                 this.createBody(meshes, position, name);
             }
         });

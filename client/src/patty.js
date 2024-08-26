@@ -5,8 +5,9 @@ export class Patty extends Food {
 
     constructor(scene, position, name) {
         super(scene);
-        SceneLoader.ImportMesh("patty", "", "./assets/burger2.glb", scene, (meshes) => {
+        SceneLoader.ImportMesh("patty", "", "./assets/burger_test2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
+                // this.joint_distance = 0.09/2;
                 this.createBody(meshes, position, name);
             }
         });

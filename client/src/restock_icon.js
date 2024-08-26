@@ -7,9 +7,9 @@ export class Restock_Icon extends Interactable {
     platform;
     constructor(scene, item, platform) {
         super(scene);
-        // this.scene = scene;
         this.item = item;
         this.platform = platform;
+        this.valid = true;
     }
 
     setModel(model) {

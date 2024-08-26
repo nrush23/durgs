@@ -377,9 +377,10 @@ export class Player {
         //Retrieve the mesh and disable its physics updates
         var mesh = this.scene.getMeshByName(item);
         console.log(mesh);
-        // mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
-        // mesh.metadata.classInstance.body.disablePreStep = false;
         mesh.metadata.classInstance.setEnabled(false);
+        if (!mesh.metadata.classInstance.valid) {
+            mesh.metadata.classInstance.addCollision();
+        }
         this.scene.hk._hknp.HP_World_RemoveBody(this.scene.hk.world, mesh.metadata.classInstance.body._pluginData.hpBodyId);
         if (right) {
             //Make sure RIGHT_ARM's position is up to date
@@ -391,33 +392,16 @@ export class Player {
         //Copy the RIGHT_ARM's position, push it a little bit forward, reset the rotation,
         //and parent to the camera
         let position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
-        // let position = Vector3.Zero();
         console.log(position);
         position.z += 1;
         mesh.metadata.classInstance.model.position = position;
         // mesh.metadata.classInstance.model.setAbsolutePosition((right)?this.RIGHT_ARM.getAbsolutePosition(): this.LEFT_ARM.getAbsolutePosition());
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
-        if(mesh.metadata.classInstance.model.parent){
+        if (mesh.metadata.classInstance.model.parent) {
             mesh.metadata.classInstance.breakLink();
         }
-        // if (mesh.metadata.classInstance.model.parent) {
-        //     var parent = mesh.metadata.classInstance.model.parent;
-        //     parent.metadata.classInstance.top_stack = null;
-        //     if (parent.metadata.classInstance.bottom == null) {
-        //         parent.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
-        //     }
-        //     mesh.metadata.classInstance.bottom = null;
-        // }
+
         mesh.metadata.classInstance.model.parent = this.camera;
-        // mesh.metadata.classInstance.model.parent = (right)? this.RIGHT_ARM: this.LEFT_ARM;
-        // if(mesh.metadata.classInstance.bottom){
-        //     // mesh.metadata.classInstance.bottom.metadata.classInstance.top_stack = null;
-        //     var bottom = mesh.metadata.classInstance.bottom;
-        //     mesh.metadata.classInstance.bottom = null;
-        //     bottom.top_stack = null;
-        // }
-
-
 
         if (right) {
             //Set our right_hand to mesh
@@ -433,20 +417,39 @@ export class Player {
 
     /*Remove the current item from the player's right hand */
     removeGrab(right) {
-        var hand = (right) ? this.right_hand : this.left_hand;
-        if (hand) {
-            console.log(hand);
-            hand.metadata.classInstance.body.disablePreStep = true;
-            hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
-            hand.metadata.classInstance.model.parent = "";
-            this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, hand.metadata.classInstance.body._pluginData.hpBodyId, false);
-            // console.log("%s", hand.metadata.classInstance.model.getAbsolutePosition());
-            if (right) {
-                this.right_hand = "";
-            } else {
-                this.left_hand = "";
+        this.scene.executeOnceBeforeRender(() => {
+            var hand = (right) ? this.right_hand : this.left_hand;
+            if (hand) {
+                console.log(hand);
+                this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, hand.metadata.classInstance.body._pluginData.hpBodyId, false);
+                hand.metadata.classInstance.body.disablePreStep = true;
+                console.log("%s %s", hand.metadata.classInstance.body.motionType, hand.metadata.classInstance.body.getMotionType());
+                hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+                console.log("%s %s", hand.metadata.classInstance.body.motionType, hand.metadata.classInstance.body.getMotionType());
+                hand.metadata.classInstance.model.parent = "";
+                // console.log("%s", hand.metadata.classInstance.model.getAbsolutePosition());
+                if (right) {
+                    this.right_hand = "";
+                } else {
+                    this.left_hand = "";
+                }
+                console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
             }
-            console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
-        }
+        });
+        // var hand = (right) ? this.right_hand : this.left_hand;
+        // if (hand) {
+        //     console.log(hand);
+        //     this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, hand.metadata.classInstance.body._pluginData.hpBodyId, false);
+        //     hand.metadata.classInstance.body.disablePreStep = true;
+        //     hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        //     hand.metadata.classInstance.model.parent = "";
+        //     // console.log("%s", hand.metadata.classInstance.model.getAbsolutePosition());
+        //     if (right) {
+        //         this.right_hand = "";
+        //     } else {
+        //         this.left_hand = "";
+        //     }
+        //     console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
+        // }
     }
 }
