@@ -75,13 +75,21 @@ export class Tray extends Interactable {
         }
     }
 
+    // checkParent(name){
+    //     if(this.model.parent && name == this.model.parent.name){
+    //         return true;
+    //     }else if(this.model.parent){
+    //         return this.model.parent.metadata.classInstance.checkParent(name);
+    //     }
+    //     return false;
+    // }
+
     checkParent(name){
-        if(this.model.parent && name == this.model.parent.name){
+        if(this.bottom && name == this.bottom.name){
             return true;
-        }else if(this.model.parent){
-            return this.model.parent.metadata.classInstance.checkParent(name);
+        }else if (this.bottom){
+            return this.bottom.metadata.classInstance.checkParent(name);
         }
         return false;
     }
-
 }

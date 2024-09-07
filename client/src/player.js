@@ -397,7 +397,7 @@ export class Player {
         mesh.metadata.classInstance.model.position = position;
         // mesh.metadata.classInstance.model.setAbsolutePosition((right)?this.RIGHT_ARM.getAbsolutePosition(): this.LEFT_ARM.getAbsolutePosition());
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
-        if (mesh.metadata.classInstance.model.parent) {
+        if (mesh.metadata.classInstance.bottom) {
             mesh.metadata.classInstance.breakLink();
         }
 

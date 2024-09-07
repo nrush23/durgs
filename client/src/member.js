@@ -38,12 +38,12 @@ export class Member {
                 this.model = meshes[0];
                 this.model.name = "member";
                 this.model.parent = this.movement;
-                // if (creepy) {
-                //     var NEW_MAT = new StandardMaterial("body_map", scene);
-                //     NEW_MAT.diffuseTexture = new Texture("./assets/skins/skin1.png", scene);
-                //     // meshes[5].material = NEW_MAT;
-                //     meshes[5].material.albedoTexture = NEW_MAT.diffuseTexture;
-                // }
+                if (creepy) {
+                    var NEW_MAT = new StandardMaterial("body_map", scene);
+                    NEW_MAT.diffuseTexture = new Texture("./assets/skins/skin1.png", scene);
+                    // meshes[5].material = NEW_MAT;
+                    meshes[5].material.albedoTexture = NEW_MAT.diffuseTexture;
+                }
                 //Set everything to be uninteractable
                 meshes.forEach(mesh => {
                     mesh.isPickable = false;
@@ -145,6 +145,10 @@ export class Member {
     addGrab(item, right) {
         let mesh = this.scene.getMeshByName(item);
         if (mesh) {
+            mesh.metadata.classInstance.setEnabled(false);
+            if (!mesh.metadata.classInstance.valid) {
+                mesh.metadata.classInstance.addCollision();
+            }
             mesh.metadata.classInstance.body.disablePreStep = false;
             mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.STATIC);
             mesh.metadata.classInstance.body.transformNode.position = (right) ? this.RIGHT_ARM.position.clone() : this.LEFT_ARM.position.clone();
@@ -156,19 +160,42 @@ export class Member {
             } else {
                 this.left_hand = mesh;
             }
+            if (mesh.metadata.classInstance.bottom) {
+                mesh.metadata.classInstance.breakLink();
+            }
+
             console.log("arm: %s", this.RIGHT_ARM.getAbsolutePosition());
         }
     }
 
     removeGrab(right) {
-        let mesh = (right) ? this.right_hand : this.left_hand;
-        if (mesh) {
-            mesh.metadata.classInstance.body.disablePreStep = true;
-            mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
-            mesh.metadata.classInstance.body.transformNode.parent = "";
-            console.log("%s: %s", mesh.name, mesh.metadata.classInstance.model.getAbsolutePosition());
-            mesh = "";
-            this.arm_retract(right);
-        }
+        // let mesh = (right) ? this.right_hand : this.left_hand;
+        // if (mesh) {
+        //     mesh.metadata.classInstance.body.disablePreStep = true;
+        //     mesh.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+        //     mesh.metadata.classInstance.body.transformNode.parent = "";
+        //     console.log("%s: %s", mesh.name, mesh.metadata.classInstance.model.getAbsolutePosition());
+        //     mesh = "";
+        //     this.arm_retract(right);
+        // }
+        this.scene.executeOnceBeforeRender(() => {
+            var hand = (right) ? this.right_hand : this.left_hand;
+            if (hand) {
+                console.log(hand);
+                this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, hand.metadata.classInstance.body._pluginData.hpBodyId, false);
+                hand.metadata.classInstance.body.disablePreStep = true;
+                console.log("%s %s", hand.metadata.classInstance.body.motionType, hand.metadata.classInstance.body.getMotionType());
+                hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
+                console.log("%s %s", hand.metadata.classInstance.body.motionType, hand.metadata.classInstance.body.getMotionType());
+                hand.metadata.classInstance.model.parent = "";
+                // console.log("%s", hand.metadata.classInstance.model.getAbsolutePosition());
+                if (right) {
+                    this.right_hand = "";
+                } else {
+                    this.left_hand = "";
+                }
+                console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
+            }
+        });
     }
 }
