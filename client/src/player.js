@@ -33,6 +33,10 @@ export class Player {
     static GRAVITY = -2.8;
     static ORIGINAL_TILT = new Vector3(0.5934119456780721, 0, 0);
 
+    //XMAS ADDITION
+    bean;
+    skin = "normal";
+
     /*Initialize the player's attributes*/
     constructor(scene, camera, socket) {
         this.scene = scene;
@@ -100,6 +104,8 @@ export class Player {
                     mesh.isPickable = false;
                     mesh.enablePointerMoveEvents = false;
                 });
+
+                this.bean = meshes[5];
             }
         });
 
@@ -255,7 +261,39 @@ export class Player {
             }
         }
 
+        //XMAS ADDITION
+        if (this.controller.creepy) {
+            this.SOCKET.send(JSON.stringify({
+                timestamp: Date.now(),
+                type: "skin",
+                name: "creepy",
+                PID: this.PID,
+            }));
+        }
+
+        if (this.controller.sled) {
+            this.SOCKET.send(JSON.stringify({
+                timestamp: Date.now(),
+                type: "skin",
+                name: "sled",
+                PID: this.PID,
+            }));
+        }
+
     }
+
+    enableSkin(name) {
+        switch (name) {
+            case 'creepy':
+                this.bean.material.albedoTexture.uAng += Math.PI;
+                break;
+            case 'sled':
+                break
+            default:
+                break;
+        }
+    }
+
 
 
     /*Enable or disable the right or left arms completely */

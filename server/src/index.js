@@ -221,6 +221,16 @@ wss.on('connection', function connection(ws) {
                     }, game.restock_manager.timer);
                 }
                 break;
+            ////XMAS ADDITION
+            case "skin":
+                var player = game.players.get(msg.PID);
+                broadcast(JSON.stringify({
+                    timestamp: Date.now(),
+                    type: "skin",
+                    name: msg.name,
+                    username: player.username,
+                }));
+                break;
             default:
                 console.log("Invalid request type: %s", msg.type);
         }

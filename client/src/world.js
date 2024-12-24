@@ -4,6 +4,7 @@ import { Restocker } from "./restocker";
 import { Grill } from "./grill";
 import { Fryer } from "./fryer";
 import { Tray } from "./tray";
+import { Xmas_Tree } from "./xmas_tree";
 export class World {
     DURGS;
     GROUND;
@@ -15,7 +16,7 @@ export class World {
     constructor(scene, callback) {
         this.scene = scene;
         var names = ["grill", "grill_top", "fryer", "right_oil", "ground"];
-        SceneLoader.ImportMeshAsync("", "./", "./assets/restaurant_furnishing4.glb", scene).then((result) => {
+        SceneLoader.ImportMeshAsync("", "./", "./assets/restaurant_furnishing_xmas2.glb", scene).then((result) => {
             const meshes = result.meshes;
             meshes.forEach((mesh) => {
                 mesh.isPickable = false;
@@ -32,6 +33,7 @@ export class World {
             }
             this.GRILL = new Grill(scene);
             this.FRYER = new Fryer(scene);
+            const tree = new Xmas_Tree(scene);
             // new Restocker(scene);
         }).catch((error) => {
             console.log("Loading mesh error: ", error);

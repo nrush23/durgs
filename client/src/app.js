@@ -39,7 +39,7 @@ class App {
     //and player id (pid)
     connect() {
         console.log("Trying to connect");
-        this.SOCKET = new WebSocket('ws://192.168.0.11:3001/');
+        this.SOCKET = new WebSocket('ws://192.168.0.47:3001/');
         // this.SOCKET = new WebSocket('ws://localhost:3001');
         // this.PLAYER = new Player(this.scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('message', (event) => {
@@ -57,7 +57,7 @@ class App {
                     console.log(data);
                     if (!this.Members.has(data.username)) {
                         var position = new Vector3(data.position.x, data.position.y, data.position.z);
-                        var member = new Member(data.username, this.scene, position, data.texture, (this.Members.size == 0)?true:false);
+                        var member = new Member(data.username, this.scene, position, data.texture, (this.Members.size == 0) ? true : false);
                         this.Members.set(member.username, member);
                     }
                     break;
@@ -154,6 +154,13 @@ class App {
                 case "cook":
                     this.WORLD.GRILL.checkCook(data.item, data.time, new Vector3(data.position._x, data.position._y, data.position._z));
                     break;
+                ///XMAS ADDITION
+                case "skin":
+                    var member = this.Members.get(data.username);
+                    if (member) {
+                        member.enableSkin(data.name);
+                    }
+                    break;
                 default:
                     console.log('Unknown type: %s', data.type);
             }
@@ -168,7 +175,8 @@ class App {
 
     START() {
         if (this.PLAYER != null && this.PLAYER.RIGHT_ARM != null) {
-            this.scene.clearColor = Color4.FromHexString("#c7f2f8");
+            // this.scene.clearColor = Color4.FromHexString("#c7f2f8");
+            this.scene.clearColor = Color4.FromHexString("#2f4152");
             this.engine.runRenderLoop(() => {
                 this.scene.render();
             });
@@ -234,6 +242,7 @@ class App {
         this.camera.attachControl(this.canvas, true);
 
         var SUN = new HemisphericLight("SUN", new Vector3(0, 3, 0), this.scene);
+        SUN.groundColor = new Color3(1, 1, 1);
         await this.initializePhysics();
         this.WORLD = new World(this.scene, () => {
             this.RESTOCKER = new Restocker(this.scene);

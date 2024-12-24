@@ -10,6 +10,8 @@ export class PlayerInput {
     horizontalAxis;
     grab_right;
     grab_left;
+    sled;
+    creepy;
 
     constructor(scene) {
 
@@ -65,5 +67,7 @@ export class PlayerInput {
         //Check for left and right grabs
         this.grab_left = this.inputMap["q"];
         this.grab_right = this.inputMap["e"];
+        this.creepy = this.inputMap["c"];
+        this.sled = this.inputMap["h"];
     }
 }

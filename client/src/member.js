@@ -14,6 +14,10 @@ export class Member {
     LEFT_ARM;
     ARM_ANGLE;
 
+    //XMAS Addition
+    bean;
+    sled;
+
     constructor(username, scene, position, texture, creepy) {
 
         //Intialize the transform nodes and position vectors
@@ -38,12 +42,8 @@ export class Member {
                 this.model = meshes[0];
                 this.model.name = "member";
                 this.model.parent = this.movement;
-                if (creepy) {
-                    var NEW_MAT = new StandardMaterial("body_map", scene);
-                    NEW_MAT.diffuseTexture = new Texture("./assets/skins/skin1.png", scene);
-                    // meshes[5].material = NEW_MAT;
-                    meshes[5].material.albedoTexture = NEW_MAT.diffuseTexture;
-                }
+                this.bean = meshes[5];
+
                 //Set everything to be uninteractable
                 meshes.forEach(mesh => {
                     mesh.isPickable = false;
@@ -73,6 +73,12 @@ export class Member {
             }
         });
 
+        SceneLoader.ImportMesh("sleigh", "", "./assets/player_xmas.glb", this.scene, (meshes) => {
+            console.log(meshes);
+            this.sled = meshes[0];
+            this.sled.parent = this.movement;
+            this.sled.setEnabled(false);
+        });
 
     }
 
@@ -197,5 +203,24 @@ export class Member {
                 console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
             }
         });
+    }
+
+    //XMAS Addition
+    enableSkin(name) {
+        switch (name) {
+            case "creepy":
+                if (this.bean.material.albedoTexture.uAng != 0) {
+                    this.bean.material.albedoTexture.uAng = 0;
+                } else {
+                    this.bean.material.albedoTexture.uAng = Math.PI;
+                }
+                break;
+            case "sled":
+                this.sled.setEnabled(!this.sled.isEnabled());
+                break;
+            default:
+                break;
+        }
+        this.scene.render();
     }
 }

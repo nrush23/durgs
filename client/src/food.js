@@ -104,7 +104,7 @@ export class Food extends Interactable {
         var radius = bound.x;
 
         const shape = new PhysicsShapeCylinder(new Vector3(0, -bound.y, 0), new Vector3(0, bound.y, 0), radius, this.scene);
-        this.body = new PhysicsBody(this.model, PhysicsMotionType.STATIC, false, this.scene);
+        this.body = new PhysicsBody(this.model, PhysicsMotionType.DYNAMIC, false, this.scene);
         this.body.shape = shape;
         this.body.setMassProperties({ mass: 0.5 });
         this.body.centerOfMass = new Vector3(0, 0, 0);
