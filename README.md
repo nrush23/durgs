@@ -17,6 +17,34 @@ In the next iteration of Durg's Durgers, we will build on all the knowledge we g
 We will also continue to implement more features and add functionality, hoping to have a full working game within the next 3 years.
 Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durgsdurgers.com/)!  
 
+## Controls
+*Currently only available for desktop/PC*
+### Movement
+- W: Forward
+- S: Backward
+- A: Left
+- D: Right
+
+### Interactions
+- E: Left Arm Grab/Press
+- R: Right Arm Grab/Press
+- C: Change Skin
+- H: Equip/Unequip Sleigh
+
+## Features
+Inside this legacy edition of Durg's Durgers, you can find the following gameplay:
+- Real time multiplayer
+- Client/Server authoritative logic
+- Movement rollback
+- Cheating detection/correction
+- Object grabbing
+- Button pressing
+- Equipping
+- Skin changing
+- Cooking
+- Object snapping
+- Physics collisions
+- Flying
 ## Legacy Edition
 
 ### **To compile this version of Durg's Durgers, follow these instructions:**
