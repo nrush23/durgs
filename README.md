@@ -1,5 +1,5 @@
-# Welcome to Durg's Durgers: Land of the Durg (Pre-Rewrite)
-### What is this?
+# Welcome to Durg's Durgers: Land of the Durg!
+## What is this?
 
 Welcome to Durg's Durgers, a multiplayer fast food simulator built for the web using Babylon.js and Havok Physics.
 In this game, control and operate your own yellow guy as you burn burgers and flip chaos. Still largely in development,
@@ -10,9 +10,9 @@ In the next iteration of Durg's Durgers, we will build on all the knowledge we g
 We will also continue to implement more features and add functionality, hoping to have a full working game within the next 3 years.
 Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durgsdurgers.com/)!
 
-### Legacy Edition
+## Legacy Edition
 
-**To compile this version of Durg's Durgers, read the following instructions:**
+### **To compile this version of Durg's Durgers, read the following instructions:**
 1. Download the zip folder of this repository and unzip it somewhere on your computer.
 2. Now open a terminal in the root folder of this project: `durgs`
 3. Change directory into the `server` folder.
@@ -24,7 +24,7 @@ You have now finished setting up the server backend.
 7. Install the client packages using `npm install`
 You have now finished setting up the client frontend.
 
-**To run a local multiplayer server, follow these instructions:**
+### **To run a local multiplayer server, follow these instructions:**
 1. If you have not installed the server and client side packages, follow steps 1 through 7 above.
 2. Open a terminal inside the `server` folder.
 3. Begin running the server with `npm run debug` Now leave this terminal running in the background
