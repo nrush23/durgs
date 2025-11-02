@@ -1,6 +1,8 @@
 # Welcome to Durg's Durgers: Land of the Durg!
 Multiplayer Babylon.js fast food simulator using Havok Physics and websockets
-<img src="client/public/assets/images/thumbnail.PNG" alt="Primordial Durg" width="400">
+<p align="center">
+    <img src="client/public/assets/images/thumbnail.PNG" alt="Primordial Durg" width="400">
+</p>
 
 ## What is this?
 Welcome to Durg's Durgers, a multiplayer fast food simulator built for the web using Babylon.js and Havok Physics.
@@ -11,8 +13,9 @@ Overall, a lot of significant progress was made and lots learned, but it's time 
 In the next iteration of Durg's Durgers, we will build on all the knowledge we gained here, creating a tighter and cleaner experience.
 We will also continue to implement more features and add functionality, hoping to have a full working game within the next 3 years.
 Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durgsdurgers.com/)!
-<img src="client/public/assets/images/burger_gif.gif" alt="Burger Gif" width="400">
-
+<p align="center">
+    <img src="client/public/assets/images/burger_gif.gif" alt="Burger Gif" width="400">
+</p>
 ## Legacy Edition
 
 ### **To compile this version of Durg's Durgers, read the following instructions:**
