@@ -1,8 +1,7 @@
 import { AbstractMesh, Mesh, Scene } from "@babylonjs/core";
 
-//Interface for describing the interactable objects
+/*Interface for describing the interactable objects*/
 export class Interactable {
-    // action(input);
     model;
     scene;
     valid = false;

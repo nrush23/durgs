@@ -54,27 +54,6 @@ export class Grill {
             this.sizzle.stop(0);
         }
         console.log("%s: %s", play, this.sizzle.isPaused);
-        // if(play && (this.sizzle.isReady || this.sizzle.isPaused)){
-        //     this.sizzle.play();
-        // }else if(!play && this.sizzle.isPlaying){
-        //     this.sizzle.stop();
-        //     console.log("stop playing");
-        // }
-        // console.log(play);
-        // switch (play) {
-        //     case true:
-        //         if (this.sizzle.isReady || this.sizzle.isPaused) {
-        //             this.sizzle.play();
-        //         }
-        //         break;
-        //     case false:
-        //         // if (this.sizzle.isPlaying) {
-        //             this.sizzle.stop();
-        //         // }
-        //         break;
-        //     default:
-        //         break
-        // }
     }
 
     addSizzle(item) {
@@ -89,7 +68,6 @@ export class Grill {
     removeSizzle(item, play) {
         this.Items.delete(item);
         console.log(this.Items.size);
-        // this.enableSizzle(play);
         if (this.Items.size == 0) {
             this.enableSizzle(false);
         }

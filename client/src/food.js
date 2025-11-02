@@ -53,16 +53,6 @@ export class Food extends Interactable {
 
     }
 
-    // createBody(mesh){
-    //     const { min, max } = mesh.getHierarchyBoundingVectors();
-    //     const size = max.subtract(min);
-    //     const center = min.add(max).scale(0.5);
-    //     const shape = new PhysicsShapeBox(new Vector3(center.x, center.y, center.z), Quaternion.Identity(), size, this.scene);
-    //     mesh.body = new PhysicsBody(mesh, PhysicsMotionType.DYNAMIC, false, this.scene);
-    //     mesh.body.shape = shape;
-    //     mesh.body.setMassProperties({ mass: 1 });
-    // }
-
     undoStack() {
         if (!this.bottom) {
             this.body.setMotionType(PhysicsMotionType.DYNAMIC);
@@ -182,15 +172,6 @@ export class Food extends Interactable {
             console.log("%s %s", this.model.name, this.body.getMotionType());
         }
     }
-
-    // checkParent(name) {
-    //     if (this.model.parent && name == this.model.parent.name) {
-    //         return true;
-    //     } else if (this.model.parent && this.model.parent.metadata?.classInstance?.checkParent) {
-    //         return this.model.parent.metadata.classInstance.checkParent(name);
-    //     }
-    //     return false;
-    // }
 
     checkParent(name){
         if(this.bottom && name == this.bottom.name){

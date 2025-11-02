@@ -1,6 +1,7 @@
 import { ActionManager, ExecuteCodeAction, Scalar, Scene } from "@babylonjs/core";
-//Class that monitors all the input from the Player
-//Game makes decision based off of these calculated inputs
+/*Class that monitors all the input from the Player
+  Game makes decision based off of these calculated inputs
+*/
 export class PlayerInput {
 
     inputMap;

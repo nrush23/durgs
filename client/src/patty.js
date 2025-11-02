@@ -7,12 +7,10 @@ export class Patty extends Food {
         super(scene);
         SceneLoader.ImportMesh("patty", "", "./assets/burger_test2.glb", scene, (meshes) => {
             if (meshes.length > 0) {
-                // this.joint_distance = 0.09/2;
                 this.createBody(meshes, position, name);
             }
         });
         this.doneness = cook_state.raw;
-        // this.joint_distance = 0.05;
     }
 
     cook() {

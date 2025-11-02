@@ -22,11 +22,8 @@ export class Input_Cache {
             this.END++;
             this.LAST_SENT++;   //Update last sent
             return true;
-        }else{
-            // console.log("Lag, please wait");
-            // return false;
-            return true;
         }
+        return false;
     }
 
     //When you remove an input from the cache,
@@ -35,24 +32,12 @@ export class Input_Cache {
         if (this.LAST_SENT - this.LAST_RECEIVED > this.CACHE.length) {
             console.log("Warning: More sent than removed %s:%s", this.LAST_SENT, this.LAST_RECEIVED);
         }
-        // if (index > this.LAST_RECEIVED && index <= this.LAST_SENT) {
-            // this.LAST_RECEIVED = index;
-            // console.log(this.CACHE);
-            // for (let i = (index + 1) % this.CACHE.length; i < this.CACHE.length; i++) {
-            //     this.CACHE[i - ((index + 1) % this.CACHE.length)] = this.CACHE[i];
-            // }
-            // this.END = this.CACHE.length - (index % this.CACHE.length);
-            // this.LAST_RECEIVED = index;
-            // console.log(this.LAST_SENT - this.LAST_RECEIVED);
-            // console.log(this.CACHE);
-        // }
         this.LAST_RECEIVED = index;
     }
 
     get(index) {
         if (this.LAST_SENT - this.LAST_RECEIVED <= this.CACHE.length && index > this.LAST_RECEIVED && index <= this.LAST_SENT) {
             return this.CACHE[index % this.CACHE.length];
-            // return this.CACHE[index - this.LAST_RECEIVED - 1];
         }
         return null;
     }

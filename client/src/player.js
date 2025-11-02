@@ -69,23 +69,9 @@ export class Player {
                 this.model.parent = this.movement;
                 this.model.setEnabled(false);
 
-
-                // //Create the main position for the arms
-                // let position = this.camera.position.clone().addInPlace(this.camera.getForwardRay().direction.scale(1.2));
-                // position.y -= 0.2;
-                // position.x += 0.4;
-
-                //TESTING
-
-                let position = this.camera.position.scale(-1);
-                // let position = new Vector3(0, -0.2, 1);
-
                 //Create the left arm and make it hidden by default
                 this.LEFT_ARM = meshes[2];
                 this.LEFT_ARM.parent = null;
-                // this.LEFT_ARM.position.addInPlace(position);
-                // this.LEFT_ARM.position = position.clone();
-                // this.LEFT_ARM.position.x -= 0.8;
                 this.LEFT_ARM.hand = meshes[3];
                 this.LEFT_ARM.parent = this.camera;
                 this.createArm(false);
@@ -93,9 +79,6 @@ export class Player {
                 //Create the right arm and make it hidden by default
                 this.RIGHT_ARM = meshes[4];
                 this.RIGHT_ARM.parent = null;
-                // this.RIGHT_ARM.position = position;
-                // this.RIGHT_ARM.position.addInPlace(position);
-                // this.RIGHT_ARM.setAbsolutePosition(this.RIGHT_ARM.getAbsolutePosition().add(position));
                 this.RIGHT_ARM.parent = this.camera;
                 this.createArm(true);
 
@@ -176,8 +159,6 @@ export class Player {
             }));
             this.PREVIOUS_POSITION = this.NEXT_POSITION.clone();
             this.movement.position = this.PREVIOUS_POSITION.clone();
-            // this.camera.position = this.PREVIOUS_POSITION.clone();
-            // this.movement.rotation = new Vector3(0, this.camera.rotation.y, 0);
             this.NEXT_POSITION = INPUT[0].clone();
 
             //TESTING
@@ -343,9 +324,6 @@ export class Player {
         const delta = this.scene.getEngine().getDeltaTime() / 1000;
         const interpolationFactor = Math.min(0.5, delta * 60);
         Vector3.LerpToRef(this.movement.position, this.NEXT_POSITION, interpolationFactor, this.movement.position);
-        // this.camera.position.copyFrom(this.movement.position);
-        // this.movement.rotation.y = this.camera.rotation.y;
-
         this.model.rotation.y = this.camera.rotation.y;
     }
 
@@ -433,7 +411,6 @@ export class Player {
         console.log(position);
         position.z += 1;
         mesh.metadata.classInstance.model.position = position;
-        // mesh.metadata.classInstance.model.setAbsolutePosition((right)?this.RIGHT_ARM.getAbsolutePosition(): this.LEFT_ARM.getAbsolutePosition());
         mesh.metadata.classInstance.model.rotation = new Vector3(0, 0, 0);
         if (mesh.metadata.classInstance.bottom) {
             mesh.metadata.classInstance.breakLink();
@@ -474,20 +451,5 @@ export class Player {
                 console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
             }
         });
-        // var hand = (right) ? this.right_hand : this.left_hand;
-        // if (hand) {
-        //     console.log(hand);
-        //     this.scene.hk._hknp.HP_World_AddBody(this.scene.hk.world, hand.metadata.classInstance.body._pluginData.hpBodyId, false);
-        //     hand.metadata.classInstance.body.disablePreStep = true;
-        //     hand.metadata.classInstance.body.setMotionType(PhysicsMotionType.DYNAMIC);
-        //     hand.metadata.classInstance.model.parent = "";
-        //     // console.log("%s", hand.metadata.classInstance.model.getAbsolutePosition());
-        //     if (right) {
-        //         this.right_hand = "";
-        //     } else {
-        //         this.left_hand = "";
-        //     }
-        //     console.log("%s: %s", hand.name, hand.metadata.classInstance.model.getAbsolutePosition());
-        // }
     }
 }
