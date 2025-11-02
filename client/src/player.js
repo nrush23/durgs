@@ -1,4 +1,4 @@
-import { AbstractMesh, RayHelper, PhysicsEventType, PhysicsViewer, ArcRotateCamera, Axis, Color3, HighlightLayer, Mesh, PhysicsBody, PhysicsShapeBox, PhysicsMotionType, PointerEventTypes, Quaternion, Ray, Scene, SceneLoader, TransformNode, UniversalCamera, Vector3, double, int, HavokPlugin, PhysicsShapeMesh } from "@babylonjs/core";
+import { RayHelper, PhysicsBody, PhysicsMotionType, Ray, SceneLoader, TransformNode, Vector3, PhysicsShapeMesh } from "@babylonjs/core";
 import { PlayerInput } from "./inputController";
 import { Input_Cache } from "./input_cache";
 const pocket = {
