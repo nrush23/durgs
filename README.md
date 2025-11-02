@@ -1,6 +1,6 @@
 # Welcome to Durg's Durgers: Land of the Durg!
-*Multiplayer Babylon.js fast food simulator using Havok Physics and websockets*
 <p align="center">
+    *Multiplayer Babylon.js fast food simulator using Havok Physics and websockets*
     <img src="client/public/assets/images/thumbnail.PNG" alt="Primordial Durg" width="400">
 </p>
 
