@@ -1,5 +1,5 @@
 # Welcome to Durg's Durgers: Land of the Durg!
-<p align="center" style="font-style: italic">
+<p align="center" style="font-style: italic;">
     <img src="client/public/assets/images/thumbnail.PNG" alt="Primordial Durg" width="400">
     Multiplayer Babylon.js fast food simulator using Havok Physics and websockets
 </p>
