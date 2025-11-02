@@ -62,14 +62,9 @@ You have now finished setting up the client frontend.
 1. If you have not installed the server and client side packages, follow steps 1 through 7 above.
 2. Open a terminal inside the `server` folder.
 3. Begin running the server with `npm run debug` Now leave this terminal running in the background
-4. Now under `client\src\app.js`, locate this line at the beginning of the file:
-`
-    this.SOCKET = new WebSocket('ws://192.168.0.143:3001/');
-`
-Change `192.168.0.143` to the `IP address` of the server.
-5. Open a terminal inside the `client` folder.
-6. Run the application with `npm start`
-7. To access a client side portal, click on the link provided in the terminal or go to `http://xxx.xxx.xxx.xxx:8080` where `xxx.xxx.xxx.xxx` is the `IP address` of your `local machine`
+4. Open a terminal inside the `client` folder.
+5. Run the application with `npm start`
+6. To access a client side portal, click on the link provided in the terminal or go to `http://xxx.xxx.xxx.xxx:8080` where `xxx.xxx.xxx.xxx` is the `IP address` of your `local machine`
 Other players on the same network can join by visiting the same link.
 
 ## License
