@@ -1,4 +1,6 @@
 # Welcome to Durg's Durgers: Land of the Durg!
+Multiplayer Babylon.js fast food simulator using Havok Physics and websockets
+![Primordial Durg]()
 ## What is this?
 
 Welcome to Durg's Durgers, a multiplayer fast food simulator built for the web using Babylon.js and Havok Physics.
