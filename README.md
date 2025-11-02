@@ -19,13 +19,12 @@ Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durg
 
 ## Legacy Edition
 
-### **To compile this version of Durg's Durgers, read the following instructions:**
+### **To compile this version of Durg's Durgers, follow these instructions:**
 1. Download the zip folder of this repository and unzip it somewhere on your computer.
 2. Now open a terminal in the root folder of this project: `durgs`
 3. Change directory into the `server` folder.
 4. Install the server packages with `npm install`  
-You have now finished setting up the server backend.  
-
+You have now finished setting up the server backend.
 5. Now open up another terminal in the root project folder `durgs`
 6. Change directory into the `client` folder.
 7. Install the client packages using `npm install`  
