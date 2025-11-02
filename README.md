@@ -66,3 +66,8 @@ You have now finished setting up the client frontend.
 5. Run the application with `npm start`
 6. To access a client side portal, click on the link provided in the terminal or go to `http://xxx.xxx.xxx.xxx:8080` where `xxx.xxx.xxx.xxx` is the `IP address` of your `local machine`
 Other players on the same network can join by visiting the same link.
+
+## License
+© 2024 Naria Rush — All rights reserved.  
+This code is provided publicly for viewing only.  
+Use, copying, modification, or distribution is not permitted.
