@@ -9,13 +9,12 @@ Welcome to Durg's Durgers, a multiplayer fast food simulator built for the web u
 In this game, control and operate your own yellow guy as you burn burgers and flip chaos. Still largely in development,
 this iteration of the game represents Durg's Durgers V0, our first attempt at implementing ragdoll physics and multiplayer servers.
 Overall, a lot of significant progress was made and lots learned, but it's time for this prototype to go back to the drawing board.
-
-In the next iteration of Durg's Durgers, we will build on all the knowledge we gained here, creating a tighter and cleaner experience.
-We will also continue to implement more features and add functionality, hoping to have a full working game within the next 3 years.
-Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durgsdurgers.com/)!
 <p align="center">
     <img src="client/public/assets/images/burger_gif.gif" alt="Burger Gif" width="400">
 </p>
+In the next iteration of Durg's Durgers, we will build on all the knowledge we gained here, creating a tighter and cleaner experience.
+We will also continue to implement more features and add functionality, hoping to have a full working game within the next 3 years.
+Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durgsdurgers.com/)!
 
 ## Legacy Edition
 
