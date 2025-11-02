@@ -1,8 +1,8 @@
 # Welcome to Durg's Durgers: Land of the Durg!
 Multiplayer Babylon.js fast food simulator using Havok Physics and websockets
-![Primordial Durg]()
+![Primordial Durg](https://github.com/nrush23/durgs/blob/main/client/public/assets/images/thumbnail.PNG)
 ## What is this?
-
+![Burger Gif](https://github.com/nrush23/durgs/blob/main/client/public/assets/images/burger_gif.gif)
 Welcome to Durg's Durgers, a multiplayer fast food simulator built for the web using Babylon.js and Havok Physics.
 In this game, control and operate your own yellow guy as you burn burgers and flip chaos. Still largely in development,
 this iteration of the game represents Durg's Durgers V0, our first attempt at implementing ragdoll physics and multiplayer servers.
