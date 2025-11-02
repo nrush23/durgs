@@ -39,8 +39,8 @@ class App {
     //and player id (pid)
     connect() {
         console.log("Trying to connect");
-        this.SOCKET = new WebSocket('ws://192.168.0.143:3001/');
-        // this.SOCKET = new WebSocket('ws://localhost:3001');
+        let WS = window.location.hostname + ':3001/';
+        this.SOCKET = new WebSocket('ws://' + WS);
         this.SOCKET.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
             // console.log('Message received: %s', event.data);

@@ -123,10 +123,8 @@ wss.on('connection', function connection(ws) {
                 if(game.players.size > 1 && VALID){
                     if(right){
                         player.extendArm(true);
-                        // player.RIGHT_ARM = true;
                     }else{
                         player.extendArm(false);
-                        // player.LEFT_ARM = true;
                     }
                     broadcast(JSON.stringify({
                         timestamp: Date.now(),
@@ -143,10 +141,8 @@ wss.on('connection', function connection(ws) {
                 if(game.players.size > 1 && VALID){
                     if(side){
                         player.retractArm(true);
-                        // player.RIGHT_ARM = false;
                     }else{
                         player.retractArm(false);
-                        // player.LEFT_ARM = false;
                     }
                     broadcast(JSON.stringify({
                         timestamp: Date.now(),
@@ -184,7 +180,6 @@ wss.on('connection', function connection(ws) {
                 break;
             case "release":
                 var player = game.players.get(msg.PID);
-                // player.right_hand = "";
                 console.log("RELEASE: %s", msg.position);
                 var position = new Vector3(msg.position._x, msg.position._y, msg.position._z);
                 console.log(msg.arm);

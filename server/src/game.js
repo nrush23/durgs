@@ -14,8 +14,6 @@ export class Game {
     restock_manager;
 
     constructor() {
-        // this.engine = new NullEngine();
-        // this.scene = new Scene(this.engine);
         this.players = new Map();
     }
 
@@ -61,16 +59,12 @@ export class Game {
                         if (player.INPUT_BUFFER.length > 0) {
                             player.INPUT_BUFFER.forEach((input) => {
                                 player.render2(input);
-                                // console.log(player.movement.position);
-                                // console.log("%s",player.camera.rotation);
                             })
                             this.broadcast(JSON.stringify({
                                 timestamp: Date.now(),
                                 type: "member_movement",
                                 username: player.username,
                                 position: player.movement.position,
-                                // rotation: new Vector3(0, player.movement.rotation.y, 0)
-                                // rotation: player.movement.rotation
                                 rotation: player.INPUT_BUFFER[player.INPUT_BUFFER.length-1][3]
                             }));
                             player.socket.send(JSON.stringify({
@@ -82,21 +76,6 @@ export class Game {
                             player.INPUT_BUFFER = [];
                         }
                     }
-                    // for (let player of this.players.values()) {
-                    //     if (player.NETWORK_CACHE.length > 0) {
-                    //         player.NETWORK_CACHE.forEach(([pos, rot]) => {
-                    //             player.render(pos, rot);
-                    //         });
-                    //         this.broadcast(JSON.stringify({
-                    //             timestamp: Date.now(),
-                    //             type: "member_movement",
-                    //             username: player.username,
-                    //             position: player.movement.position,
-                    //             rotation: player.movement.rotation
-                    //         }));
-                    //         player.NETWORK_CACHE = [];
-                    //     }
-                    // }
                     accumulator -= FIXED_TIME;
                 }
             });
