@@ -39,9 +39,8 @@ class App {
     //and player id (pid)
     connect() {
         console.log("Trying to connect");
-        this.SOCKET = new WebSocket('ws://192.168.0.47:3001/');
+        this.SOCKET = new WebSocket('ws://192.168.0.143:3001/');
         // this.SOCKET = new WebSocket('ws://localhost:3001');
-        // this.PLAYER = new Player(this.scene, this.camera, this.SOCKET);
         this.SOCKET.addEventListener('message', (event) => {
             const data = JSON.parse(event.data);
             // console.log('Message received: %s', event.data);
@@ -86,40 +85,21 @@ class App {
                     }
                     break;
                 case "grabbed":
-                    // var item = this.scene.getMeshByName(data.item);
-                    // // item.metadata.classInstance.body.physicsImposter.disable();
-                    // // console.log(data);
-                    // // console.log(item.metadata.classInstance.body);
-                    // item.metadata.classInstance.body.disablePreStep = false;
-                    // // this.PLAYER.right_hand = item.parent.parent;
-                    // this.PLAYER.right_hand = item;
                     console.log(data);
                     this.PLAYER.addGrab(data.item, data.arm);
                     break;
                 case "released":
-                    // if (this.PLAYER.right_hand) {
-                    //     this.PLAYER.right_hand.metadata.classInstance.body.disablePreStep = true;
-                    //     this.PLAYER.right_hand = "";
-                    // }
                     this.PLAYER.removeGrab(data.arm);
                     break;
                 case "member_grabbed":
-                    // console.log('Message received: %s', event.data);
                     if (this.Members.has(data.username)) {
                         var member = this.Members.get(data.username);
-                        // var item = this.scene.getMeshByName(data.item);
-                        // member.updateGrab(item);
                         member.addGrab(data.item, data.arm);
                     }
                     break;
                 case "member_released":
-                    // console.log('Message received: %s', event.data);
                     if (this.Members.has(data.username)) {
                         var member = this.Members.get(data.username);
-                        // // member.right_hand.position.y = 0;
-                        // // console.log(member);
-                        // member.right_hand.metadata.classInstance.body.disablePreStep = true;
-                        // member.updateGrab("");
                         member.removeGrab(data.arm);
                     }
                     break;
@@ -194,15 +174,11 @@ class App {
                 while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
                     this.PLAYER.updateInteract();
                     this.PLAYER.sendPosition();
-                    // this.Members.forEach((member) => {
-                    //     // if (member.movement) {
-                    //     // member.render();
-                    //     // }
-                    // });
                     accumulator -= FIXED_TIME;
                 }
             })
 
+            //Uncomment for viewing the physics in the Scene
             // let viewer = new PhysicsViewer(this.scene);
             // for (let mesh of this.scene.meshes) {
             //     if (mesh.physicsBody) {
@@ -250,67 +226,6 @@ class App {
         //Connect to server and start game
         this.connect();
 
-    }
-
-    async RUN2() {
-        //Initialize this.canvas and attach to webpage
-        this.canvas = document.createElement("canvas");
-        this.canvas.style.width = "100%";
-        this.canvas.style.height = "100%";
-        this.canvas.id = "canvas";
-        document.body.appendChild(this.canvas);
-
-        //Initialize babylon scene, this.engine, camera, and lighting
-        this.engine = new Engine(this.canvas, true);
-        this.scene = new Scene(this.engine);
-        this.scene.locked = false;
-        this.scene.getEngine().setHardwareScalingLevel(0.5);
-        this.Members = new Map();
-
-        window.addEventListener('resize', () => {
-            this.canvas.width = window.innerWidth;
-            this.canvas.height = window.innerHeight;
-            this.engine.resize();
-        });
-
-        this.camera = new UniversalCamera("camera", new Vector3(0, 0, 0), this.scene);
-        this.camera.attachControl(this.canvas, true);
-
-        var SUN = new HemisphericLight("SUN", new Vector3(0, 3, 0), this.scene);
-        this.initializePhysics().then(() => {
-            this.WORLD = new World(this.scene, () => {
-                this.RESTOCKER = new Restocker(this.scene);
-            });
-
-        });
-        //Connect to server
-        this.connect();
-        this.scene.clearColor = Color4.FromHexString("#c7f2f8");
-        this.engine.runRenderLoop(() => {
-            this.scene.render();
-        });
-
-        let startTime = performance.now();
-        let simulationSpeedFactor = 1;
-        let accumulator = 0;
-        let FIXED_TIME = 0.02;
-        this.scene.registerBeforeRender(() => {
-            const now = performance.now();
-            const delta = (now - startTime) / 1000;
-            startTime = now;
-            accumulator += delta;
-
-            while (accumulator >= FIXED_TIME * simulationSpeedFactor) {
-                this.PLAYER.updateInteract();
-                // this.PLAYER.sendPosition();
-                // this.Members.forEach((member) => {
-                //     member.render();
-                // });
-                accumulator -= FIXED_TIME;
-            }
-        })
-
-        this.scene.debugLayer.show();
     }
 }
 

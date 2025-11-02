@@ -15,7 +15,7 @@ export class World {
     //Need to finsih modifying how the world imports the restock icons
     constructor(scene, callback) {
         this.scene = scene;
-        var names = ["grill", "grill_top", "fryer", "right_oil", "ground"];
+        var names = ["grill", "grill_top", "fryer", "right_oil"];
         SceneLoader.ImportMeshAsync("", "./", "./assets/restaurant_furnishing_xmas2.glb", scene).then((result) => {
             const meshes = result.meshes;
             meshes.forEach((mesh) => {
@@ -27,7 +27,7 @@ export class World {
             });
             this.DURGS = meshes[0];
             this.DURGS.name = "restaurant";
-            this.GROUND = new PhysicsAggregate(scene.getMeshByName("ground"), PhysicsShapeType.BOX, { mass: 0 }, scene);
+            // this.GROUND = new PhysicsAggregate(scene.getMeshByName("ground"), PhysicsShapeType.BOX, { mass: 0 }, scene);
             if (typeof callback == 'function') {
                 callback();
             }
