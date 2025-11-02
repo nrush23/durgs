@@ -20,16 +20,16 @@ Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durg
 ## Controls
 *Currently only available for desktop/PC*
 ### Movement
-- W: Forward
-- S: Backward
-- A: Left
-- D: Right
+- `W`: Forward
+- `S`: Backward
+- `A`: Left
+- `D`: Right
 
 ### Interactions
-- E: Left Arm Grab/Press
-- R: Right Arm Grab/Press
-- C: Change Skin
-- H: Equip/Unequip Sleigh
+- `E`: Left Arm Grab/Press
+- `R`: Right Arm Grab/Press
+- `C`: Change Skin
+- `H`: Equip/Unequip Sleigh
 
 ## Features
 Inside this legacy edition of Durg's Durgers, you can find the following gameplay:
