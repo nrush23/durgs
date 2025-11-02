@@ -14,7 +14,7 @@ Overall, a lot of significant progress was made and lots learned, but it's time 
 </p>
 In the next iteration of Durg's Durgers, we will build on all the knowledge we gained here, creating a tighter and cleaner experience.
 We will also continue to implement more features and add functionality, hoping to have a full working game within the next 3 years.
-Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durgsdurgers.com/)!
+Keep track of the latest game updates on [Durg's Durgers: The Blog](https://durgsdurgers.com/)!  
 
 ## Legacy Edition
 
